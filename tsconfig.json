@@ -31,8 +31,8 @@
     "outDir": "./build"
   },
   "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules", "**/*.spec.ts", "./build", "./public"],
+  "exclude": ["node_modules", "**/*.spec.ts", "./build", "./public", "./client"],
   "watchOptions": {
-    "excludeDirectories": ["node_modules", "./public", "./build"]
+    "excludeDirectories": ["node_modules", "./build", "./client"]
   }
 }

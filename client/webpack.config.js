@@ -14,7 +14,6 @@ module.exports = {
         path: path.resolve("./../public"),
         publicPath: "./../"
     },
-
     module: {
         rules: [
             {

@@ -9,7 +9,7 @@
     "client-install": "cd client && yarn install",
     "clean": "shx rm -rf ./build/* ./public/*",
     "compile": "tsc",
-    "prod": "cd client && yarn run prod",
+    "prod": "cd client && yarn run start",
     "build": "run-s clean compile prod",
     "start": "node -r dotenv/config ./build/server.js",
     "watch": "nodemon -r node_modules/dotenv/config ./build/server.js -e ts,tsx --exec \"yarn run build && yarn run start\""
@@ -22,7 +22,9 @@
     "express": "^4.17.2",
     "nodemon": "^2.0.15",
     "reflect-metadata": "^0.1.13",
-    "ts-node": "^10.4.0"
+    "tripetto": "^4.4.2",
+    "ts-node": "^10.4.0",
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@types/node": "^17.0.15",

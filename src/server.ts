@@ -1,5 +1,5 @@
 import path from "path";
-import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, URL } from "./settings";
+import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL } from "./settings";
 
 const express = require("express");
 const cors = require("cors");
@@ -18,7 +18,7 @@ app.locals = {
     env: ENV,
     host: SERVER_HOST,
     appName: APP_NAME,
-    url: URL
+    url: PUBLIC_URL
 };
 
 app.use(async (req, res, next) => {
@@ -29,6 +29,12 @@ app.use(async (req, res, next) => {
 
         next(error.message);
     }
+});
+
+app.get('/api/definition', (req, res) => {
+    const definition = {};
+
+    res.json(definition);
 });
 
 app.get('/*', (req, res) => {
