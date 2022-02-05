@@ -1,0 +1,38 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "module": "CommonJS",
+    "noImplicitAny": false,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "sourceMap": true,
+    "lib": ["es5", "es6", "dom"],
+    "types": ["node", "reflect-metadata"],
+    "target": "ES5",
+    "jsx": "react",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "Node",
+    "strict": true,
+    "strictFunctionTypes": false,
+    "experimentalDecorators": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "noEmitHelpers": false,
+    "importHelpers": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "useUnknownInCatchVariables": false,
+    "baseUrl": "./src/api",
+    "outDir": "./build"
+  },
+  "include": ["./src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts", "./build", "./src/client/**/*", "./public"],
+  "watchOptions": {
+    "excludeDirectories": ["node_modules", "./src/client", "./public"]
+  }
+}

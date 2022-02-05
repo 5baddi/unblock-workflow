@@ -1,0 +1,89 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "5.0.0",
+    "tripetto": "^4.4.2",
+    "tripetto-block-calculator": "^3.1.1",
+    "tripetto-block-checkbox": "^5.1.0",
+    "tripetto-block-checkboxes": "^6.0.1",
+    "tripetto-block-date": "^3.0.0",
+    "tripetto-block-device": "^4.0.0",
+    "tripetto-block-dropdown": "^5.1.1",
+    "tripetto-block-email": "^5.0.0",
+    "tripetto-block-error": "^4.0.0",
+    "tripetto-block-evaluate": "^3.0.1",
+    "tripetto-block-file-upload": "^4.0.0",
+    "tripetto-block-hidden-field": "^5.0.2",
+    "tripetto-block-mailer": "^5.0.1",
+    "tripetto-block-matrix": "^4.1.0",
+    "tripetto-block-multiple-choice": "^5.1.0",
+    "tripetto-block-number": "^7.0.2",
+    "tripetto-block-paragraph": "^4.0.0",
+    "tripetto-block-password": "^5.0.0",
+    "tripetto-block-phone-number": "^3.0.0",
+    "tripetto-block-picture-choice": "^4.1.0",
+    "tripetto-block-radiobuttons": "^6.0.2",
+    "tripetto-block-rating": "^5.0.1",
+    "tripetto-block-regex": "^3.0.0",
+    "tripetto-block-scale": "^3.0.1",
+    "tripetto-block-setter": "^2.0.2",
+    "tripetto-block-statement": "^4.0.0",
+    "tripetto-block-stop": "^2.0.0",
+    "tripetto-block-text": "^5.0.3",
+    "tripetto-block-textarea": "^5.1.0",
+    "tripetto-block-url": "^5.0.0",
+    "tripetto-block-variable": "^2.0.2",
+    "tripetto-block-yes-no": "^4.0.2",
+    "tripetto-collector": "^1.7.0",
+    "tripetto-collector-standard-bootstrap": "^1.0.23",
+    "tripetto-runner-foundation": "^6.2.5",
+    "web-vitals": "^2.1.0"
+  },
+  "devDependencies": {
+    "babel-loader": "^8.2.3",
+    "copy-webpack-plugin": "^10.2.4",
+    "css-loader": "^6.6.0",
+    "dotenv": "^16.0.0",
+    "node-polyfill-webpack-plugin": "^1.1.4",
+    "sass-loader": "^12.4.0",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.2.6",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "scripts": {
+    "prod": "webpack --mode production"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "tripetto": {
+    "blocks": [
+      "."
+    ],
+    "noFurtherLoading": false
+  }
+}
