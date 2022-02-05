@@ -7,6 +7,10 @@ import { loadDefaultDefinition } from "../../helpers";
 
 class Editor extends React.Component<IEditorProps>
 {
+    constructor(props) {
+        super(props);
+    }
+
     static propTypes = {
         getDefinition: PropTypes.func.isRequired,
         definition: PropTypes.object.isRequired
@@ -14,10 +18,6 @@ class Editor extends React.Component<IEditorProps>
 
     static defaultProps = {
         definition: {} as IDefinition
-    }
-
-    componentWillMount() {
-        this.props.getDefinition();
     }
 
     render()
