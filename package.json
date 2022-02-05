@@ -6,7 +6,8 @@
   "private": true,
   "main": "build/server.js",
   "scripts": {
-    "client-install": "cd client && yarn install",
+    "client:install": "cd client && yarn install",
+    "client:watch": "cd client && yarn run watch",
     "clean": "shx rm -rf ./build/* ./public/*",
     "compile": "tsc",
     "prod": "cd client && yarn run start",

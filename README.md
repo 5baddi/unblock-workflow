@@ -15,7 +15,7 @@ cp .env.example .env
 2. Install dependencies
 
 ```bash
-yarn install && yarn run client-install
+yarn install && yarn run client:install
 ```
 
 3. Compile the project first if there any issue
@@ -36,10 +36,16 @@ yarn run build
 yarn run start
 ```
 
-6. Watch the project
+6. Watch the back-end
 
 ```bash
 yarn run watch
+```
+
+7. Watch the front-end
+
+```bash
+yarn run client:watch
 ```
 
 ## Resources
