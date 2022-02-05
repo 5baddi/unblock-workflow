@@ -27,12 +27,12 @@
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "useUnknownInCatchVariables": false,
-    "baseUrl": "./src/api",
+    "baseUrl": "./src",
     "outDir": "./build"
   },
   "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules", "**/*.spec.ts", "./build", "./src/client/**/*", "./public"],
+  "exclude": ["node_modules", "**/*.spec.ts", "./build", "./public"],
   "watchOptions": {
-    "excludeDirectories": ["node_modules", "./src/client", "./public", "./build"]
+    "excludeDirectories": ["node_modules", "./public", "./build"]
   }
 }

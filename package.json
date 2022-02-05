@@ -6,10 +6,10 @@
   "private": true,
   "main": "build/server.js",
   "scripts": {
-    "client-install": "cd src/client && yarn install",
+    "client-install": "cd client && yarn install",
     "clean": "shx rm -rf ./build/* ./public/*",
     "compile": "tsc",
-    "prod": "cd src/client && yarn run prod",
+    "prod": "cd client && yarn run prod",
     "build": "run-s clean compile prod",
     "start": "node -r dotenv/config ./build/server.js",
     "watch": "nodemon -r node_modules/dotenv/config ./build/server.js -e ts,tsx --exec \"yarn run build && yarn run start\""

@@ -4,15 +4,15 @@ const Copy = require("copy-webpack-plugin");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const dotenv = require("dotenv");
 
-const dotenvParsed = dotenv.config({ path: path.resolve("./.env") }).parsed;
+const dotenvParsed = dotenv.config({ path: path.resolve("./../.env") }).parsed;
 
 module.exports = {
     target: ["web", "es5"],
     entry: "./src/index.tsx",
     output: {
         filename: "bundle.js",
-        path: path.resolve("../../public"),
-        publicPath: "../../"
+        path: path.resolve("./../public"),
+        publicPath: "./../"
     },
 
     module: {
