@@ -36,7 +36,7 @@ app.get('/*', (req, res) => {
 });
 
 app.listen(SERVER_PORT, SERVER_HOST,(error) => {
-    let protocol = "http";
+    let protocol = ENV === "development" ? "http" : "https";
     console.log(`Unblock forms studio running on: ${protocol}://${SERVER_HOST}:${SERVER_PORT}`);
     console.log(`Environment: ${ENV}`);
 

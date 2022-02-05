@@ -12,7 +12,7 @@
     "prod": "cd src/client && yarn run prod",
     "build": "run-s clean compile prod",
     "start": "node -r dotenv/config ./build/server.js",
-    "watch": "nodemon -r dotenv/config ./build/server.js -e ts,tsx --exec \"yarn run build && yarn run start\""
+    "watch": "nodemon -r node_modules/dotenv/config ./build/server.js -e ts,tsx --exec \"yarn run build && yarn run start\""
   },
   "dependencies": {
     "body-parser": "^1.19.1",
@@ -21,7 +21,8 @@
     "ejs": "^3.1.6",
     "express": "^4.17.2",
     "nodemon": "^2.0.15",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^10.4.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.15",

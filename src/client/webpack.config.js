@@ -68,7 +68,8 @@ module.exports = {
         }),
         new NodePolyfillPlugin(),
         new webpack.DefinePlugin({
-            "process.env": JSON.stringify(dotenvParsed)
+            "process.env": JSON.stringify(dotenvParsed),
+            "process.env.NODE_DEBUG": JSON.stringify(process.env.NODE_DEBUG)
         })
     ],
     stats: {
