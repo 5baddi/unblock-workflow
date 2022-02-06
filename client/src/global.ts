@@ -1,4 +1,7 @@
+import { IEditorProperties } from "./interfaces";
+
 export const DEFINITION_KEY = "definition";
+export const EDITOR_CONTAINER_ID: string = "editor-container";
 export const DEFAULT_DEFINITION = {
     "name": "Demo",
     "clusters": [
@@ -482,4 +485,19 @@ export const DEFAULT_DEFINITION = {
         }
     ],
     "editor": { "name": "tripetto", "version": "0.4.13-63" }
+};
+export const DEFAULT_EDITOR_PROPERTIES: IEditorProperties = {
+    element: null,
+    fonts: "fonts/",
+    disableLogo: true,
+    disableTutorialButton: true,
+    disableSaveButton: true,
+    disableRestoreButton: true,
+    disableClearButton: true,
+    disableCloseButton: true,
+    supportURL: false,
+    disableOpenCloseAnimation: true,
+    showTutorial: false,
+    disableEditButton: true,
+    zoom: "fit"
 };

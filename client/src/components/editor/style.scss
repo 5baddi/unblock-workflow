@@ -1,0 +1,22 @@
+#editor-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 56px;
+  bottom: 0;
+  cursor: default;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  backface-visibility: hidden;
+  box-sizing: border-box;
+  contain: strict;
+  overflow: hidden;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+  visibility: inherit;
+  width: auto;
+  height: auto;
+  background-color: rgb(236, 245, 253);
+  z-index: 10000000;
+}
