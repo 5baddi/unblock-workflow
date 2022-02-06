@@ -22,3 +22,13 @@ export interface IEditorState
 {
     definition?: IDefinition;
 }
+
+export interface IHeaderProps
+{
+    definition?: IDefinition;
+}
+
+export interface IHeaderState
+{
+    definition?: IDefinition;
+}
