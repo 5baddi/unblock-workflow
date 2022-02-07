@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { IMongoDBProvider } from "../../interfaces/providers";
 import { ILogger } from "../../interfaces/logger";
 import Symbols from "../../symbols";
-import { MongoClient, Db, ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { IEntity } from "../../interfaces/entity";
 import { MONGODB_URL, DEFINITION_COLLECTION_NAME, TASK_COLLECTION_NAME, USER_COLLECTION_NAME } from "../../settings";
 
