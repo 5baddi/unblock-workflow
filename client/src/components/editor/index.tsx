@@ -4,9 +4,9 @@ import { getDefinition } from "../../store/actions/definition";
 import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
-import { loadDefaultDefinition } from "../../helpers";
 import { ENV } from "../../../../src/settings";
 import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
+import API  from "../../api";
 
 import "./blocks";
 
@@ -58,10 +58,24 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let properties = this.mergeProperties(this.props.properties || DEFAULT_EDITOR_PROPERTIES);
 
-        this.editor = Builder.open(this.props.definition || loadDefaultDefinition(), properties);
+        this.editor = Builder.open(this.props.definition, properties);
 
         this.editor.onChange = (definition: IDefinition) => this.onChange(definition);
         this.editor.onSave = (definition: IDefinition) => this.onChange(definition);
+
+        return this.editor;
+    }
+
+    private updateEditorDefinition(definition: IDefinition): Builder | undefined
+    {
+        if (ENV === "development") {
+            console.log("updating the editor definition");
+        }
+
+        if (this.editor) {
+            this.editor.definition = definition;
+            this.setState({ definition });
+        }
 
         return this.editor;
     }
@@ -74,17 +88,25 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return properties as IEditorProperties;
     }
 
-    private onChange(definition: IDefinition)
+    private async onChange(definition: IDefinition)
     {
         if (ENV === "development") {
             console.log("saving form definition");
         }
 
-        localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+        await API.post("definition", { definition })
+            .then(response => {
+                if (! response.data.definition) {
+                    return;
+                }
 
-        this.setState({ definition });
+                localStorage.setItem(DEFINITION_KEY, JSON.stringify(response.data.definition));
 
-        // TODO: save form definition on DB
+                this.updateEditorDefinition(response.data.definition);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     private onResize()
@@ -103,7 +125,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
 
 const mapStateToProps = (state) => ({
-    definition: state.definition || loadDefaultDefinition()
+    definition: state.definition
 });
 
 const dispatchToProps = (dispatch) => ({

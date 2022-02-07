@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from "react-redux";
 import { Grid } from "@mui/material";
 import { TextField } from "@material-ui/core";
-import { IDefinition, IHeaderProps, IHeaderState } from "../../interfaces";
+import { IHeaderProps, IHeaderState } from "../../interfaces";
 import { loadDefaultDefinition } from "../../helpers";
 import { ENV } from "../../../../src/settings";
 import { DEFINITION_KEY } from "../../global";
@@ -13,13 +13,9 @@ import "./style.scss";
 
 class Header extends React.Component<IHeaderProps, IHeaderState>
 {
-    readonly definition: IDefinition;
-
     constructor(props)
     {
         super(props);
-
-        this.definition = loadDefaultDefinition();
 
         this.onChange = this.onChange.bind(this);
     }
@@ -32,7 +28,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
                     <Grid item md={4}>
                         <TextField
                             variant="standard"
-                            value={this.definition.name || "Unnamed"}
+                            value={this.props.definition.name || "Unnamed"}
                             onChange={this.onChange}
                         />
                     </Grid>
@@ -53,18 +49,18 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
             console.log("updating form name");
         }
 
-        this.definition.name = e.target.value;
+        this.props.definition.name = e.target.value;
 
-        localStorage.setItem(DEFINITION_KEY, JSON.stringify(this.definition));
+        localStorage.setItem(DEFINITION_KEY, JSON.stringify(this.props.definition));
 
-        this.setState({ definition: this.definition });
+        this.setState({ definition: this.props.definition });
 
         // TODO: save form definition on DB
     }
 }
 
 const mapStateToProps = (state) => ({
-    definition: state.definition || loadDefaultDefinition()
+    definition: state.definition
 });
 
 export default connect(mapStateToProps)(Header);
