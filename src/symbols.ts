@@ -1,5 +1,5 @@
 const Symbols = {
-    // Logger: Symbol('Logger'),
+    Logger: Symbol('Logger'),
     // MongoDBProvider: Symbol('MongoDBProvider'),
     // MongoDBService: Symbol('MongoDBService'),
     // DefinitionService: Symbol('DefinitionService'),
