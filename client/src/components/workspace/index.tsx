@@ -11,7 +11,8 @@ class Workspace extends React.Component
 {
     private definitions?: IDefinition[];
 
-    constructor(props) {
+    constructor(props)
+    {
         super(props);
 
         this.loadDefinitions();
@@ -26,24 +27,34 @@ class Workspace extends React.Component
                         <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
                             Forms list
                         </Typography>
-                        <List>
-                            <ListItem
-                                secondaryAction={
-                                    <IconButton edge="end" aria-label="delete">
-                                        <DeleteIcon />
-                                    </IconButton>
+                        {
+                            this.definitions ? <List>
+                                {
+                                    this.definitions.map(definition => {
+                                        <ListItem
+                                            secondaryAction={
+                                                <IconButton edge="end" aria-label="delete">
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            }
+                                        >
+                                            <ListItemAvatar>
+                                                <Avatar>
+                                                    <FolderIcon />
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={definition.name}
+                                            />
+                                        </ListItem>
+                                    })
                                 }
-                            >
-                                <ListItemAvatar>
-                                    <Avatar>
-                                        <FolderIcon />
-                                    </Avatar>
-                                </ListItemAvatar>
-                                <ListItemText
-                                    primary="Single-line item"
-                                />
-                            </ListItem>
-                        </List>
+                            </List>
+                            : 
+                            <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+                                No form found
+                            </Typography>
+                        }
                     </Grid>
                 </Grid>
             </Box>
