@@ -18,6 +18,10 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
     {
         super(props);
 
+        this.state = {
+            name:  "Unnamed"
+        };
+
         this.onChange = this.onChange.bind(this);
     }
 
@@ -74,7 +78,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
 }
 
 const mapStateToProps = (state) => ({
-    definition: state.definition
+    name: state.name
 });
 
 export default connect(mapStateToProps)(Header);
