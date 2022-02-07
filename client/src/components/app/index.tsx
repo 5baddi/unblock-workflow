@@ -5,7 +5,7 @@ import { CssBaseline, withStyles } from "@material-ui/core";
 import store from "../../store";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
-import Home from "../../pages/Home";
+import Home from "../../pages/home";
 
 import "./style.scss";
 
