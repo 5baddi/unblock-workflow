@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  unblock-workflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PORT: ${SERVER_PORT}
+    image: unblock-workflow:latest
+    container_name: unblock-workflow
+    expose:
+      - ${SERVER_PORT}
+    volumes:
+      - '/var/log/unblock-workflow:/var/log/unblock-workflow'
+    networks:
+      unblock-workflow:
+        ipv4_address: 172.51.3.10
+    restart: always
+networks:
+  unblock-workflow:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.51.3.0/24
