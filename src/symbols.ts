@@ -3,7 +3,6 @@ const Symbols = {
     MongoDBProvider: Symbol('MongoDBProvider'),
     MongoDBService: Symbol('MongoDBService'),
     DefinitionService: Symbol('DefinitionService'),
-    DefinitionController: Symbol('DefinitionController'),
 };
 
 export default Symbols;

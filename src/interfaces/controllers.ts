@@ -1,4 +1,6 @@
-export interface IDefinitionController
+import express from "express";
+
+export interface IAPIController
 {
-    save(request, response);
+    save(request: express.Request, response: express.Response): express.Response;
 }
