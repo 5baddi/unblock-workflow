@@ -5,9 +5,10 @@ import { TextField } from "@material-ui/core";
 import { IHeaderProps, IHeaderState } from "../../interfaces";
 import { loadDefaultDefinition } from "../../helpers";
 import { ENV } from "../../../../src/settings";
-import { DEFINITION_KEY } from "../../global";
+import { DEFINITION_KEY, DEFINITION_NAME_KEY, DEFINITION_ID_KEY } from "../../global";
 import { FiSliders, FiShare2, FiShare, FiDownload } from "react-icons/fi";
 import { HeaderButton } from "./button";
+import API  from "../../api";
 
 import "./style.scss";
 
@@ -28,7 +29,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
                     <Grid item md={4}>
                         <TextField
                             variant="standard"
-                            value={this.props.definition?.name || "Unnamed"}
+                            value={this.state.name || "Unnamed"}
                             onChange={this.onChange}
                         />
                     </Grid>
@@ -43,19 +44,32 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
         )
     }
 
-    private onChange(e)
+    private async onChange(e)
     {
         if (ENV === "development") {
             console.log("updating form name");
         }
 
-        // this.props.definition.name = e.target.value;
-        //
-        // localStorage.setItem(DEFINITION_KEY, JSON.stringify(this.props.definition));
-        //
-        // this.setState({ definition: this.props.definition });
+        let name = e.target.value;
+        let id = localStorage.getItem(DEFINITION_ID_KEY);
+        
+        if (! id) {
+            return;
+        }
 
-        // TODO: save form definition on DB
+        await API.put(`definition/${id}`, { name })
+            .then(response => {
+                if (! response.data.definition) {
+                    return;
+                }
+
+                localStorage.setItem(DEFINITION_NAME_KEY, response.data.definition.name);
+
+                this.setState({ name: response.data.name });
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 }
 

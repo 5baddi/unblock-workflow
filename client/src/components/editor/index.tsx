@@ -5,7 +5,7 @@ import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV } from "../../../../src/settings";
-import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_ID_KEY, USER_ID_KEY } from "../../global";
+import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_ID_KEY, USER_ID_KEY, DEFINITION_NAME_KEY } from "../../global";
 import API  from "../../api";
 
 import "./blocks";
@@ -57,6 +57,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         localStorage.removeItem(DEFINITION_ID_KEY);
+        localStorage.removeItem(DEFINITION_NAME_KEY);
         localStorage.removeItem(USER_ID_KEY);
 
         let properties = this.mergeProperties(this.props.properties || DEFAULT_EDITOR_PROPERTIES);

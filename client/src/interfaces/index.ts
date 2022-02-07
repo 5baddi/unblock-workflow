@@ -33,6 +33,7 @@ export interface IHeaderProps
 export interface IHeaderState
 {
     definition?: IDefinition;
+    name?: string;
 }
 
 export interface IRunnerProps

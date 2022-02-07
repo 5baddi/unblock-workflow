@@ -113,4 +113,48 @@ router.post("/definition", (req, res) => {
         });
 });
 
+
+router.put("/definition/:id", (req, res) => {
+    let body = req.body;
+    let name = body.name;
+    let id = req.params.id;
+    if (! name || ! id) {
+        res.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOneAndUpdate({ _id: id }, { $set: { name: name } }, { upsert: false })
+                .then(result => {
+                    if (! result.ok) {
+                        client.close();
+
+                        return res.status(401).send({
+                            success: false,
+                            message: "failed to update definition name",
+                        });
+                    }
+
+                    client.close();
+
+                    return res.send({ success: true, name });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return res.status(500).send({
+                        success: false,
+                        message: error.message || "failed to update definition name",
+                    });
+                });
+        });
+});
+
 module.exports = router;
