@@ -25,6 +25,7 @@
     "inversify-inject-decorators": "^3.1.0",
     "mongodb": "^4.3.1",
     "nodemon": "^2.0.15",
+    "prop-types": "^15.8.1",
     "reflect-metadata": "^0.1.13",
     "tripetto": "^4.4.2",
     "ts-node": "^10.4.0",

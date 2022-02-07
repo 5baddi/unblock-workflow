@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { connect } from "react-redux";
-import { Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
+import { TextField } from "@material-ui/core";
 import { IDefinition, IHeaderProps, IHeaderState } from "../../interfaces";
 import { loadDefaultDefinition } from "../../helpers";
+import { ENV } from "../../../../src/settings";
+import { DEFINITION_KEY } from "../../global";
 import { FiSliders, FiShare2, FiShare, FiDownload } from "react-icons/fi";
 import { HeaderButton } from "./button";
 
@@ -17,6 +20,8 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
         super(props);
 
         this.definition = loadDefaultDefinition();
+
+        this.onChange = this.onChange.bind(this);
     }
 
     render()
@@ -25,7 +30,11 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
             <Grid container className="header">
                 <Grid item md={7} container justifyContent="start" alignItems="center">
                     <Grid item md={4}>
-                        <Typography padding={2}>{this.definition.name || "Unnamed"}</Typography>
+                        <TextField
+                            variant="standard"
+                            value={this.definition.name || "Unnamed"}
+                            onChange={this.onChange}
+                        />
                     </Grid>
                 </Grid>
                 <Grid item md={5} container justifyContent="end" alignItems="center" className="header-actions">
@@ -36,6 +45,21 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
                 </Grid>
             </Grid>
         )
+    }
+
+    private onChange(e)
+    {
+        if (ENV === "development") {
+            console.log("updating form name");
+        }
+
+        this.definition.name = e.target.value;
+
+        localStorage.setItem(DEFINITION_KEY, JSON.stringify(this.definition));
+
+        this.setState({ definition: this.definition });
+
+        // TODO: save form definition on DB
     }
 }
 
