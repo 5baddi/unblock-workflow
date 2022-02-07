@@ -4,7 +4,8 @@ import Editor from "../../components/editor";
 import { EDITOR_CONTAINER_ID } from "../../global";
 import Header from "../../components/header";
 
-export default function Studio () {
+export default function Studio ()
+{
     return (
         <Grid container>
             <Header/>

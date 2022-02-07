@@ -33,6 +33,32 @@ async function connect()
     }
 }
 
+router.get("/definitions", (req, res) => {
+    return connect()
+        .then(client => {
+            let db = client.db();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .find()
+                .sort({ name: 1 })
+                .toArray()
+                .then(items => {
+
+                    client.close();
+
+                    return res.send({ success: true, definitions: items });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return res.status(500).send({
+                        success: false,
+                        message: error.message || "failed to fetch definitions",
+                    });
+                });
+        });
+});
+
 router.post("/definition", (req, res) => {
     let body = req.body;
     let definition = body.definition;
