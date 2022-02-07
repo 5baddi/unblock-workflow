@@ -36,22 +36,24 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                             this.state.definitions.length > 0 ? <List>
                                 {
                                     this.state.definitions.map((definition: IDefinition) => {
-                                        <ListItem
-                                            secondaryAction={
-                                                <IconButton edge="end" aria-label="delete">
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            }
-                                        >
-                                            <ListItemAvatar>
-                                                <Avatar>
-                                                    <FolderIcon />
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText
-                                                primary={definition.name}
-                                            />
-                                        </ListItem>
+                                        return (
+                                            <ListItem
+                                                secondaryAction={
+                                                    <IconButton edge="end" aria-label="delete">
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                }
+                                            >
+                                                <ListItemAvatar>
+                                                    <Avatar>
+                                                        <FolderIcon />
+                                                    </Avatar>
+                                                </ListItemAvatar>
+                                                <ListItemText
+                                                    primary={definition.name}
+                                                />
+                                            </ListItem>
+                                        );
                                     })
                                 }
                             </List>
