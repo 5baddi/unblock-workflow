@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Box, Grid, Typography, List, ListItem, ListItemText, ListItemAvatar, Avatar } from "@mui/material";
 import IconButton from '@mui/material/IconButton';
-import { Delete as DeleteIcon, Folder as FolderIcon } from "@mui/icons-material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
 import { IDefinition } from "../../interfaces";
 import API from "../../api";
+import { FiFileText } from "react-icons/fi";
 
 import "./style.scss";
 
@@ -46,7 +47,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar>
-                                                        <FolderIcon />
+                                                        <FiFileText />
                                                     </Avatar>
                                                 </ListItemAvatar>
                                                 <ListItemText
