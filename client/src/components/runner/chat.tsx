@@ -6,9 +6,8 @@ import { Export } from "tripetto-runner-foundation";
 import { IDefinition } from "../../interfaces";
 import { Instance } from "tripetto-collector";
 import { loadDefaultDefinition } from "../../helpers";
-import API from "../../api";
 
-export class ChatRunner extends React.Component<IRunnerProps, { definition: undefined }>
+export class ChatRunner extends React.Component<IRunnerProps>
 {
     readonly definition: IDefinition;
 
@@ -16,27 +15,18 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition: unde
     {
         super(props);
 
-        this.state = {
-            definition: undefined
-        };
-
         this.definition = loadDefaultDefinition();
-    }
-
-    componentDidMount()
-    {
-        this.fetchDefinition();
     }
 
     render()
     {
-        if (! this.props.definitionId || ! this.state.definition) {
+        if (! this.props.definitionId || ! this.definition) {
             return (<Navigate to="/404"/>);
         }
 
         return (
             <TripettoChatRunner
-                definition={this.state.definition}
+                definition={this.definition}
                 onSubmit={this.onSubmit}
             />
         );
@@ -44,7 +34,6 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition: unde
 
     private onSubmit(instance: Instance): void
     {
-        console.log(this.state.definition);
         // Implement your response handler here.
 
         // For this example we output all exportable fields to the browser console
@@ -52,22 +41,5 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition: unde
 
         // Or output the data in CSV-format
         console.dir(Export.CSV(instance));
-    }
-
-    private fetchDefinition()
-    {
-        API.get(`definition/${this.props.definitionId}`)
-            .then(response => {
-                if (! response.data.definition) {
-                    return;
-                }
-
-                this.setState({
-                    definition: response.data.definition
-                });
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 }
