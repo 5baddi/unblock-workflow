@@ -28,7 +28,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
                     <Grid item md={4}>
                         <TextField
                             variant="standard"
-                            value={this.props.definition.name || "Unnamed"}
+                            value={this.props.definition?.name || "Unnamed"}
                             onChange={this.onChange}
                         />
                     </Grid>
@@ -49,11 +49,11 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
             console.log("updating form name");
         }
 
-        this.props.definition.name = e.target.value;
-
-        localStorage.setItem(DEFINITION_KEY, JSON.stringify(this.props.definition));
-
-        this.setState({ definition: this.props.definition });
+        // this.props.definition.name = e.target.value;
+        //
+        // localStorage.setItem(DEFINITION_KEY, JSON.stringify(this.props.definition));
+        //
+        // this.setState({ definition: this.props.definition });
 
         // TODO: save form definition on DB
     }

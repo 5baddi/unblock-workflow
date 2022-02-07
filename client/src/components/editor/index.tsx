@@ -5,7 +5,7 @@ import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV } from "../../../../src/settings";
-import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
+import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_ID_KEY, USER_ID_KEY } from "../../global";
 import API  from "../../api";
 
 import "./blocks";
@@ -56,26 +56,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("opening the editor");
         }
 
+        localStorage.removeItem(DEFINITION_ID_KEY);
+        localStorage.removeItem(USER_ID_KEY);
+
         let properties = this.mergeProperties(this.props.properties || DEFAULT_EDITOR_PROPERTIES);
 
         this.editor = Builder.open(this.props.definition, properties);
 
-        this.editor.onChange = (definition: IDefinition) => this.onChange(definition);
         this.editor.onSave = (definition: IDefinition) => this.onChange(definition);
-
-        return this.editor;
-    }
-
-    private updateEditorDefinition(definition: IDefinition): Builder | undefined
-    {
-        if (ENV === "development") {
-            console.log("updating the editor definition");
-        }
-
-        if (this.editor) {
-            this.editor.definition = definition;
-            this.setState({ definition });
-        }
 
         return this.editor;
     }
@@ -84,6 +72,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         let properties = Object.assign({}, JSON.parse(JSON.stringify(config)));
         properties.element = document.getElementById(this.props.element);
+
+        // Force shows save button
+        properties.disableSaveButton = false;
 
         return properties as IEditorProperties;
     }
@@ -94,15 +85,24 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("saving form definition");
         }
 
+        let definitionId = localStorage.getItem(DEFINITION_ID_KEY);
+        let userId = localStorage.getItem(USER_ID_KEY);
+
+        if (definitionId && userId) {
+            definition._id = definitionId;
+            definition.userId = userId;
+        }
+
         await API.post("definition", { definition })
             .then(response => {
                 if (! response.data.definition) {
                     return;
                 }
 
-                localStorage.setItem(DEFINITION_KEY, JSON.stringify(response.data.definition));
+                localStorage.setItem(DEFINITION_ID_KEY, response.data.definition._id);
+                localStorage.setItem(USER_ID_KEY, response.data.definition.userId);
 
-                this.updateEditorDefinition(response.data.definition);
+                this.setState({ definition: response.data.definition });
             })
             .catch(error => {
                 console.log(error);

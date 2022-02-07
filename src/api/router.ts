@@ -52,6 +52,10 @@ router.post("/definition", (req, res) => {
                 definition._id = new ObjectId();
             }
 
+            if (typeof definition._id === "string") {
+                definition._id = new ObjectId(definition._id);
+            }
+
             if (typeof definition.userId === "undefined") {
                 definition.userId = ROOT_USER_ID;
             }

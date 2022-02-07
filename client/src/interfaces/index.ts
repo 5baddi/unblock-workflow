@@ -2,7 +2,9 @@ import { IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto
 
 export interface IDefinition extends TripettoIDefinition
 {
+    _id?: string;
     name?: string;
+    userId?: string;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}

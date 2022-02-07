@@ -1,6 +1,8 @@
 import { IEditorProperties } from "./interfaces";
 
 export const DEFINITION_KEY = "definition";
+export const DEFINITION_ID_KEY = "definition-id";
+export const USER_ID_KEY = "user-id";
 export const EDITOR_CONTAINER_ID: string = "editor-container";
 export const DEFAULT_DEFINITION = {
     "name": "Demo",
@@ -491,7 +493,7 @@ export const DEFAULT_EDITOR_PROPERTIES: IEditorProperties = {
     fonts: "fonts/",
     disableLogo: true,
     disableTutorialButton: true,
-    disableSaveButton: true,
+    disableSaveButton: false,
     disableRestoreButton: true,
     disableClearButton: true,
     disableCloseButton: true,
