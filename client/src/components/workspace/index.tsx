@@ -7,14 +7,19 @@ import API from "../../api";
 
 import "./style.scss";
 
-class Workspace extends React.Component
+class Workspace extends React.Component<{}, { definitions: [] }>
 {
-    private definitions?: IDefinition[];
-
     constructor(props)
     {
         super(props);
 
+        this.state = {
+            definitions: [],
+        };
+    }
+
+    componentDidMount()
+    {
         this.loadDefinitions();
     }
 
@@ -28,9 +33,10 @@ class Workspace extends React.Component
                             Forms list
                         </Typography>
                         {
-                            this.definitions ? <List>
+                            this.state.definitions.length > 0 ? <List>
                                 {
-                                    this.definitions.map(definition => {
+                                    this.state.definitions.map((definition: IDefinition) => {
+                                        { definition.name }
                                         <ListItem
                                             secondaryAction={
                                                 <IconButton edge="end" aria-label="delete">
@@ -69,7 +75,9 @@ class Workspace extends React.Component
                     return;
                 }
 
-                this.definitions = response.data.definitions;
+                this.setState({
+                    definitions: response.data.definitions
+                });
             })
             .catch(error => {
                 console.log(error);
