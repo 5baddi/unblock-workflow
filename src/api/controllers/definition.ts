@@ -1,9 +1,10 @@
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import Symbols from "../../symbols";
 import { IDefinitionService } from "../../interfaces/services";
 import { IEntity } from "../../interfaces/entity";
 import { IDefinitionController } from "../../interfaces/controllers";
 
+@injectable()
 export class DefinitionController implements IDefinitionController
 {
     private readonly definitionService: IDefinitionService;
