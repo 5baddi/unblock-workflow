@@ -2,6 +2,7 @@ import { Container } from "../container";
 import Symbols from "../symbols";
 import { DefinitionController } from "./controllers/definition";
 import {MongoClient, ObjectId} from "mongodb";
+import { IDefinition } from '../../client/src/interfaces/index';
 import {
     DEFINITION_COLLECTION_NAME,
     MONGODB_URL,
@@ -152,6 +153,49 @@ router.put("/definition/:id", (req, res) => {
                     return res.status(500).send({
                         success: false,
                         message: error.message || "failed to update definition name",
+                    });
+                });
+        });
+});
+
+router.get("/definition/:id", (req, res) => {
+    let id = req.params.id;
+    if (! id) {
+        res.status(401)
+            .send({
+                success: false,
+                message: "Definition not found!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOne({ _id: new ObjectId(id) })
+                .then(result => {
+                    if (result === null) {
+                        client.close();
+
+                        return res.status(401).send({
+                            success: false,
+                            message: "Definition not found",
+                        });
+                    }
+
+                    client.close();
+
+                    let definition = Object.assign({} as IDefinition, result);
+
+                    return res.send({ success: true, definition });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return res.status(500).send({
+                        success: false,
+                        message: error.message || "failed to fetch definition",
                     });
                 });
         });

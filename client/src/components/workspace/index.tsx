@@ -36,7 +36,6 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                             this.state.definitions.length > 0 ? <List>
                                 {
                                     this.state.definitions.map((definition: IDefinition) => {
-                                        { definition.name }
                                         <ListItem
                                             secondaryAction={
                                                 <IconButton edge="end" aria-label="delete">

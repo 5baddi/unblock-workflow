@@ -6,8 +6,9 @@ import { Export } from "tripetto-runner-foundation";
 import { IDefinition } from "../../interfaces";
 import { Instance } from "tripetto-collector";
 import { loadDefaultDefinition } from "../../helpers";
+import API from "../../api";
 
-export class ChatRunner extends React.Component<IRunnerProps>
+export class ChatRunner extends React.Component<IRunnerProps, { definition: undefined }>
 {
     readonly definition: IDefinition;
 
@@ -15,18 +16,27 @@ export class ChatRunner extends React.Component<IRunnerProps>
     {
         super(props);
 
+        this.state = {
+            definition: undefined
+        };
+
         this.definition = loadDefaultDefinition();
+    }
+
+    componentDidMount()
+    {
+        this.fetchDefinition();
     }
 
     render()
     {
-        if (! this.props.definitionId || ! this.definition) {
+        if (! this.props.definitionId || ! this.state.definition) {
             return (<Navigate to="/404"/>);
         }
 
         return (
             <TripettoChatRunner
-                definition={this.definition}
+                definition={this.state.definition}
                 onSubmit={this.onSubmit}
             />
         );
@@ -34,6 +44,7 @@ export class ChatRunner extends React.Component<IRunnerProps>
 
     private onSubmit(instance: Instance): void
     {
+        console.log(this.state.definition);
         // Implement your response handler here.
 
         // For this example we output all exportable fields to the browser console
@@ -41,5 +52,22 @@ export class ChatRunner extends React.Component<IRunnerProps>
 
         // Or output the data in CSV-format
         console.dir(Export.CSV(instance));
+    }
+
+    private fetchDefinition()
+    {
+        API.get(`definition/${this.props.definitionId}`)
+            .then(response => {
+                if (! response.data.definition) {
+                    return;
+                }
+
+                this.setState({
+                    definition: response.data.definition
+                });
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 }
