@@ -55,6 +55,14 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
         }
 
         let name = e.target.value;
+        let oldName = localStorage.getItem(DEFINITION_NAME_KEY);
+
+        if (name === oldName) {
+            return;
+        }
+
+        localStorage.setItem(DEFINITION_NAME_KEY, name);
+
         let id = localStorage.getItem(DEFINITION_ID_KEY);
         
         if (! id) {

@@ -87,12 +87,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let definitionId = localStorage.getItem(DEFINITION_ID_KEY);
+        let name = localStorage.getItem(DEFINITION_NAME_KEY) || "Unamed";
         let userId = localStorage.getItem(USER_ID_KEY);
 
         if (definitionId && userId) {
             definition._id = definitionId;
             definition.userId = userId;
         }
+
+        definition.name = name;
 
         await API.post("definition", { definition })
             .then(response => {
