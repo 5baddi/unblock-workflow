@@ -61,6 +61,7 @@
     "tripetto-block-yes-no": "^4.0.2",
     "tripetto-collector": "^1.7.0",
     "tripetto-collector-standard-bootstrap": "^1.0.23",
+    "tripetto-runner-chat": "^3.6.0",
     "tripetto-runner-foundation": "^6.2.5",
     "web-vitals": "^2.1.0"
   },

@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { CssBaseline, withStyles } from "@material-ui/core";
 import store from "../../store";
 import Studio from "../../pages/studio";
+import ChatRunner from "../../pages/run";
 
 import "./style.scss";
 
@@ -24,7 +25,7 @@ const App = ({ classes }) => {
                 <main className={classes.main}>
                     <BrowserRouter>
                         <Routes>
-                            {/*<Route path="/run/:id" element={<ChatRunner />} />*/}
+                            <Route path="/run/:id" element={<ChatRunner />} />
                             <Route path="/*" element={<Studio />}/>
                         </Routes>
                     </BrowserRouter>

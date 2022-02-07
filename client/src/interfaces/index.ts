@@ -32,3 +32,8 @@ export interface IHeaderState
 {
     definition?: IDefinition;
 }
+
+export interface IRunnerProps
+{
+    definitionId?: string;
+}

@@ -4,6 +4,7 @@ import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL } from "./settings"
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const apiRouter = require("./api/router");
 
 const app = express();
 
@@ -23,6 +24,16 @@ app.locals = {
 
 app.use(async (req, res, next) => {
     try {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header(
+            "Access-Control-Allow-Headers",
+            "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+        );
+        if (req.method === "OPTIONS") {
+            res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+            return res.status(200).json({});
+        }
+
         next();
     } catch (error) {
         console.log(error);
@@ -31,11 +42,12 @@ app.use(async (req, res, next) => {
     }
 });
 
-app.get('/api/definition', (req, res) => {
-    const definition = {};
-
-    res.json(definition);
+app.get('/404', (req, res) => {
+    res.render("404");
 });
+
+app.use(express.json());
+app.use("/api", apiRouter);
 
 app.get('/*', (req, res) => {
     res.render("index");
