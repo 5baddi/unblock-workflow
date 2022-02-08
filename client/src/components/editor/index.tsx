@@ -4,8 +4,8 @@ import { getDefinition } from "../../store/actions/definition";
 import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
-import { ENV } from "../../../../src/settings";
-import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_ID_KEY, USER_ID_KEY, DEFINITION_NAME_KEY } from "../../global";
+import { ENV, PUBLIC_URL } from "../../../../src/settings";
+import {DEFAULT_EDITOR_PROPERTIES, DEFINITION_ID_KEY, USER_ID_KEY, DEFINITION_NAME_KEY} from "../../global";
 import API  from "../../api";
 
 import "./blocks";
@@ -61,9 +61,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         localStorage.removeItem(USER_ID_KEY);
 
         let properties = this.mergeProperties(this.props.properties || DEFAULT_EDITOR_PROPERTIES);
-        let definition = typeof this.props.definitionId !== "undefined" ? await this.loadDefinitionById(this.props.definitionId) : this.props.definition;
+        let definition = await this.loadDefinitionById(this.props.definitionId);
 
-        this.editor = Builder.open(definition, properties);
+        this.editor = Builder.open(definition || this.props.definition, properties);
 
         this.editor.onSave = (definition: IDefinition) => this.onChange(definition);
 
@@ -98,7 +98,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         definition.name = name;
 
-        await API.post("definition", { definition })
+        await API.post(`${PUBLIC_URL}/definition`, { definition })
             .then(response => {
                 if (! response.data.definition) {
                     return;
@@ -133,7 +133,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return undefined;
         }
 
-        return await API.get(`definition/${definitionId}`)
+        return await API.get(`${PUBLIC_URL}/definition/${definitionId}`)
             .then(response => {
                 if (response.data.definition) {
                     return Promise.resolve(undefined);

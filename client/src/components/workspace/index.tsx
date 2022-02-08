@@ -9,6 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import "./style.scss";
 import {DEFINITION_NAME_KEY} from "../../global";
+import {PUBLIC_URL} from "../../settings";
 
 class Workspace extends React.Component<{}, { definitions: [] }>
 {
@@ -78,7 +79,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
 
     private loadDefinitions()
     {
-        API.get("/definitions")
+        API.get(`${PUBLIC_URL}/definitions`)
             .then(response => {
                 if (! response.data.definitions) {
                     return;
@@ -95,7 +96,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
 
     private editDefinition(definitionId)
     {
-        window.location.assign(`/${definitionId}`);
+        window.location.assign(`${PUBLIC_URL}/edit/${definitionId}`);
    }
 
     private async deleteDefinition(definitionId)
@@ -104,7 +105,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
             return;
         }
 
-        API.delete(`definition/${definitionId}`)
+        API.delete(`${PUBLIC_URL}/definition/${definitionId}`)
             .then(response => {
                 window.location.reload();
             })

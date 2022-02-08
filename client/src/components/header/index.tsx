@@ -4,8 +4,8 @@ import { Grid } from "@mui/material";
 import { TextField } from "@material-ui/core";
 import { IHeaderProps, IHeaderState } from "../../interfaces";
 import { loadDefaultDefinition } from "../../helpers";
-import { ENV } from "../../../../src/settings";
-import { DEFINITION_KEY, DEFINITION_NAME_KEY, DEFINITION_ID_KEY } from "../../global";
+import { ENV, PUBLIC_URL } from "../../../../src/settings";
+import {DEFINITION_KEY, DEFINITION_NAME_KEY, DEFINITION_ID_KEY } from "../../global";
 import { FiSliders, FiShare2, FiShare, FiDownload } from "react-icons/fi";
 import { HeaderButton } from "./button";
 import API  from "../../api";
@@ -69,7 +69,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
             return;
         }
 
-        await API.put(`definition/${id}`, { name })
+        await API.put(`${PUBLIC_URL}/definition/${id}`, { name })
             .then(response => {
                 if (! response.data.definition) {
                     return;
