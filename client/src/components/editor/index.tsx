@@ -9,7 +9,7 @@ import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
 import API  from "../../api";
 import { loadDefaultDefinition } from "../../helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faQuestion } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faQuestion, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 import "./blocks";
 
@@ -31,6 +31,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.onChange = this.onChange.bind(this);
         this.editDefinitionProps = this.editDefinitionProps.bind(this);
         this.openTutorial = this.openTutorial.bind(this);
+        this.clear = this.clear.bind(this);
     }
 
     render()
@@ -41,6 +42,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     <div className="editor-menu">
                         <button onClick={this.editDefinitionProps}>
                             <FontAwesomeIcon icon={faPen}/>
+                        </button>
+                        <button onClick={this.clear}>
+                            <FontAwesomeIcon icon={faTrash}/>
                         </button>
                         <button onClick={this.openTutorial}>
                             <FontAwesomeIcon icon={faQuestion}/>
@@ -143,6 +147,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         this.editor?.tutorial();
+    }
+
+    private clear()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        localStorage.removeItem(DEFINITION_KEY);
+
+        this.editor?.clear();
     }
 
     private onResize()
