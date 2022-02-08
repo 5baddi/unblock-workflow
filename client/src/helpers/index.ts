@@ -1,9 +1,12 @@
-import { DEFAULT_DEFINITION, DEFINITION_KEY } from "../global";
+import { DEFINITION_KEY } from "../global";
 import { IDefinition } from "../interfaces";
 
-export function loadDefaultDefinition(): IDefinition
+export function loadDefaultDefinition(): IDefinition | undefined
 {
-    let localDefinition = JSON.parse(localStorage.getItem(DEFINITION_KEY) || JSON.stringify(DEFAULT_DEFINITION));
+    let localDefinition = JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined");
+    if (! localDefinition) {
+        return undefined;
+    }
 
     return Object.assign({} as IDefinition, localDefinition);
 }

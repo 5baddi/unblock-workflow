@@ -17,6 +17,7 @@ import API  from "../../api";
 import "./blocks";
 
 import "./style.scss";
+import {loadDefaultDefinition} from "../../helpers";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -83,6 +84,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.editor.onChange = (definition: IDefinition) => this.onChange(definition);
 
+        this.editor.hook("OnClose", "synchronous", () => {
+            console.log("close");
+        });
+
         return this.editor;
     }
 
@@ -100,13 +105,18 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("saving form definition");
         }
 
+        let oldDefinition = Object.assign({} as IDefinition, JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined"));
+        if (typeof oldDefinition._id === "string") {
+            definition._id = oldDefinition._id;
+        }
+
         await API.post(`${PUBLIC_URL}/api/definition`, { definition })
             .then(response => {
                 if (! response.data.definition) {
                     return;
                 }
 
-                localStorage.setItem(DEFINITION_KEY, response.data.definition);
+                localStorage.setItem(DEFINITION_KEY, JSON.stringify(response.data.definition));
 
                 this.setState({ definition: response.data.definition });
             })
@@ -131,7 +141,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
     {
         if (! definitionId) {
-            return undefined;
+            return loadDefaultDefinition();
         }
 
         return await API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
