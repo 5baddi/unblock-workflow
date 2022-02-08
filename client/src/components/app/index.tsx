@@ -6,7 +6,6 @@ import { CssBaseline, withStyles } from "@material-ui/core";
 import store from "../../store";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
-import Home from "../../pages/home";
 
 import "./style.scss";
 import {ENV} from "../../../../src/settings";
@@ -53,9 +52,7 @@ const App = ({ classes }) => {
                         <BrowserRouter basename={ BASE_NAME }>
                             <Routes>
                                 <Route path="/run/:id" element={<ChatRunner />} />
-                                {/*<Route path="/edit/:id" element={<Studio />}/>*/}
                                 <Route path="/" element={<Studio />}/>
-                                {/*<Route path="/" element={<Home />}/>*/}
                             </Routes>
                         </BrowserRouter>
                     </main>
