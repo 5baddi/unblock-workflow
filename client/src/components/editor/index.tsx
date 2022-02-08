@@ -81,7 +81,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.editor = Builder.open(definition || this.props.definition, properties);
 
-        this.editor.onSave = (definition: IDefinition) => this.onChange(definition);
+        this.editor.onChange = (definition: IDefinition) => this.onChange(definition);
 
         return this.editor;
     }
