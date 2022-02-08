@@ -25,6 +25,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 name: "Unnamed"
             } as IDefinition
         };
+
+        this.onChange = this.onChange.bind(this);
+        this.updateDefinitionName = this.updateDefinitionName.bind(this);
     }
 
     render()
@@ -36,7 +39,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <Grid item md={4}>
                             <TextField
                                 variant="standard"
-                                defaultValue={this.state.definition?.name || "Unnamed"}
+                                defaultValue={this.state.definition?.name}
                                 onBlur={this.updateDefinitionName}
                                 onChange={() => {}}
                             />
@@ -116,19 +119,20 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        await API.put(`${PUBLIC_URL}/api/definition`, { name })
+        let definition = Object.assign({} as IDefinition, this.state.definition);
+        definition.name = name;
+
+        await API.post(`${PUBLIC_URL}/api/definition`, { definition })
             .then(response => {
-                if (! response.data.id) {
+                if (! response.data.definition) {
                     return;
                 }
 
-                localStorage.setItem(DEFINITION_ID_KEY, response.data.id);
-                localStorage.setItem(DEFINITION_NAME_KEY, response.data.name);
+                localStorage.setItem(DEFINITION_ID_KEY, response.data.definition._id);
+                localStorage.setItem(DEFINITION_NAME_KEY, response.data.definition.name);
+                localStorage.setItem(USER_ID_KEY, response.data.definition.userId);
 
-                let definition = Object.assign({} as IDefinition, this.state.definition);
-                definition.name = name;
-
-                this.setState({ definition });
+                this.setState({ definition: response.data.definition });
             })
             .catch(error => {
                 console.log(error);
