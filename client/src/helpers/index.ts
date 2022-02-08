@@ -3,14 +3,13 @@ import { IDefinition } from "../interfaces";
 
 export function loadDefaultDefinition(): IDefinition | undefined
 {
-    try {
-        let localDefinition = JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined");
-        if (! localDefinition) {
-            return undefined;
-        }
+    let localDefinition = localStorage.getItem(DEFINITION_KEY)
+        ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
+        : Object.assign({} as IDefinition, {});
 
-        return Object.assign({} as IDefinition, localDefinition);
-    } catch (error) {
+    if (! localDefinition) {
         return undefined;
     }
+
+    return Object.assign({} as IDefinition, localDefinition);
 }

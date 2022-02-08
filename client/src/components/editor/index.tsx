@@ -8,6 +8,8 @@ import { ENV, PUBLIC_URL } from "../../../../src/settings";
 import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
 import API  from "../../api";
 import { loadDefaultDefinition } from "../../helpers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen, faQuestion } from "@fortawesome/free-solid-svg-icons";
 
 import "./blocks";
 
@@ -27,13 +29,24 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         };
 
         this.onChange = this.onChange.bind(this);
+        this.editDefinitionProps = this.editDefinitionProps.bind(this);
+        this.openTutorial = this.openTutorial.bind(this);
     }
 
     render()
     {
         return (
             <Grid container>
-                <Grid item md={12} id={this.props.element}></Grid>
+                <Grid item md={12} id={this.props.element}>
+                    <div className="editor-menu">
+                        <button onClick={this.editDefinitionProps}>
+                            <FontAwesomeIcon icon={faPen}/>
+                        </button>
+                        <button onClick={this.openTutorial}>
+                            <FontAwesomeIcon icon={faQuestion}/>
+                        </button>
+                    </div>
+                </Grid>
             </Grid>
         );
     }
@@ -91,7 +104,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("saving form definition");
         }
 
-        let oldDefinition = Object.assign({} as IDefinition, JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined"));
+        let oldDefinition = localStorage.getItem(DEFINITION_KEY)
+            ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
+            : Object.assign({} as IDefinition, {});
+
         if (typeof oldDefinition._id === "string") {
             definition._id = oldDefinition._id;
         }
@@ -109,6 +125,24 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             .catch(error => {
                 console.log(error);
             });
+    }
+
+    private editDefinitionProps()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        this.editor?.edit("properties");
+    }
+
+    private openTutorial()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        this.editor?.tutorial();
     }
 
     private onResize()

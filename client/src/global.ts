@@ -494,14 +494,14 @@ export const DEFAULT_EDITOR_PROPERTIES: IEditorProperties = {
     element: null,
     fonts: `${PUBLIC_URL}/fonts/`,
     disableLogo: true,
-    disableTutorialButton: false,
+    disableTutorialButton: true,
     disableSaveButton: true,
     disableRestoreButton: true,
-    disableClearButton: false,
+    disableClearButton: true,
     disableCloseButton: true,
     supportURL: false,
     disableOpenCloseAnimation: true,
     showTutorial: false,
-    disableEditButton: false,
+    disableEditButton: true,
     zoom: "fit-horizontal"
 };
