@@ -49,12 +49,12 @@ const App = ({ classes }) => {
                 <React.Fragment>
                     <CssBaseline/>
                     <main className={classes.main}>
-                        <BrowserRouter>
+                        <BrowserRouter basename={process.env.BASE_NAME}>
                             <Routes>
-                                <Route path={`${process.env.PUBLIC_URL}/run/:id`} element={<ChatRunner />} />
-                                <Route path={`${process.env.PUBLIC_URL}/edit/:id`} element={<Studio />}/>
-                                <Route path={`${process.env.PUBLIC_URL}/new`} element={<Studio />}/>
-                                <Route path={`${process.env.PUBLIC_URL}/`} element={<Home />}/>
+                                <Route path="/run/:id" element={<ChatRunner />} />
+                                <Route path="/edit/:id" element={<Studio />}/>
+                                <Route path="/new" element={<Studio />}/>
+                                <Route path="/" element={<Home />}/>
                             </Routes>
                         </BrowserRouter>
                     </main>
