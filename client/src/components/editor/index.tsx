@@ -133,10 +133,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return undefined;
         }
 
-        return API.get(`definition/${definitionId}`)
+        return await API.get(`definition/${definitionId}`)
             .then(response => {
                 if (response.data.definition) {
-                    return undefined;
+                    return Promise.resolve(undefined);
                 }
 
                 let definition = Object.assign({} as IDefinition, response.data.definition);
@@ -144,7 +144,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 localStorage.setItem(DEFINITION_NAME_KEY, definition.name);
                 localStorage.setItem(USER_ID_KEY, definition.userId);
 
-                return definition;
+                return Promise.resolve(definition);
             })
             .catch(error => {
                 console.log(error);

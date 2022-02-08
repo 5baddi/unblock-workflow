@@ -1,10 +1,11 @@
 import * as React from "react";
-import { Box, Grid, Typography, List, ListItem, ListItemText, ListItemAvatar, Avatar } from "@mui/material";
+import { Box, Grid, Typography, List, ListItem, ListItemText, ListItemAvatar, Avatar, ListItemButton } from "@mui/material";
 import IconButton from '@mui/material/IconButton';
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import { IDefinition } from "../../interfaces";
 import API from "../../api";
 import { FiFileText } from "react-icons/fi";
+import EditIcon from '@mui/icons-material/Edit';
 
 import "./style.scss";
 import {DEFINITION_NAME_KEY} from "../../global";
@@ -47,6 +48,11 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                                                 </IconButton>
                                             }
                                         >
+                                            <ListItemButton>
+                                                <IconButton edge="end" aria-label="delete" onClick={() => this.editDefinition(definition._id)}>
+                                                    <EditIcon />
+                                                </IconButton>
+                                            </ListItemButton>
                                             <ListItemAvatar>
                                                 <Avatar>
                                                     <FiFileText />
@@ -86,6 +92,11 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                 console.log(error);
             });
     }
+
+    private editDefinition(definitionId)
+    {
+        window.location.assign(`/${definitionId}`);
+   }
 
     private async deleteDefinition(definitionId)
     {
