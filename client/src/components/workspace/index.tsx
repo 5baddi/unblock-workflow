@@ -96,7 +96,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
 
     private editDefinition(definitionId)
     {
-        window.location.assign(`${PUBLIC_URL}/api/edit/${definitionId}`);
+        window.location.assign(`${PUBLIC_URL}/edit/${definitionId}`);
    }
 
     private async deleteDefinition(definitionId)
