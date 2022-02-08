@@ -9,6 +9,7 @@ import {
     TASK_COLLECTION_NAME,
     USER_COLLECTION_NAME
 } from "../settings";
+import {IDefinition} from "../interfaces/definition";
 
 const express = require("express");
 const router = express.Router();
@@ -145,6 +146,50 @@ router.put("/definition/:id", (req, res) => {
                     client.close();
 
                     return res.send({ success: true, name });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return res.status(500).send({
+                        success: false,
+                        message: error.message || "failed to update definition name",
+                    });
+                });
+        });
+});
+
+router.get("/definition/:id", (req, res) => {
+    let body = req.body;
+    let id = req.params.id;
+    if (! id) {
+        res.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOne({ _id: new ObjectId(id) })
+                .then(result => {
+                    if (! result === null) {
+                        client.close();
+
+                        return res.status(401).send({
+                            success: false,
+                            message: "failed to update definition name",
+                        });
+                    }
+
+                    client.close();
+
+                    let definition = Object.assign({} as IDefinition, result);
+
+                    return res.send({ success: true, definition });
                 })
                 .catch(error => {
                     client.close();

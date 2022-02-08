@@ -13,6 +13,8 @@ export interface IEditorProps
 {
     element: string;
 
+    definitionId?: string;
+
     definition?: IDefinition;
 
     properties?: IEditorProperties;

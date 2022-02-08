@@ -30,7 +30,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     componentDidMount()
     {
         this.open()
-            .resize();
+            .catch((error) => console.log(error));
 
         if (typeof this.editor === "undefined") {
             return;
@@ -50,7 +50,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         window.removeEventListener("orientationchange", this.onResize);
     }
 
-    private open(): Builder
+    private async open(): Promise<Builder>
     {
         if (ENV === "development") {
             console.log("opening the editor");
@@ -61,8 +61,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         localStorage.removeItem(USER_ID_KEY);
 
         let properties = this.mergeProperties(this.props.properties || DEFAULT_EDITOR_PROPERTIES);
+        let definition = typeof this.props.definitionId !== "undefined" ? await this.loadDefinitionById(this.props.definitionId) : this.props.definition;
 
-        this.editor = Builder.open(this.props.definition, properties);
+        this.editor = Builder.open(definition, properties);
 
         this.editor.onSave = (definition: IDefinition) => this.onChange(definition);
 
@@ -124,6 +125,30 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         this.editor.resize();
+    }
+
+    private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
+    {
+        if (! definitionId) {
+            return undefined;
+        }
+
+        return API.get(`definition/${definitionId}`)
+            .then(response => {
+                if (response.data.definition) {
+                    return undefined;
+                }
+
+                let definition = Object.assign({} as IDefinition, response.data.definition);
+                localStorage.setItem(DEFINITION_ID_KEY, definition._id);
+                localStorage.setItem(DEFINITION_NAME_KEY, definition.name);
+                localStorage.setItem(USER_ID_KEY, definition.userId);
+
+                return definition;
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 }
 

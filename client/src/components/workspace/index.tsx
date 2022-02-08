@@ -40,9 +40,9 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                             this.state.definitions.length > 0 ? <List>
                                 {
                                     this.state.definitions.map((definition: IDefinition) =>  (
-                                        <ListItem
+                                        <ListItem key={definition._id}
                                             secondaryAction={
-                                                <IconButton id={`item-${definition._id}`} edge="end" aria-label="delete" onClick={() => this.deleteDefinition(definition._id)}>
+                                                <IconButton edge="end" aria-label="delete" onClick={() => this.deleteDefinition(definition._id)}>
                                                     <DeleteIcon />
                                                 </IconButton>
                                             }

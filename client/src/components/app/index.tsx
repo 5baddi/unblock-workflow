@@ -28,7 +28,8 @@ const App = ({ classes }) => {
                         <Routes>
                             <Route path="/run/:id" element={<ChatRunner />} />
                             <Route path="/new" element={<Studio />}/>
-                            <Route path="/*" element={<Home />}/>
+                            <Route path="/:id" element={<Studio />}/>
+                            <Route path="/" element={<Home />}/>
                         </Routes>
                     </BrowserRouter>
                 </main>
