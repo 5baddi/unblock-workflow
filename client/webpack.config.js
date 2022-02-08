@@ -56,6 +56,7 @@ module.exports = {
         },
         alias: {
             "react-dom$": "react-dom/profiling",
+            "scheduler/tracing": "scheduler/tracing-profiling",
         }
     },
 
