@@ -17,6 +17,7 @@ import { IDefinition } from "../../interfaces";
 import API from "../../api";
 import { FiFileText } from "react-icons/fi";
 import EditIcon from '@mui/icons-material/Edit';
+import PlayCircleFilledWhiteIcon from '@mui/icons-material/PlayCircleFilledWhite';
 
 import "./style.scss";
 import {DEFINITION_ID_KEY, DEFINITION_NAME_KEY, USER_ID_KEY} from "../../global";
@@ -64,8 +65,13 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                                             }
                                         >
                                             <ListItemButton>
-                                                <IconButton edge="end" aria-label="delete" onClick={() => this.editDefinition(definition._id)}>
+                                                <IconButton edge="end" aria-label="edit" onClick={() => this.editDefinition(definition._id)}>
                                                     <EditIcon />
+                                                </IconButton>
+                                            </ListItemButton>
+                                            <ListItemButton>
+                                                <IconButton edge="end" aria-label="run" onClick={() => this.runDefinition(definition._id)}>
+                                                    <PlayCircleFilledWhiteIcon />
                                                 </IconButton>
                                             </ListItemButton>
                                             <ListItemAvatar>
@@ -119,6 +125,11 @@ class Workspace extends React.Component<{}, { definitions: [] }>
     private editDefinition(definitionId)
     {
         window.location.assign(`${PUBLIC_URL}/edit/${definitionId}`);
+   }
+
+   private runDefinition(definitionId)
+    {
+        window.location.assign(`${PUBLIC_URL}/run/${definitionId}`);
    }
 
     private async updateDefinitionName(e, definition)
