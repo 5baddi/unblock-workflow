@@ -115,11 +115,11 @@ router.post("/definition", (req, res) => {
 });
 
 
-router.put("/definition/:id", (req, res) => {
+router.put("/definition/:id?", (req, res) => {
     let body = req.body;
     let name = body.name;
     let id = req.params.id;
-    if (! name || ! id) {
+    if (! name) {
         res.status(401)
             .send({
                 success: false,
@@ -127,12 +127,14 @@ router.put("/definition/:id", (req, res) => {
             });
     }
 
+    id = new ObjectId(id);
+
     return connect()
         .then(client => {
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { name: name } }, { upsert: false })
+                .findOneAndUpdate({ _id: id }, { $set: { _id: id, name: name } }, { upsert: true })
                 .then(result => {
                     if (! result.ok) {
                         client.close();
@@ -145,7 +147,7 @@ router.put("/definition/:id", (req, res) => {
 
                     client.close();
 
-                    return res.send({ success: true, name });
+                    return res.send({ success: true, id, name });
                 })
                 .catch(error => {
                     client.close();

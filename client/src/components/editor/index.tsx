@@ -11,6 +11,7 @@ import API  from "../../api";
 import "./blocks";
 
 import "./style.scss";
+import {TextField} from "@material-ui/core";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -18,12 +19,38 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            definition: {
+                name: "Unnamed"
+            } as IDefinition
+        };
     }
 
     render()
     {
         return (
-            <Grid item md={12} id={this.props.element}></Grid>
+            <Grid container>
+                <Grid container className="header">
+                    <Grid item md={7} container justifyContent="start" alignItems="center">
+                        <Grid item md={4}>
+                            <TextField
+                                variant="standard"
+                                defaultValue={this.state.definition?.name || "Unnamed"}
+                                onBlur={this.updateDefinitionName}
+                                onChange={() => {}}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Grid item md={5} container justifyContent="end" alignItems="center" className="header-actions">
+                        {/*<HeaderButton label="Customize" hoverClassName="blue" children={<FiSliders/>}/>*/}
+                        {/*<HeaderButton label="Share" hoverClassName="yellow" children={<FiShare/>}/>*/}
+                        {/*<HeaderButton label="Automate" hoverClassName="green" children={<FiShare2/>}/>*/}
+                        {/*<HeaderButton label="Results" hoverClassName="pink" children={<FiDownload/>}/>*/}
+                    </Grid>
+                </Grid>
+                <Grid item md={12} id={this.props.element}></Grid>
+            </Grid>
         );
     }
 
@@ -81,6 +108,33 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return properties as IEditorProperties;
     }
 
+    private async updateDefinitionName(e)
+    {
+        let oldName = localStorage.getItem(DEFINITION_NAME_KEY);
+        let name = e.target.value;
+        if (oldName === name) {
+            return;
+        }
+
+        await API.put(`${PUBLIC_URL}/api/definition`, { name })
+            .then(response => {
+                if (! response.data.id) {
+                    return;
+                }
+
+                localStorage.setItem(DEFINITION_ID_KEY, response.data.id);
+                localStorage.setItem(DEFINITION_NAME_KEY, response.data.name);
+
+                let definition = Object.assign({} as IDefinition, this.state.definition);
+                definition.name = name;
+
+                this.setState({ definition });
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     private async onChange(definition: IDefinition)
     {
         if (ENV === "development") {
@@ -88,7 +142,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let definitionId = localStorage.getItem(DEFINITION_ID_KEY);
-        let name = localStorage.getItem(DEFINITION_NAME_KEY) || "Unamed";
+        let name = localStorage.getItem(DEFINITION_NAME_KEY) || "Unnamed";
         let userId = localStorage.getItem(USER_ID_KEY);
 
         if (definitionId && userId) {
@@ -135,7 +189,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         return await API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
             .then(response => {
-                if (response.data.definition) {
+                if (! response.data.definition) {
                     return Promise.resolve(undefined);
                 }
 
@@ -143,6 +197,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 localStorage.setItem(DEFINITION_ID_KEY, definition._id);
                 localStorage.setItem(DEFINITION_NAME_KEY, definition.name);
                 localStorage.setItem(USER_ID_KEY, definition.userId);
+
+                this.setState({ definition });
 
                 return Promise.resolve(definition);
             })

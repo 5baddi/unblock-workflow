@@ -10,9 +10,6 @@ export default function Studio (props)
     let { id } = useParams();
 
     return (
-        <Grid container>
-            <Header/>
-            <Editor element={ EDITOR_CONTAINER_ID } definitionId={id}/>
-        </Grid>
+        <Editor element={ EDITOR_CONTAINER_ID } definitionId={id}/>
     );
 };
