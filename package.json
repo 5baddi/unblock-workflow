@@ -4,6 +4,8 @@
   "description": "Unblock workflow studio",
   "author": "5baddi <project@baddi.info>",
   "private": true,
+  "proxy": "http://localhost:3001/",
+  "homepage": ".",
   "main": "build/server.js",
   "scripts": {
     "client:install": "cd client && yarn install",
