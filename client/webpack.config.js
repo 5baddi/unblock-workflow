@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const Copy = require("copy-webpack-plugin");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const dotenv = require("dotenv");
 
 const dotenvParsed = dotenv.config({ path: path.resolve("./../.env") }).parsed;
@@ -52,6 +53,9 @@ module.exports = {
             "os": require.resolve("os-browserify/browser"),
             "path": false,
             "fs": false
+        },
+        alias: {
+            "react-dom$": "react-dom/profiling",
         }
     },
 
@@ -74,6 +78,11 @@ module.exports = {
             "process.env.NODE_DEBUG": JSON.stringify(process.env.NODE_DEBUG)
         })
     ],
+    optimization: {
+        minimize: true,
+        mangleExports: false,
+        minimizer: [new TerserPlugin()],
+    },
     stats: {
         children: true
     },
