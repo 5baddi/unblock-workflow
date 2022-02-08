@@ -1,4 +1,5 @@
 import { IEditorProperties } from "./interfaces";
+import { PUBLIC_URL } from "./settings";
 
 export const DEFINITION_KEY = "definition";
 export const DEFINITION_ID_KEY = "definition-id";
@@ -491,7 +492,7 @@ export const DEFAULT_DEFINITION = {
 };
 export const DEFAULT_EDITOR_PROPERTIES: IEditorProperties = {
     element: null,
-    fonts: "fonts/",
+    fonts: `${PUBLIC_URL}/fonts/`,
     disableLogo: true,
     disableTutorialButton: true,
     disableSaveButton: false,
