@@ -8,7 +8,9 @@ import { ENV, PUBLIC_URL } from "../../../../src/settings";
 import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
 import API  from "../../api";
 import { loadDefaultDefinition } from "../../helpers";
-import Menu from "./menu";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen, faQuestion, faTrash } from "@fortawesome/free-solid-svg-icons";
+import DefinitionsModal from "./definitions-modal";
 
 import "./blocks";
 
@@ -24,10 +26,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.state = {
             definition: {
                 name: "Unnamed"
-            } as IDefinition
+            } as IDefinition,
+            showModal: false
         };
 
         this.onChange = this.onChange.bind(this);
+        this.editDefinitionProps = this.editDefinitionProps.bind(this);
+        this.openTutorial = this.openTutorial.bind(this);
+        this.clear = this.clear.bind(this);
+        this.setShowModal = this.setShowModal.bind(this);
+        this.showDefinitionsModal = this.showDefinitionsModal.bind(this);
     }
 
     render()
@@ -35,8 +43,23 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return (
             <Grid container>
                 <Grid item md={12} id={this.props.element}>
-                    <Menu editor={this.editor}/>
+                    <div className="editor-menu">
+                        <button onClick={this.showDefinitionsModal}>
+                            <img src={`${PUBLIC_URL}/logo.png`} />
+                        </button>
+                        <button onClick={this.editDefinitionProps}>
+                            <FontAwesomeIcon icon={faPen}/>
+                        </button>
+                        <button onClick={this.clear}>
+                            <FontAwesomeIcon icon={faTrash}/>
+                        </button>
+                        <button onClick={this.openTutorial}>
+                            <FontAwesomeIcon icon={faQuestion}/>
+                        </button>
+                        <DefinitionsModal show={this.state.showModal} onHide={this.setShowModal}/>
+                    </div>
                 </Grid>
+
             </Grid>
         );
     }
@@ -143,7 +166,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 }
 
                 let definition = Object.assign({} as IDefinition, response.data.definition);
-                localStorage.setItem(DEFINITION_KEY, definition);
+                localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
                 this.setState({ definition });
 
@@ -152,6 +175,49 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             .catch(error => {
                 console.log(error);
             });
+    }
+
+    private setShowModal()
+    {
+        this.setState({
+            showModal: ! this.state.showModal
+        })
+    }
+
+    private showDefinitionsModal()
+    {
+        this.setState({
+            showModal: ! this.state.showModal
+        })
+    }
+
+    private editDefinitionProps()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        this.editor?.edit("properties");
+    }
+
+    private openTutorial()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        this.editor?.tutorial();
+    }
+
+    private clear()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        localStorage.removeItem(DEFINITION_KEY);
+
+        this.editor?.clear();
     }
 }
 

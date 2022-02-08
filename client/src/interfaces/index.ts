@@ -1,4 +1,5 @@
 import { Builder, IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto";
+import { ModalProps } from "react-bootstrap/Modal";
 
 export interface IDefinition extends TripettoIDefinition
 {
@@ -23,6 +24,7 @@ export interface IEditorProps
 export interface IEditorState
 {
     definition: IDefinition;
+    showModal: boolean;
 }
 
 export interface IHeaderProps
@@ -44,4 +46,16 @@ export interface IRunnerProps
 export interface IEditorMenuProps
 {
     editor?: Builder;
+}
+
+export interface IEditorMenuState {}
+
+export interface IEditorDefinitionsModalProps extends ModalProps
+{
+    onHide: () => void;
+}
+
+export interface IEditorDefinitionsModalState extends ModalProps
+{
+    definitions?: IDefinition[];
 }
