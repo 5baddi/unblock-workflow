@@ -10,6 +10,7 @@ import Home from "../../pages/home";
 
 import "./style.scss";
 import {ENV} from "../../../../src/settings";
+import {BASE_NAME} from "../../settings";
 
 const styles = theme => ({
     main: {
@@ -49,12 +50,12 @@ const App = ({ classes }) => {
                 <React.Fragment>
                     <CssBaseline/>
                     <main className={classes.main}>
-                        <BrowserRouter basename={process.env.BASE_NAME}>
+                        <BrowserRouter basename={ BASE_NAME }>
                             <Routes>
                                 <Route path="/run/:id" element={<ChatRunner />} />
-                                <Route path="/edit/:id" element={<Studio />}/>
-                                <Route path="/new" element={<Studio />}/>
-                                <Route path="/" element={<Home />}/>
+                                {/*<Route path="/edit/:id" element={<Studio />}/>*/}
+                                <Route path="/" element={<Studio />}/>
+                                {/*<Route path="/" element={<Home />}/>*/}
                             </Routes>
                         </BrowserRouter>
                     </main>

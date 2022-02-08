@@ -17,8 +17,6 @@ export interface IEditorProps
 
     definition?: IDefinition;
 
-    properties?: IEditorProperties;
-
     getDefinition(): IDefinition | undefined;
 }
 

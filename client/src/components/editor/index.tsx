@@ -5,13 +5,18 @@ import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../../../src/settings";
-import {DEFAULT_EDITOR_PROPERTIES, DEFINITION_ID_KEY, USER_ID_KEY, DEFINITION_NAME_KEY} from "../../global";
+import {
+    DEFAULT_EDITOR_PROPERTIES,
+    DEFINITION_ID_KEY,
+    USER_ID_KEY,
+    DEFINITION_NAME_KEY,
+    DEFINITION_KEY
+} from "../../global";
 import API  from "../../api";
 
 import "./blocks";
 
 import "./style.scss";
-import {TextField} from "@material-ui/core";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -33,24 +38,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         return (
             <Grid container>
-                <Grid container className="header">
-                    <Grid item md={7} container justifyContent="start" alignItems="center">
-                        <Grid item md={4}>
-                            <TextField
-                                variant="standard"
-                                defaultValue={this.state.definition?.name || "Unnamed"}
-                                onBlur={this.updateDefinitionName}
-                                onChange={() => {}}
-                            />
-                        </Grid>
-                    </Grid>
-                    <Grid item md={5} container justifyContent="end" alignItems="center" className="header-actions">
-                        {/*<HeaderButton label="Customize" hoverClassName="blue" children={<FiSliders/>}/>*/}
-                        {/*<HeaderButton label="Share" hoverClassName="yellow" children={<FiShare/>}/>*/}
-                        {/*<HeaderButton label="Automate" hoverClassName="green" children={<FiShare2/>}/>*/}
-                        {/*<HeaderButton label="Results" hoverClassName="pink" children={<FiDownload/>}/>*/}
-                    </Grid>
-                </Grid>
                 <Grid item md={12} id={this.props.element}></Grid>
             </Grid>
         );
@@ -89,7 +76,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         localStorage.removeItem(DEFINITION_NAME_KEY);
         localStorage.removeItem(USER_ID_KEY);
 
-        let properties = this.mergeProperties(this.props.properties || DEFAULT_EDITOR_PROPERTIES);
+        let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
         let definition = await this.loadDefinitionById(this.props.definitionId);
 
         this.editor = Builder.open(definition || this.props.definition, properties);
@@ -104,37 +91,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let properties = Object.assign({}, JSON.parse(JSON.stringify(config)));
         properties.element = document.getElementById(this.props.element);
 
-        // Force shows save button
-        properties.disableSaveButton = false;
-
         return properties as IEditorProperties;
-    }
-
-    private async updateDefinitionName(e)
-    {
-        let oldName = localStorage.getItem(DEFINITION_NAME_KEY);
-        let name = e.target.value;
-        if (oldName === name) {
-            return;
-        }
-
-        await API.put(`${PUBLIC_URL}/api/definition`, { name })
-            .then(response => {
-                if (! response.data.id) {
-                    return;
-                }
-
-                localStorage.setItem(DEFINITION_ID_KEY, response.data.id);
-                localStorage.setItem(DEFINITION_NAME_KEY, response.data.name);
-
-                let definition = Object.assign({} as IDefinition, this.state.definition);
-                definition.name = name;
-
-                this.setState({ definition });
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 
     private async onChange(definition: IDefinition)
@@ -143,25 +100,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("saving form definition");
         }
 
-        let definitionId = localStorage.getItem(DEFINITION_ID_KEY);
-        let name = localStorage.getItem(DEFINITION_NAME_KEY) || "Unnamed";
-        let userId = localStorage.getItem(USER_ID_KEY);
-
-        if (definitionId && userId) {
-            definition._id = definitionId;
-            definition.userId = userId;
-        }
-
-        definition.name = name;
-
         await API.post(`${PUBLIC_URL}/api/definition`, { definition })
             .then(response => {
                 if (! response.data.definition) {
                     return;
                 }
 
-                localStorage.setItem(DEFINITION_ID_KEY, response.data.definition._id);
-                localStorage.setItem(USER_ID_KEY, response.data.definition.userId);
+                localStorage.setItem(DEFINITION_KEY, response.data.definition);
 
                 this.setState({ definition: response.data.definition });
             })
@@ -196,9 +141,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 }
 
                 let definition = Object.assign({} as IDefinition, response.data.definition);
-                localStorage.setItem(DEFINITION_ID_KEY, definition._id);
-                localStorage.setItem(DEFINITION_NAME_KEY, definition.name);
-                localStorage.setItem(USER_ID_KEY, definition.userId);
+                localStorage.setItem(DEFINITION_KEY, definition);
 
                 this.setState({ definition });
 
