@@ -61,6 +61,7 @@ module.exports = {
             patterns: [
                 { from: "src/views"},
                 { from: "src/assets"},
+                { from: "src/registerServiceWorker.ts"},
                 { from: "node_modules/tripetto/fonts/", to: "fonts/" },
                 { from: "node_modules/@fortawesome/fontawesome-free/webfonts/", to: "fonts/" }
         ]
