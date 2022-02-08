@@ -27,31 +27,30 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         };
 
         this.onChange = this.onChange.bind(this);
-        this.updateDefinitionName = this.updateDefinitionName.bind(this);
     }
 
     render()
     {
         return (
             <Grid container>
-                <Grid container className="header">
-                    <Grid item md={7} container justifyContent="start" alignItems="center">
-                        <Grid item md={4}>
-                            <TextField
-                                variant="standard"
-                                defaultValue={this.state.definition.name}
-                                onBlur={this.updateDefinitionName}
-                                onChange={() => {}}
-                            />
-                        </Grid>
-                    </Grid>
-                    <Grid item md={5} container justifyContent="end" alignItems="center" className="header-actions">
-                        {/*<HeaderButton label="Customize" hoverClassName="blue" children={<FiSliders/>}/>*/}
-                        {/*<HeaderButton label="Share" hoverClassName="yellow" children={<FiShare/>}/>*/}
-                        {/*<HeaderButton label="Automate" hoverClassName="green" children={<FiShare2/>}/>*/}
-                        {/*<HeaderButton label="Results" hoverClassName="pink" children={<FiDownload/>}/>*/}
-                    </Grid>
-                </Grid>
+                {/*<Grid container className="header">*/}
+                {/*    <Grid item md={7} container justifyContent="start" alignItems="center">*/}
+                {/*        <Grid item md={4}>*/}
+                {/*            <TextField*/}
+                {/*                variant="standard"*/}
+                {/*                defaultValue={this.state.definition.name}*/}
+                {/*                onBlur={this.updateDefinitionName}*/}
+                {/*                onChange={() => {}}*/}
+                {/*            />*/}
+                {/*        </Grid>*/}
+                {/*    </Grid>*/}
+                {/*    <Grid item md={5} container justifyContent="end" alignItems="center" className="header-actions">*/}
+                {/*        /!*<HeaderButton label="Customize" hoverClassName="blue" children={<FiSliders/>}/>*!/*/}
+                {/*        /!*<HeaderButton label="Share" hoverClassName="yellow" children={<FiShare/>}/>*!/*/}
+                {/*        /!*<HeaderButton label="Automate" hoverClassName="green" children={<FiShare2/>}/>*!/*/}
+                {/*        /!*<HeaderButton label="Results" hoverClassName="pink" children={<FiDownload/>}/>*!/*/}
+                {/*    </Grid>*/}
+                {/*</Grid>*/}
                 <Grid item md={12} id={this.props.element}></Grid>
             </Grid>
         );
@@ -109,34 +108,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         properties.disableSaveButton = false;
 
         return properties as IEditorProperties;
-    }
-
-    private async updateDefinitionName(e)
-    {
-        let oldName = localStorage.getItem(DEFINITION_NAME_KEY);
-        let name = e.target.value;
-        if (oldName === name) {
-            return;
-        }
-
-        let definition = Object.assign({} as IDefinition, this.state.definition);
-        definition.name = name;
-
-        await API.post(`${PUBLIC_URL}/api/definition`, { definition })
-            .then(response => {
-                if (! response.data.definition) {
-                    return;
-                }
-
-                localStorage.setItem(DEFINITION_ID_KEY, response.data.definition._id);
-                localStorage.setItem(DEFINITION_NAME_KEY, response.data.definition.name);
-                localStorage.setItem(USER_ID_KEY, response.data.definition.userId);
-
-                this.setState({ definition: response.data.definition });
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 
     private async onChange(definition: IDefinition)

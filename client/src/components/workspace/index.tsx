@@ -8,8 +8,9 @@ import { FiFileText } from "react-icons/fi";
 import EditIcon from '@mui/icons-material/Edit';
 
 import "./style.scss";
-import {DEFINITION_NAME_KEY} from "../../global";
+import {DEFINITION_ID_KEY, DEFINITION_NAME_KEY, USER_ID_KEY} from "../../global";
 import {PUBLIC_URL} from "../../settings";
+import {TextField} from "@material-ui/core";
 
 class Workspace extends React.Component<{}, { definitions: [] }>
 {
@@ -22,6 +23,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
         };
 
         this.deleteDefinition = this.deleteDefinition.bind(this);
+        this.updateDefinitionName = this.updateDefinitionName.bind(this);
     }
 
     componentDidMount()
@@ -59,8 +61,11 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                                                     <FiFileText />
                                                 </Avatar>
                                             </ListItemAvatar>
-                                            <ListItemText
-                                                primary={definition.name}
+                                            <TextField
+                                                variant="standard"
+                                                defaultValue={definition.name}
+                                                onBlur={(e) => this.updateDefinitionName(e, definition)}
+                                                onChange={() => {}}
                                             />
                                         </ListItem>
                                     ))
@@ -98,6 +103,17 @@ class Workspace extends React.Component<{}, { definitions: [] }>
     {
         window.location.assign(`${PUBLIC_URL}/edit/${definitionId}`);
    }
+
+    private async updateDefinitionName(e, definition)
+    {
+        let name = e.target.value;
+        definition.name = name;
+
+        await API.post(`${PUBLIC_URL}/api/definition`, { definition })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 
     private async deleteDefinition(definitionId)
     {
