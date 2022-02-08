@@ -39,7 +39,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <Grid item md={4}>
                             <TextField
                                 variant="standard"
-                                defaultValue={this.state.definition?.name}
+                                defaultValue={this.state.definition.name}
                                 onBlur={this.updateDefinitionName}
                                 onChange={() => {}}
                             />

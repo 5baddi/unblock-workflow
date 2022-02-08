@@ -24,7 +24,7 @@ export interface IEditorProps
 
 export interface IEditorState
 {
-    definition?: IDefinition;
+    definition: IDefinition;
 }
 
 export interface IHeaderProps
