@@ -9,6 +9,7 @@ import ChatRunner from "../../pages/run";
 import Home from "../../pages/home";
 
 import "./style.scss";
+import {ENV} from "../../../../src/settings";
 
 const styles = theme => ({
     main: {
@@ -28,6 +29,10 @@ const logProfile = (
     commitTime: number,
     interactions: Set<any>
 ) => {
+    if (ENV !== "production") {
+        return;
+    }
+
     console.log("Profiling ID", id);
     console.log("Profiling phase", phase);
     console.log("Profiling actualDuration", actualDuration);
@@ -39,7 +44,7 @@ const logProfile = (
 
 const App = ({ classes }) => {
     return (
-        <Profiler id="app" onRender={logProfile}>
+        <Profiler id="application" onRender={logProfile}>
             <Provider store={ store }>
                 <React.Fragment>
                     <CssBaseline/>
