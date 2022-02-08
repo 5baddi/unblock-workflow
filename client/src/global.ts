@@ -503,5 +503,5 @@ export const DEFAULT_EDITOR_PROPERTIES: IEditorProperties = {
     disableOpenCloseAnimation: true,
     showTutorial: false,
     disableEditButton: false,
-    zoom: "fit"
+    zoom: "fit-horizontal"
 };

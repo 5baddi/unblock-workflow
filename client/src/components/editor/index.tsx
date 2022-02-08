@@ -5,19 +5,13 @@ import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../../../src/settings";
-import {
-    DEFAULT_EDITOR_PROPERTIES,
-    DEFINITION_ID_KEY,
-    USER_ID_KEY,
-    DEFINITION_NAME_KEY,
-    DEFINITION_KEY
-} from "../../global";
+import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
 import API  from "../../api";
+import { loadDefaultDefinition } from "../../helpers";
 
 import "./blocks";
 
 import "./style.scss";
-import {loadDefaultDefinition} from "../../helpers";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -73,20 +67,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("opening the editor");
         }
 
-        localStorage.removeItem(DEFINITION_ID_KEY);
-        localStorage.removeItem(DEFINITION_NAME_KEY);
-        localStorage.removeItem(USER_ID_KEY);
-
         let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
         let definition = await this.loadDefinitionById(this.props.definitionId);
 
         this.editor = Builder.open(definition || this.props.definition, properties);
 
         this.editor.onChange = (definition: IDefinition) => this.onChange(definition);
-
-        this.editor.hook("OnClose", "synchronous", () => {
-            console.log("close");
-        });
 
         return this.editor;
     }
