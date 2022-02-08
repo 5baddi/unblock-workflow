@@ -41,6 +41,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 <Grid item md={12} id={this.props.element}>
                     <div className="editor-menu">
                         <button onClick={this.editDefinitionProps}>
+                            <img src={`${PUBLIC_URL}/logo.jpg`} />
+                        </button>
+                        <button onClick={this.editDefinitionProps}>
                             <FontAwesomeIcon icon={faPen}/>
                         </button>
                         <button onClick={this.clear}>
