@@ -8,9 +8,12 @@ const dotenvParsed = dotenv.config({ path: path.resolve("./../.env") }).parsed;
 
 module.exports = {
     target: ["web", "es5"],
-    entry: "./src/index.tsx",
+    entry: {
+        "bundle": "./src/index.tsx",
+        "service-worker": "./src/registerServiceWorker.ts"
+    },
     output: {
-        filename: "bundle.js",
+        filename: "[name].js",
         path: path.resolve("./../public"),
         publicPath: "./../"
     },
@@ -61,7 +64,6 @@ module.exports = {
             patterns: [
                 { from: "src/views"},
                 { from: "src/assets"},
-                // { from: "src/registerServiceWorker.ts"},
                 { from: "node_modules/tripetto/fonts/", to: "fonts/" },
                 { from: "node_modules/@fortawesome/fontawesome-free/webfonts/", to: "fonts/" }
         ]
