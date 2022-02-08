@@ -4,7 +4,7 @@ import { IDefinition, IEditorDefinitionsModalProps, IEditorDefinitionsModalState
 import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderOpen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faFolderOpen, faTrash, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
 
 class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEditorDefinitionsModalState>
 {
@@ -85,10 +85,14 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     this.state.definitions.map((definition: IDefinition) => (
                         <tr id={`definition-${definition._id}`} key={definition._id}>
                             <td>{ definition.name || "Unnamed" }</td>
-                            <td width="30%" className="text-center">
+                            <td width="40%" className="text-center">
                                 <Button variant="outline-primary" className="btn-sm m-2"
                                         onClick={() => this.openDefinition(definition._id)}>
                                     <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
+                                </Button>
+                                <Button variant="outline-primary" className="btn-sm m-2"
+                                        onClick={() => this.runDefinition(definition._id)}>
+                                    <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
                                 </Button>
                                 <Button variant="outline-danger" className="btn-sm m-2"
                                         onClick={() => this.deleteDefinition(definition._id)}>
@@ -110,6 +114,15 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         }
 
         window.location.assign(`${PUBLIC_URL}/${definitionId}`);
+    }
+
+    private runDefinition(definitionId?: string)
+    {
+        if (! definitionId) {
+            return;
+        }
+
+        window.open(`${PUBLIC_URL}/run/${definitionId}`, "_blank")?.focus();
     }
 
     private deleteDefinition(definitionId?: string)
