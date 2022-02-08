@@ -10,21 +10,18 @@ import API from "../../api";
 import {PUBLIC_URL} from "../../../../src/settings";
 import {DEFINITION_ID_KEY, DEFINITION_NAME_KEY, USER_ID_KEY} from "../../global";
 
-export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition }>
+export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean }>
 {
     constructor(props)
     {
         super(props);
 
         this.state = {
-            definition: undefined
-        }
-    }
+            definition: undefined,
+            isLoading: true
+        };
 
-    componentDidMount()
-    {
-        this.loadDefinitionById(this.props.definitionId)
-            .catch(error => console.log(error));
+        this.loadDefinitionById(this.props.definitionId);
     }
 
     render()
@@ -33,15 +30,17 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return (<Navigate to="/404"/>);
         }
 
-        if (! this.state.definition) {
-            return (<Navigate to="/404"/>);
-        }
-
         return (
-            <TripettoChatRunner
-                definition={this.state.definition}
-                onSubmit={this.onSubmit}
-            />
+            this.state.isLoading
+                ? <h4>Loading...</h4>
+                : (
+                    this.state.definition
+                        ? <TripettoChatRunner
+                            definition={this.state.definition}
+                            onSubmit={this.onSubmit}
+                        />
+                        : <Navigate to="/404"/>
+                )
         );
     }
 
@@ -56,23 +55,21 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         console.dir(Export.CSV(instance));
     }
 
-    private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
+    private loadDefinitionById(definitionId?: string): void
     {
         if (! definitionId) {
-            return undefined;
+            return;
         }
 
-        return await API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
+        API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
             .then(response => {
                 if (! response.data.definition) {
-                    return Promise.resolve(undefined);
+                    return;
                 }
 
                 let definition = Object.assign({} as IDefinition, response.data.definition);
 
-                this.setState({ definition });
-
-                return Promise.resolve(definition);
+                this.setState({ definition, isLoading: false });
             })
             .catch(error => {
                 console.log(error);
