@@ -51,10 +51,10 @@ const App = ({ classes }) => {
                     <main className={classes.main}>
                         <BrowserRouter>
                             <Routes>
-                                <Route path="/run/:id" element={<ChatRunner />} />
-                                <Route path="/edit/:id" element={<Studio />}/>
-                                <Route path="/new" element={<Studio />}/>
-                                <Route path="/" element={<Home />}/>
+                                <Route path={`${process.env.PUBLIC_URL}/run/:id`} element={<ChatRunner />} />
+                                <Route path={`${process.env.PUBLIC_URL}/edit/:id`} element={<Studio />}/>
+                                <Route path={`${process.env.PUBLIC_URL}/new`} element={<Studio />}/>
+                                <Route path={`${process.env.PUBLIC_URL}/`} element={<Home />}/>
                             </Routes>
                         </BrowserRouter>
                     </main>
