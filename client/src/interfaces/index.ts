@@ -1,4 +1,4 @@
-import { IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto";
+import { Builder, IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto";
 
 export interface IDefinition extends TripettoIDefinition
 {
@@ -39,4 +39,9 @@ export interface IHeaderState
 export interface IRunnerProps
 {
     definitionId?: string;
+}
+
+export interface IEditorMenuProps
+{
+    editor?: Builder;
 }

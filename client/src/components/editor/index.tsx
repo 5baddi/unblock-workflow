@@ -8,8 +8,7 @@ import { ENV, PUBLIC_URL } from "../../../../src/settings";
 import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
 import API  from "../../api";
 import { loadDefaultDefinition } from "../../helpers";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faQuestion, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Menu from "./menu";
 
 import "./blocks";
 
@@ -29,9 +28,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         };
 
         this.onChange = this.onChange.bind(this);
-        this.editDefinitionProps = this.editDefinitionProps.bind(this);
-        this.openTutorial = this.openTutorial.bind(this);
-        this.clear = this.clear.bind(this);
     }
 
     render()
@@ -39,20 +35,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return (
             <Grid container>
                 <Grid item md={12} id={this.props.element}>
-                    <div className="editor-menu">
-                        <button onClick={this.editDefinitionProps}>
-                            <img src={`${PUBLIC_URL}/logo.jpg`} />
-                        </button>
-                        <button onClick={this.editDefinitionProps}>
-                            <FontAwesomeIcon icon={faPen}/>
-                        </button>
-                        <button onClick={this.clear}>
-                            <FontAwesomeIcon icon={faTrash}/>
-                        </button>
-                        <button onClick={this.openTutorial}>
-                            <FontAwesomeIcon icon={faQuestion}/>
-                        </button>
-                    </div>
+                    <Menu editor={this.editor}/>
                 </Grid>
             </Grid>
         );
@@ -132,35 +115,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             .catch(error => {
                 console.log(error);
             });
-    }
-
-    private editDefinitionProps()
-    {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
-
-        this.editor?.edit("properties");
-    }
-
-    private openTutorial()
-    {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
-
-        this.editor?.tutorial();
-    }
-
-    private clear()
-    {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
-
-        localStorage.removeItem(DEFINITION_KEY);
-
-        this.editor?.clear();
     }
 
     private onResize()
