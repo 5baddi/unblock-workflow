@@ -98,7 +98,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         definition.name = name;
 
-        await API.post(`${PUBLIC_URL}/definition`, { definition })
+        await API.post(`${PUBLIC_URL}/api/definition`, { definition })
             .then(response => {
                 if (! response.data.definition) {
                     return;
@@ -133,7 +133,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return undefined;
         }
 
-        return await API.get(`${PUBLIC_URL}/definition/${definitionId}`)
+        return await API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
             .then(response => {
                 if (response.data.definition) {
                     return Promise.resolve(undefined);

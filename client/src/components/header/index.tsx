@@ -69,7 +69,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
             return;
         }
 
-        await API.put(`${PUBLIC_URL}/definition/${id}`, { name })
+        await API.put(`${PUBLIC_URL}/api/definition/${id}`, { name })
             .then(response => {
                 if (! response.data.definition) {
                     return;

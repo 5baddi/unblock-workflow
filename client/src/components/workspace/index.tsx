@@ -79,7 +79,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
 
     private loadDefinitions()
     {
-        API.get(`${PUBLIC_URL}/definitions`)
+        API.get(`${PUBLIC_URL}/api/definitions`)
             .then(response => {
                 if (! response.data.definitions) {
                     return;
@@ -96,7 +96,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
 
     private editDefinition(definitionId)
     {
-        window.location.assign(`${PUBLIC_URL}/edit/${definitionId}`);
+        window.location.assign(`${PUBLIC_URL}/api/edit/${definitionId}`);
    }
 
     private async deleteDefinition(definitionId)
@@ -105,7 +105,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
             return;
         }
 
-        API.delete(`${PUBLIC_URL}/definition/${definitionId}`)
+        API.delete(`${PUBLIC_URL}/api/definition/${definitionId}`)
             .then(response => {
                 window.location.reload();
             })
