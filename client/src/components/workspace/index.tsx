@@ -1,5 +1,16 @@
 import * as React from "react";
-import { Box, Grid, Typography, List, ListItem, ListItemText, ListItemAvatar, Avatar, ListItemButton } from "@mui/material";
+import {
+    Box,
+    Grid,
+    Typography,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemAvatar,
+    Avatar,
+    ListItemButton,
+    Button
+} from "@mui/material";
 import IconButton from '@mui/material/IconButton';
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import { IDefinition } from "../../interfaces";
@@ -40,6 +51,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                         <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
                             Forms list
                         </Typography>
+                        <Button variant="contained" onClick={this.openNew}>Create new form</Button>
                         {
                             this.state.definitions.length > 0 ? <List>
                                 {
@@ -80,6 +92,11 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                 </Grid>
             </Box>
         );
+    }
+
+    private openNew()
+    {
+        window.location.assign(`${PUBLIC_URL}/new`);
     }
 
     private loadDefinitions()
