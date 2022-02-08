@@ -131,7 +131,7 @@ router.put("/definition/:id", (req, res) => {
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate({ _id: id }, { $set: { name: name } }, { upsert: false })
+                .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { name: name } }, { upsert: false })
                 .then(result => {
                     if (! result.ok) {
                         client.close();
@@ -152,6 +152,47 @@ router.put("/definition/:id", (req, res) => {
                     return res.status(500).send({
                         success: false,
                         message: error.message || "failed to update definition name",
+                    });
+                });
+        });
+});
+
+router.delete("/definition/:id", (req, res) => {
+    let id = req.params.id;
+    if (! id) {
+        res.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOneAndDelete({ _id: new ObjectId(id) })
+                .then(result => {
+                    if (! result.ok) {
+                        client.close();
+
+                        return res.status(401).send({
+                            success: false,
+                            message: "failed to delete definition",
+                        });
+                    }
+
+                    client.close();
+
+                    return res.send({ success: true });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return res.status(500).send({
+                        success: false,
+                        message: error.message || "failed to delete definition",
                     });
                 });
         });

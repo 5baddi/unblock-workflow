@@ -33,7 +33,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState>
                     <Grid item md={4}>
                         <TextField
                             variant="standard"
-                            value={this.state.name || "Unnamed"}
+                            defaultValue={this.state.name || "Unnamed"}
                             onChange={this.onChange}
                         />
                     </Grid>

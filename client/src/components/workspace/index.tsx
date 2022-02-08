@@ -7,6 +7,7 @@ import API from "../../api";
 import { FiFileText } from "react-icons/fi";
 
 import "./style.scss";
+import {DEFINITION_NAME_KEY} from "../../global";
 
 class Workspace extends React.Component<{}, { definitions: [] }>
 {
@@ -17,6 +18,8 @@ class Workspace extends React.Component<{}, { definitions: [] }>
         this.state = {
             definitions: [],
         };
+
+        this.deleteDefinition = this.deleteDefinition.bind(this);
     }
 
     componentDidMount()
@@ -39,7 +42,7 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                                     this.state.definitions.map((definition: IDefinition) =>  (
                                         <ListItem
                                             secondaryAction={
-                                                <IconButton edge="end" aria-label="delete">
+                                                <IconButton id={`item-${definition._id}`} edge="end" aria-label="delete" onClick={() => this.deleteDefinition(definition._id)}>
                                                     <DeleteIcon />
                                                 </IconButton>
                                             }
@@ -78,6 +81,21 @@ class Workspace extends React.Component<{}, { definitions: [] }>
                 this.setState({
                     definitions: response.data.definitions
                 });
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    private async deleteDefinition(definitionId)
+    {
+        if (! confirm("Are you sure you want to delete this form?")) {
+            return;
+        }
+
+        API.delete(`definition/${definitionId}`)
+            .then(response => {
+                window.location.reload();
             })
             .catch(error => {
                 console.log(error);
