@@ -5,6 +5,7 @@ import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen, faTrash, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
+import {DEFINITION_KEY} from "../../global";
 
 class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEditorDefinitionsModalState>
 {
@@ -155,6 +156,13 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                 let el = document.getElementById(`definition-${definitionId}`);
                 if (el) {
                     el.remove();
+                }
+
+                let oldDefinition = localStorage.getItem(DEFINITION_KEY)
+                    ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
+                    : undefined;
+                if (oldDefinition && oldDefinition._id === definitionId) {
+                    localStorage.removeItem(DEFINITION_KEY)
                 }
             })
             .catch(error => {
