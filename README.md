@@ -53,3 +53,4 @@ yarn run client:watch
 ## Resources
 
 - [Chat runner](https://gitlab.com/tripetto/runners/chat)
+- [Custom block development](https://docs.tripetto.com/guide/blocks)
