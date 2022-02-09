@@ -5,8 +5,7 @@ import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen, faTrash, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
-import {DEFINITION_KEY} from "../../global";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, useGridApiRef, GridApiRef } from "@mui/x-data-grid";
 
 class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEditorDefinitionsModalState>
 {
@@ -20,6 +19,8 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
         this.loadDefinitions = this.loadDefinitions.bind(this);
         this.renderDefinitionsTable = this.renderDefinitionsTable.bind(this);
+        this.openWorkflow = this.openWorkflow.bind(this);
+        this.deleteWorkflow = this.deleteWorkflow.bind(this);
     }
 
     componentDidMount()
@@ -84,7 +85,6 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             );
         }
 
-        let { openWorkflow, deleteWorkflow } = this.props;
         let columns: GridColDef[] = [
             {
                 field: "name",
@@ -106,7 +106,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     return (
                         <div>
                             <Button variant="outline-primary" className="btn-sm mr-2"
-                                    onClick={() => openWorkflow(cellValues.row)}>
+                                    onClick={() => this.openWorkflow(cellValues.row)}>
                                 <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
                             </Button>
                             <Button variant="outline-primary" className="btn-sm mr-2"
@@ -114,7 +114,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                                 <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
                             </Button>
                             <Button variant="outline-danger" className="btn-sm"
-                                    onClick={() => deleteWorkflow(cellValues.row._id)}>
+                                    onClick={() => this.deleteWorkflow(cellValues.row._id)}>
                                 <FontAwesomeIcon icon={faTrash}/>&nbsp;Delete
                             </Button>
                         </div>
@@ -143,6 +143,18 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         }
 
         window.open(`${PUBLIC_URL}/run/${definitionId}`, "_blank")?.focus();
+    }
+
+    private deleteWorkflow(definitionId: string)
+    {
+        this.props
+            .deleteWorkflow(definitionId)
+            .then(() => this.loadDefinitions());
+    }
+
+    private openWorkflow(definition: IDefinition)
+    {
+        this.props.openWorkflow(definition);
     }
 }
 

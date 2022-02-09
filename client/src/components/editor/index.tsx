@@ -234,7 +234,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor?.tutorial();
     }
 
-    private deleteWorkflow(definitionId?: string)
+    private deleteWorkflow(definitionId?: string): Promise<void | undefined>
     {
         let oldDefinition = localStorage.getItem(DEFINITION_KEY)
             ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
@@ -245,7 +245,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (! confirm("Are you sure you want to delete this workflow?")) {
-            return;
+            return Promise.resolve(undefined);
         }
 
         API.delete(`${PUBLIC_URL}/api/definition/${definitionId}`)
@@ -258,12 +258,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     localStorage.removeItem(DEFINITION_KEY);
 
                     this.initBuilder();
+                }
+
+                if (this.state.showModal) {
                     this.toggleModal();
                 }
             })
             .catch(error => {
                 console.log(error);
             });
+
+        return Promise.resolve(undefined);
     }
 
     private openWorkflow(definition?: IDefinition)
