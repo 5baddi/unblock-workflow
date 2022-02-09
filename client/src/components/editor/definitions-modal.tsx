@@ -149,7 +149,13 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
     {
         this.props
             .deleteWorkflow(definitionId)
-            .then(() => this.loadDefinitions());
+            .then((result) => {
+                if (! result) {
+                    return;
+                }
+
+                this.loadDefinitions();
+            });
     }
 
     private openWorkflow(definition: IDefinition)

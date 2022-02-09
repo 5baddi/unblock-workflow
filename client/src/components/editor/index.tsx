@@ -131,7 +131,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let oldDefinition = localStorage.getItem(DEFINITION_KEY)
             ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
-            : Object.assign({} as IDefinition, {});
+            : undefined;
+
+        if (typeof definition.clusters === "undefined" && (typeof oldDefinition === "undefined" || typeof oldDefinition.clusters === "undefined")) {
+            localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
+            return;
+        }
 
         if (typeof oldDefinition._id === "string") {
             definition._id = oldDefinition._id;
@@ -234,41 +240,40 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor?.tutorial();
     }
 
-    private deleteWorkflow(definitionId?: string): Promise<void | undefined>
+    private deleteWorkflow(definitionId?: string): Promise<boolean>
     {
         let oldDefinition = localStorage.getItem(DEFINITION_KEY)
             ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
             : undefined;
 
-        if (! definitionId) {
-            definitionId = oldDefinition._id;
+        if (! definitionId && typeof oldDefinition._id !== "string") {
+            return Promise.resolve(false);
         }
 
         if (! confirm("Are you sure you want to delete this workflow?")) {
-            return Promise.resolve(undefined);
+            return Promise.resolve(false);
         }
 
-        API.delete(`${PUBLIC_URL}/api/definition/${definitionId}`)
+        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinition._id}`)
             .then(response => {
                 if (! response.data.success) {
-                    return;
+                    return false;
                 }
 
                 if (oldDefinition && oldDefinition._id === definitionId) {
                     localStorage.removeItem(DEFINITION_KEY);
 
                     this.initBuilder();
-                }
-
-                if (this.state.showModal) {
                     this.toggleModal();
                 }
+
+                return true;
             })
             .catch(error => {
                 console.log(error);
-            });
 
-        return Promise.resolve(undefined);
+                return false;
+            });
     }
 
     private openWorkflow(definition?: IDefinition)
