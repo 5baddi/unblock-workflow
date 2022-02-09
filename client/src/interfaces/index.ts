@@ -53,6 +53,7 @@ export interface IEditorMenuState {}
 export interface IEditorDefinitionsModalProps extends ModalProps
 {
     onHide: () => void;
+    createNewWorkflow: () => void;
 }
 
 export interface IEditorDefinitionsModalState extends ModalProps

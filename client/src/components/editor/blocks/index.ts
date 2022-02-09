@@ -33,4 +33,4 @@ import "tripetto-block-variable";
 // FIXME: not appear
 import "tripetto-block-calculator";
 
-// import "./process-task";
+import "./process-task";

@@ -49,6 +49,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     { this.renderDefinitionsTable() }
                 </Modal.Body>
                 <Modal.Footer>
+                    <Button onClick={this.props.createNewWorkflow}>Create New Workflow</Button>
                     <Button onClick={this.props.onHide}>Close</Button>
                 </Modal.Footer>
             </Modal>

@@ -34,8 +34,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editDefinitionProps = this.editDefinitionProps.bind(this);
         this.openTutorial = this.openTutorial.bind(this);
         this.clear = this.clear.bind(this);
-        this.setShowModal = this.setShowModal.bind(this);
+        this.toggleModal = this.toggleModal.bind(this);
         this.showDefinitionsModal = this.showDefinitionsModal.bind(this);
+        this.createNewWorkflow = this.createNewWorkflow.bind(this);
     }
 
     render()
@@ -56,7 +57,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <button onClick={this.openTutorial}>
                             <FontAwesomeIcon icon={faQuestion}/>
                         </button>
-                        <DefinitionsModal show={this.state.showModal} onHide={this.setShowModal}/>
+                        <DefinitionsModal show={this.state.showModal} 
+                                          onHide={this.toggleModal}
+                                          createNewWorkflow={this.createNewWorkflow}/>
                     </div>
                 </Grid>
 
@@ -176,8 +179,19 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 console.log(error);
             });
     }
+    
+    private createNewWorkflow()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
 
-    private setShowModal()
+        localStorage.removeItem(DEFINITION_KEY)
+        this.editor?.clear();
+        this.toggleModal();
+    }
+
+    private toggleModal()
     {
         this.setState({
             showModal: ! this.state.showModal
@@ -215,9 +229,29 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        localStorage.removeItem(DEFINITION_KEY);
+        let definition = localStorage.getItem(DEFINITION_KEY)
+            ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "{}")
+            : {};
 
-        this.editor?.clear();
+        if (! definition._id) {
+            localStorage.removeItem(DEFINITION_KEY);
+            this.editor?.clear();
+
+            return;
+        }
+
+        API.delete(`${PUBLIC_URL}/api/definition/${definition._id}`)
+            .then(response => {
+                if (! response.data.success) {
+                    return;
+                }
+
+                localStorage.removeItem(DEFINITION_KEY);
+                this.editor?.clear();
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 }
 
