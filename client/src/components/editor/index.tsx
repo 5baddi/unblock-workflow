@@ -139,6 +139,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 this.setState({ definition: response.data.definition });
             })
             .catch(error => {
+                localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
                 console.log(error);
             });
     }
