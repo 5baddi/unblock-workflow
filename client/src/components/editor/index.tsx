@@ -139,7 +139,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        if (typeof oldDefinition._id === "string") {
+        if (oldDefinition && typeof oldDefinition._id === "string") {
             definition._id = oldDefinition._id;
         }
 
@@ -246,7 +246,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
             : undefined;
 
-        if (! definitionId && typeof oldDefinition._id !== "string") {
+        if (! definitionId && (! oldDefinition || typeof oldDefinition._id !== "string")) {
             return Promise.resolve(false);
         }
 
@@ -261,11 +261,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 }
 
                 if (oldDefinition && oldDefinition._id === definitionId) {
-                    localStorage.removeItem(DEFINITION_KEY);
-
-                    this.initBuilder();
                     this.toggleModal();
                 }
+
+                localStorage.removeItem(DEFINITION_KEY);
+                this.initBuilder();
 
                 return true;
             })
