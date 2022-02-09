@@ -2,8 +2,7 @@
 
 Is software as service allow clap clients to build forms easily and connect them with rest of Unblock services.
 
-![screenshot](https://user-images.githubusercontent.com/26310674/153190754-5b25fa88-cb64-4dce-ba71-06cf9e380666.png)
-
+![screenshot](https://user-images.githubusercontent.com/26310674/153287776-9d4ce499-6164-4e22-9c35-949fccb9f270.png)
 
 ## Get Started
 
