@@ -5,10 +5,9 @@ import { ChatRunner as TripettoChatRunner } from "tripetto-runner-chat";
 import { Export } from "tripetto-runner-foundation";
 import { IDefinition } from "../../interfaces";
 import { Instance } from "tripetto-collector";
-import { loadDefaultDefinition } from "../../helpers";
 import API from "../../api";
-import {PUBLIC_URL} from "../../../../src/settings";
-import {DEFINITION_ID_KEY, DEFINITION_NAME_KEY, USER_ID_KEY} from "../../global";
+import { PUBLIC_URL } from "../../../../src/settings";
+import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
 
 export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean }>
 {
@@ -42,6 +41,17 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                         : <Navigate to="/404"/>
                 )
         );
+    }
+
+    private mergedStyle(): IChatStyles
+    {
+        let style = {
+            background: {
+                color: "white"
+            },
+        };
+
+        return Object.assign({} as IChatStyles, style);
     }
 
     private onSubmit(instance: Instance): void
