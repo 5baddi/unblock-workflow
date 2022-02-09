@@ -162,7 +162,9 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
                     : undefined;
                 if (oldDefinition && oldDefinition._id === definitionId) {
-                    localStorage.removeItem(DEFINITION_KEY)
+                    localStorage.removeItem(DEFINITION_KEY);
+
+                    window.location.assign(PUBLIC_URL);
                 }
             })
             .catch(error => {
