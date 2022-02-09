@@ -117,7 +117,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private async onChange(definition: IDefinition)
     {
         if (ENV === "development") {
-            console.log("saving form definition");
+            console.log("saving workflow definition");
         }
 
         let oldDefinition = localStorage.getItem(DEFINITION_KEY)
@@ -226,6 +226,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private clear()
     {
         if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        if (! confirm("Are you sure you want to delete this workflow?")) {
             return;
         }
 

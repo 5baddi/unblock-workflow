@@ -79,7 +79,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
     {
         if (! this.state.definitions  || this.state.definitions.length === 0) {
             return (
-                <p className="text-muted text-center">No form found!</p>
+                <p className="text-muted text-center">No workflow found!</p>
             );
         }
 
@@ -142,7 +142,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             return;
         }
 
-        if (! confirm("Are you sure you want to delete this form?")) {
+        if (! confirm("Are you sure you want to delete this workflow?")) {
             return;
         }
 
