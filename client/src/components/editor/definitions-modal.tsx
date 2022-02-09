@@ -33,24 +33,26 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     render()
     {
+        const {createNewWorkflow, ...rest} = this.props;
+
         return (
             <Modal
-                {...this.props}
+                {...rest}
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Saved forms
+                        Saved Workflows
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     { this.renderDefinitionsTable() }
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={this.props.createNewWorkflow}>Create New Workflow</Button>
-                    <Button onClick={this.props.onHide}>Close</Button>
+                    <Button onClick={createNewWorkflow}>Create New Workflow</Button>
+                    <Button onClick={rest.onHide}>Close</Button>
                 </Modal.Footer>
             </Modal>
         );
