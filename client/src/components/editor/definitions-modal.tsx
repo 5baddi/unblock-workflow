@@ -6,6 +6,7 @@ import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen, faTrash, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
 import {DEFINITION_KEY} from "../../global";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEditorDefinitionsModalState>
 {
@@ -83,38 +84,85 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             );
         }
 
-        return (
-            <Table striped bordered hover size="sm">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {
-                    this.state.definitions.map((definition: IDefinition) => (
-                        <tr id={`definition-${definition._id}`} key={definition._id}>
-                            <td>{ definition.name || "Unnamed" }</td>
-                            <td width="40%" className="text-center">
-                                <Button variant="outline-primary" className="btn-sm m-2"
-                                        onClick={() => this.openDefinition(definition._id)}>
-                                    <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
-                                </Button>
-                                <Button variant="outline-primary" className="btn-sm m-2"
-                                        onClick={() => this.runDefinition(definition._id)}>
-                                    <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
-                                </Button>
-                                <Button variant="outline-danger" className="btn-sm m-2"
-                                        onClick={() => this.deleteDefinition(definition._id)}>
-                                    <FontAwesomeIcon icon={faTrash}/>&nbsp;Delete
-                                </Button>
-                            </td>
-                        </tr>
-                    ))
+        let columns: GridColDef[] = [
+            {
+                field: "name",
+                headerName: "Name",
+                description: "Workflow name",
+                sortable: true,
+                flex: 3,
+                minWidth: 500,
+                valueGetter: params => `${params.row.name || "Unnamed"}`
+            },
+            {
+                field: "_id",
+                headerName: "Actions",
+                sortable: false,
+                flex: 1.5,
+                minWidth: 200,
+                cellClassName: "text-center",
+                renderCell: (cellValues) => {
+                    return (
+                        <div>
+                            <Button variant="outline-primary" className="btn-sm mr-2"
+                                    onClick={() => this.openDefinition(cellValues.row._id)}>
+                                <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
+                            </Button>
+                            <Button variant="outline-primary" className="btn-sm mr-2"
+                                    onClick={() => this.runDefinition(cellValues.row._id)}>
+                                <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
+                            </Button>
+                            <Button variant="outline-danger" className="btn-sm"
+                                    onClick={() => this.deleteDefinition(cellValues.row._id)}>
+                                <FontAwesomeIcon icon={faTrash}/>&nbsp;Delete
+                            </Button>
+                        </div>
+                    );
                 }
-                </tbody>
-            </Table>
+            },
+        ];
+
+        return (
+            <div style={{ height: 300, width: '100%' }}>
+                <DataGrid
+                    rows={this.state.definitions}
+                    columns={columns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5]}
+                    getRowId={(row) => row._id }
+                />
+            </div>
+            // <Table striped bordered hover size="sm">
+            //     <thead>
+            //         <tr>
+            //             <th>Name</th>
+            //             <th>Actions</th>
+            //         </tr>
+            //     </thead>
+            //     <tbody>
+            //     {
+            //         this.state.definitions.map((definition: IDefinition) => (
+            //             <tr id={`definition-${definition._id}`} key={definition._id}>
+            //                 <td>{ definition.name || "Unnamed" }</td>
+            //                 <td width="40%" className="text-center">
+            //                     <Button variant="outline-primary" className="btn-sm m-2"
+            //                             onClick={() => this.openDefinition(definition._id)}>
+            //                         <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
+            //                     </Button>
+            //                     <Button variant="outline-primary" className="btn-sm m-2"
+            //                             onClick={() => this.runDefinition(definition._id)}>
+            //                         <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
+            //                     </Button>
+            //                     <Button variant="outline-danger" className="btn-sm m-2"
+            //                             onClick={() => this.deleteDefinition(definition._id)}>
+            //                         <FontAwesomeIcon icon={faTrash}/>&nbsp;Delete
+            //                     </Button>
+            //                 </td>
+            //             </tr>
+            //         ))
+            //     }
+            //     </tbody>
+            // </Table>
         );
     }
 
