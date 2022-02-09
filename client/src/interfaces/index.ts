@@ -53,6 +53,8 @@ export interface IEditorMenuState {}
 export interface IEditorDefinitionsModalProps extends ModalProps
 {
     createNewWorkflow: () => void;
+    openWorkflow: (definition: IDefinition) => void;
+    deleteWorkflow: (definitionId: string) => void;
 }
 
 export interface IEditorDefinitionsModalState extends ModalProps

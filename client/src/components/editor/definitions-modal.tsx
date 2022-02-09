@@ -36,7 +36,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     render()
     {
-        const {createNewWorkflow, ...rest} = this.props;
+        const {createNewWorkflow, openWorkflow, deleteWorkflow, ...rest} = this.props;
 
         return (
             <Modal
@@ -84,6 +84,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             );
         }
 
+        let { openWorkflow, deleteWorkflow } = this.props;
         let columns: GridColDef[] = [
             {
                 field: "name",
@@ -105,7 +106,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     return (
                         <div>
                             <Button variant="outline-primary" className="btn-sm mr-2"
-                                    onClick={() => this.openDefinition(cellValues.row._id)}>
+                                    onClick={() => openWorkflow(cellValues.row)}>
                                 <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
                             </Button>
                             <Button variant="outline-primary" className="btn-sm mr-2"
@@ -113,7 +114,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                                 <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
                             </Button>
                             <Button variant="outline-danger" className="btn-sm"
-                                    onClick={() => this.deleteDefinition(cellValues.row._id)}>
+                                    onClick={() => deleteWorkflow(cellValues.row._id)}>
                                 <FontAwesomeIcon icon={faTrash}/>&nbsp;Delete
                             </Button>
                         </div>
@@ -132,47 +133,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     getRowId={(row) => row._id }
                 />
             </div>
-            // <Table striped bordered hover size="sm">
-            //     <thead>
-            //         <tr>
-            //             <th>Name</th>
-            //             <th>Actions</th>
-            //         </tr>
-            //     </thead>
-            //     <tbody>
-            //     {
-            //         this.state.definitions.map((definition: IDefinition) => (
-            //             <tr id={`definition-${definition._id}`} key={definition._id}>
-            //                 <td>{ definition.name || "Unnamed" }</td>
-            //                 <td width="40%" className="text-center">
-            //                     <Button variant="outline-primary" className="btn-sm m-2"
-            //                             onClick={() => this.openDefinition(definition._id)}>
-            //                         <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
-            //                     </Button>
-            //                     <Button variant="outline-primary" className="btn-sm m-2"
-            //                             onClick={() => this.runDefinition(definition._id)}>
-            //                         <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
-            //                     </Button>
-            //                     <Button variant="outline-danger" className="btn-sm m-2"
-            //                             onClick={() => this.deleteDefinition(definition._id)}>
-            //                         <FontAwesomeIcon icon={faTrash}/>&nbsp;Delete
-            //                     </Button>
-            //                 </td>
-            //             </tr>
-            //         ))
-            //     }
-            //     </tbody>
-            // </Table>
         );
-    }
-
-    private openDefinition(definitionId?: string)
-    {
-        if (! definitionId) {
-            return;
-        }
-
-        window.location.assign(`${PUBLIC_URL}/${definitionId}`);
     }
 
     private runDefinition(definitionId?: string)
@@ -182,47 +143,6 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         }
 
         window.open(`${PUBLIC_URL}/run/${definitionId}`, "_blank")?.focus();
-    }
-
-    private deleteDefinition(definitionId?: string)
-    {
-        if (! definitionId) {
-            return;
-        }
-
-        if (! confirm("Are you sure you want to delete this workflow?")) {
-            return;
-        }
-
-        API.delete(`${PUBLIC_URL}/api/definition/${definitionId}`)
-            .then(response => {
-                if (! response.data.success) {
-                    return;
-                }
-
-                this.setState({
-                    definitions: this.state.definitions?.filter((definition: IDefinition) => {
-                        return definition._id !== definitionId;
-                    })
-                });
-
-                let el = document.getElementById(`definition-${definitionId}`);
-                if (el) {
-                    el.remove();
-                }
-
-                let oldDefinition = localStorage.getItem(DEFINITION_KEY)
-                    ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
-                    : undefined;
-                if (oldDefinition && oldDefinition._id === definitionId) {
-                    localStorage.removeItem(DEFINITION_KEY);
-
-                    window.location.assign(PUBLIC_URL);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 }
 

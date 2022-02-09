@@ -33,10 +33,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.onChange = this.onChange.bind(this);
         this.editDefinitionProps = this.editDefinitionProps.bind(this);
         this.openTutorial = this.openTutorial.bind(this);
-        this.clear = this.clear.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
         this.showDefinitionsModal = this.showDefinitionsModal.bind(this);
         this.createNewWorkflow = this.createNewWorkflow.bind(this);
+        this.deleteWorkflow = this.deleteWorkflow.bind(this);
+        this.openWorkflow = this.openWorkflow.bind(this);
+        this.initBuilder = this.initBuilder.bind(this);
     }
 
     render()
@@ -51,7 +53,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <button onClick={this.editDefinitionProps}>
                             <FontAwesomeIcon icon={faPen}/>
                         </button>
-                        <button onClick={this.clear}>
+                        <button onClick={() => this.deleteWorkflow()}>
                             <FontAwesomeIcon icon={faTrash}/>
                         </button>
                         <button onClick={this.openTutorial}>
@@ -59,7 +61,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         </button>
                         <DefinitionsModal show={this.state.showModal} 
                                           onHide={this.toggleModal}
-                                          createNewWorkflow={this.createNewWorkflow}/>
+                                          createNewWorkflow={this.createNewWorkflow}
+                                          deleteWorkflow={this.deleteWorkflow}
+                                          openWorkflow={this.openWorkflow}/>
                     </div>
                 </Grid>
 
@@ -96,11 +100,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("opening the editor");
         }
 
-        let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
         let definition = await this.loadDefinitionById(this.props.definitionId);
 
-        this.editor = Builder.open(definition || this.props.definition, properties);
+        return this.initBuilder(definition);
+    }
 
+    private initBuilder(definition?: IDefinition): Builder
+    {
+        let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
+
+        this.editor = Builder.open(definition || this.props.definition, properties);
         this.editor.onChange = (definition: IDefinition) => this.onChange(definition);
 
         return this.editor;
@@ -189,7 +198,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         localStorage.removeItem(DEFINITION_KEY)
-        this.editor?.clear();
+        this.initBuilder();
         this.toggleModal();
     }
 
@@ -225,39 +234,48 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor?.tutorial();
     }
 
-    private clear()
+    private deleteWorkflow(definitionId?: string)
     {
-        if (typeof this.editor === "undefined") {
-            return;
+        let oldDefinition = localStorage.getItem(DEFINITION_KEY)
+            ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
+            : undefined;
+
+        if (! definitionId) {
+            definitionId = oldDefinition._id;
         }
 
         if (! confirm("Are you sure you want to delete this workflow?")) {
             return;
         }
 
-        let definition = localStorage.getItem(DEFINITION_KEY)
-            ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "{}")
-            : {};
-
-        if (! definition._id) {
-            localStorage.removeItem(DEFINITION_KEY);
-            this.editor?.clear();
-
-            return;
-        }
-
-        API.delete(`${PUBLIC_URL}/api/definition/${definition._id}`)
+        API.delete(`${PUBLIC_URL}/api/definition/${definitionId}`)
             .then(response => {
                 if (! response.data.success) {
                     return;
                 }
 
-                localStorage.removeItem(DEFINITION_KEY);
-                this.editor?.clear();
+                if (oldDefinition && oldDefinition._id === definitionId) {
+                    localStorage.removeItem(DEFINITION_KEY);
+
+                    this.initBuilder();
+                    this.toggleModal();
+                }
             })
             .catch(error => {
                 console.log(error);
             });
+    }
+
+    private openWorkflow(definition?: IDefinition)
+    {
+        if (! definition || typeof this.editor === "undefined") {
+            return;
+        }
+
+        localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
+        this.initBuilder(definition);
+        this.toggleModal();
     }
 }
 
