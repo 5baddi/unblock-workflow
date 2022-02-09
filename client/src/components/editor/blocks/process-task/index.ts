@@ -3,8 +3,8 @@ import { NodeBlock, tripetto } from "tripetto";
 
 @tripetto({
     type: "node",
-    identifier: "example-block",
+    identifier: "process-task",
     icon: "",
-    label: "Example node block"
+    label: "Process Task"
 })
 export class ProcessTask extends NodeBlock {}
