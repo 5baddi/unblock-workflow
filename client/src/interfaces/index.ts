@@ -6,6 +6,7 @@ export interface IDefinition extends TripettoIDefinition
     _id?: string;
     name?: string;
     userId?: string;
+    saved: boolean;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}
@@ -60,4 +61,5 @@ export interface IEditorDefinitionsModalProps extends ModalProps
 export interface IEditorDefinitionsModalState extends ModalProps
 {
     definitions?: IDefinition[];
+    isLoading: boolean;
 }

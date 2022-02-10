@@ -1,11 +1,12 @@
 import * as React from "react";
-import { Button, Modal, Table, ButtonGroup } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { IDefinition, IEditorDefinitionsModalProps, IEditorDefinitionsModalState } from "../../interfaces";
 import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen, faTrash, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
-import { DataGrid, GridColDef, useGridApiRef, GridApiRef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import PulseLoader from "react-spinners/PulseLoader";
 
 class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEditorDefinitionsModalState>
 {
@@ -14,7 +15,8 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         super(props);
 
         this.state = {
-            definitions: []
+            definitions: [],
+            isLoading: true
         }
 
         this.loadDefinitions = this.loadDefinitions.bind(this);
@@ -64,21 +66,36 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     private loadDefinitions()
     {
+        this.setState({ isLoading: true });
+
         API.get(`${PUBLIC_URL}/api/definitions`)
             .then(response => {
                 if (! response.data.definitions) {
-                    this.setState({ definitions: [] });
+                    this.setState({ definitions: [], isLoading: false });
                 }
 
-                this.setState({ definitions: response.data.definitions });
+                this.setState({ definitions: response.data.definitions, isLoading: false });
             })
             .catch(error => {
                 console.log(error);
+
+                this.setState({ isLoading: false  });
             });
     }
 
     private renderDefinitionsTable()
     {
+        if (! this.props.show) {
+            return undefined;
+        }
+        
+        if (this.state.isLoading) {
+            return (
+                <div className="text-center">
+                    <PulseLoader color="rgba(44,64,90,0.8)" size={15} margin={12}/>
+                </div>
+            );
+        }
         if (! this.state.definitions  || this.state.definitions.length === 0) {
             return (
                 <p className="text-muted text-center">No workflow found!</p>
@@ -147,10 +164,14 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     private deleteWorkflow(definitionId: string)
     {
+        this.setState({ isLoading: true });
+
         this.props
             .deleteWorkflow(definitionId)
             .then((result) => {
                 if (! result) {
+                    this.setState({ isLoading: false });
+
                     return;
                 }
 

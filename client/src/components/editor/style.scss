@@ -12,6 +12,23 @@
   margin-right: 2px;
 }
 
+.modal-dialog {
+  .btn-primary {
+    background-color: rgba(44,64,90,0.8) !important;
+    border-color: rgba(44,64,90,0.8) !important;
+  }
+
+  .btn-outline-primary {
+    border-color: rgba(44,64,90,0.8) !important;
+    color: rgba(44,64,90,0.8) !important;
+
+    &:hover, &:active, &:focus {
+      color: white !important;
+      background-color: rgba(44,64,90,0.8) !important;
+    }
+  }
+}
+
 #editor-container {
   position: absolute;
   left: 0;

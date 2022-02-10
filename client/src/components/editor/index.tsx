@@ -19,6 +19,7 @@ import "./style.scss";
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
     private editor?: Builder;
+    private timer?;
 
     constructor(props) {
         super(props);
@@ -93,6 +94,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("orientationchange", this.onResize);
+
+        if (typeof this.timer !== "undefined") {
+            clearTimeout(this.timer);
+        }
     }
 
     private async open(): Promise<Builder>
@@ -147,25 +152,40 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition._id = oldDefinition._id;
         }
 
-        await API.post(`${PUBLIC_URL}/api/definition`, { definition })
+        if (typeof definition.saved === "undefined") {
+            definition.saved = false;
+        }
+
+        await this.saveDefinition(definition)
+            .catch((error) => console.log(error));
+    }
+
+    private async saveDefinition(definition?: IDefinition): Promise<IDefinition | undefined>
+    {
+        return API.post(`${PUBLIC_URL}/api/definition`, { definition })
             .then(response => {
                 if (! response.data.definition) {
-                    return;
+                    return Promise.resolve(undefined);
                 }
 
-                this.setDefinition(response.data.definition);
-            })
-            .catch(error => {
+                let definition = Object.assign({} as IDefinition, response.data.definition);
+                definition.saved = true;
+
                 this.setDefinition(definition);
 
-                console.log(error);
-            });
+                return Promise.resolve(definition);
+            })
+            .catch(error => Promise.reject(error));
     }
 
     private setDefinition(definition?: IDefinition): void
     {
         this.setState({ definition });
         localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
+        // if (typeof definition !== "undefined") {
+        //     this.timer = setTimeout(() => this.saveDefinition(definition), 5000);
+        // }
     }
 
     private onResize()
@@ -249,25 +269,30 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>
     {
-        let oldDefinition = localStorage.getItem(DEFINITION_KEY)
-            ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
-            : undefined;
-
-        if (! definitionId && (! oldDefinition || typeof oldDefinition._id !== "string")) {
-            return Promise.resolve(false);
+        let oldDefinition = this.state.definition;
+        if (! oldDefinition && localStorage.getItem(DEFINITION_KEY)) {
+            oldDefinition = JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined");
         }
 
         if (! confirm("Are you sure you want to delete this workflow?")) {
             return Promise.resolve(false);
         }
 
-        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinition._id}`)
+        let oldDefinitionId = oldDefinition ? oldDefinition._id : undefined;
+        if (! definitionId || ! oldDefinitionId) {
+            localStorage.removeItem(DEFINITION_KEY);
+            this.initBuilder();
+
+            return Promise.resolve(true);
+        }
+
+        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}`)
             .then(response => {
                 if (! response.data.success) {
                     return false;
                 }
 
-                if (oldDefinition && oldDefinition._id === definitionId) {
+                if (oldDefinitionId && oldDefinitionId === definitionId) {
                     this.toggleModal();
                 }
 
