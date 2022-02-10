@@ -23,7 +23,7 @@ export interface IEditorProps
 
 export interface IEditorState
 {
-    definition: IDefinition;
+    definition?: IDefinition;
     showModal: boolean;
 }
 

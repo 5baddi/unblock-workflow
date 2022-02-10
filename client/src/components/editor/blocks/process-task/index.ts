@@ -24,7 +24,7 @@ export class ProcessTask extends NodeBlock
             controls: [
                 new Forms
                     .Static(
-                        "Generate a process based on already defined process tasks."
+                        "Generate a process based on already defined tasks."
                     )
                     .markdown(),
             ],

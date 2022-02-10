@@ -31,6 +31,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         };
 
         this.onChange = this.onChange.bind(this);
+        this.setDefinition = this.setDefinition.bind(this);
         this.editDefinitionProps = this.editDefinitionProps.bind(this);
         this.openTutorial = this.openTutorial.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
@@ -125,18 +126,21 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(definition: IDefinition)
     {
-        if (ENV === "development") {
-            console.log("saving workflow definition");
+        let oldDefinition = this.state.definition;
+        if (! oldDefinition) {
+            oldDefinition = localStorage.getItem(DEFINITION_KEY)
+                ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
+                : undefined;
         }
 
-        let oldDefinition = localStorage.getItem(DEFINITION_KEY)
-            ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
-            : undefined;
-
         if (typeof definition.clusters === "undefined" && (typeof oldDefinition === "undefined" || typeof oldDefinition.clusters === "undefined")) {
-            localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+            this.setDefinition(definition);
 
             return;
+        }
+
+        if (ENV === "development") {
+            console.log("saving workflow definition", definition);
         }
 
         if (oldDefinition && typeof oldDefinition._id === "string") {
@@ -149,15 +153,19 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     return;
                 }
 
-                localStorage.setItem(DEFINITION_KEY, JSON.stringify(response.data.definition));
-
-                this.setState({ definition: response.data.definition });
+                this.setDefinition(response.data.definition);
             })
             .catch(error => {
-                localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+                this.setDefinition(definition);
 
                 console.log(error);
             });
+    }
+
+    private setDefinition(definition?: IDefinition): void
+    {
+        this.setState({ definition });
+        localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
     }
 
     private onResize()
@@ -186,9 +194,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 }
 
                 let definition = Object.assign({} as IDefinition, response.data.definition);
-                localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
-                this.setState({ definition });
+                this.setDefinition(definition);
 
                 return Promise.resolve(definition);
             })
