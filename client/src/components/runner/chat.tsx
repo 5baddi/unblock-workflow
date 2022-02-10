@@ -8,8 +8,15 @@ import { Instance } from "tripetto-collector";
 import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
+import { css } from "@emotion/react";
+import PulseLoader from "react-spinners/PulseLoader";
 
 import "./style.scss";
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean }>
 {
@@ -36,7 +43,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         return (
             this.state.isLoading
-                ? <h4>Loading...</h4>
+                ? <PulseLoader color="#4B5565" css={override} size={15} margin={2}/>
                 : (
                     this.state.definition
                         ? <TripettoChatRunner
