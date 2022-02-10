@@ -57,7 +57,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             autoFocus: true,
             noBranding: true,
             fonts: {
-                family: "inter",
+                family: "Inter",
                 size : 16,
                 sizeSmall : 14,
             },
