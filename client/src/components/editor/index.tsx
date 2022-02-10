@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { getDefinition } from "../../store/actions/definition";
 import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
+import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../../../src/settings";
 import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
@@ -116,7 +117,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
 
         this.editor = Builder.open(definition || this.props.definition, properties);
-        this.editor.onChange = (definition: IDefinition) => this.onChange(definition);
+        this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
 
         return this.editor;
     }
@@ -129,19 +130,21 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return properties as IEditorProperties;
     }
 
-    private async onChange(definition: IDefinition)
+    private async onChange(submitedDefinition: TripettoDefinition): Promise<void>
     {
         let oldDefinition = this.state.definition;
         if (! oldDefinition) {
-            oldDefinition = localStorage.getItem(DEFINITION_KEY)
-                ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
+            oldDefinition = window.sessionStorage.getItem(DEFINITION_KEY)
+                ? JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined")
                 : undefined;
         }
+
+        let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submitedDefinition)));
 
         if (typeof definition.clusters === "undefined" && (typeof oldDefinition === "undefined" || typeof oldDefinition.clusters === "undefined")) {
             this.setDefinition(definition);
 
-            return;
+            return Promise.resolve();
         }
 
         if (ENV === "development") {
@@ -150,10 +153,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (oldDefinition && typeof oldDefinition._id === "string") {
             definition._id = oldDefinition._id;
-        }
-
-        if (typeof definition.saved === "undefined") {
-            definition.saved = false;
         }
 
         await this.saveDefinition(definition)
@@ -169,7 +168,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 }
 
                 let definition = Object.assign({} as IDefinition, response.data.definition);
-                definition.saved = true;
 
                 this.setDefinition(definition);
 
@@ -181,7 +179,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private setDefinition(definition?: IDefinition): void
     {
         this.setState({ definition });
-        localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+        window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
         // if (typeof definition !== "undefined") {
         //     this.timer = setTimeout(() => this.saveDefinition(definition), 5000);
@@ -230,7 +228,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        localStorage.removeItem(DEFINITION_KEY)
+        window.sessionStorage.removeItem(DEFINITION_KEY)
         this.initBuilder();
         this.toggleModal();
     }
@@ -270,8 +268,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private deleteWorkflow(definitionId?: string): Promise<boolean>
     {
         let oldDefinition = this.state.definition;
-        if (! oldDefinition && localStorage.getItem(DEFINITION_KEY)) {
-            oldDefinition = JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined");
+        if (! oldDefinition && window.sessionStorage.getItem(DEFINITION_KEY)) {
+            oldDefinition = JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined");
         }
 
         if (! confirm("Are you sure you want to delete this workflow?")) {
@@ -280,7 +278,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let oldDefinitionId = oldDefinition ? oldDefinition._id : undefined;
         if (! definitionId || ! oldDefinitionId) {
-            localStorage.removeItem(DEFINITION_KEY);
+            window.sessionStorage.removeItem(DEFINITION_KEY);
             this.initBuilder();
 
             return Promise.resolve(true);
@@ -296,7 +294,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     this.toggleModal();
                 }
 
-                localStorage.removeItem(DEFINITION_KEY);
+                window.sessionStorage.removeItem(DEFINITION_KEY);
                 this.initBuilder();
 
                 return true;
@@ -314,7 +312,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        localStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+        window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
         this.initBuilder(definition);
         this.toggleModal();

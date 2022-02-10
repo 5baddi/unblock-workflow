@@ -3,8 +3,8 @@ import { IDefinition } from "../interfaces";
 
 export function loadDefaultDefinition(): IDefinition | undefined
 {
-    let localDefinition = localStorage.getItem(DEFINITION_KEY)
-        ? JSON.parse(localStorage.getItem(DEFINITION_KEY) || "undefined")
+    let localDefinition = window.sessionStorage.getItem(DEFINITION_KEY)
+        ? JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined")
         : Object.assign({} as IDefinition, {});
 
     if (! localDefinition) {

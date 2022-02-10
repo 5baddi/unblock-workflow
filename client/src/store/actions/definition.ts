@@ -3,7 +3,7 @@ import {PUBLIC_URL} from "../../../../src/settings";
 import {DEFINITION_ID_KEY} from "../../global";
 
 export const getDefinition = () => dispatch => {
-    let id = localStorage.getItem(DEFINITION_ID_KEY);
+    let id = window.sessionStorage.getItem(DEFINITION_ID_KEY);
     if (! id) {
         return;
     }

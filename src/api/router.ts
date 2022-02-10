@@ -101,6 +101,8 @@ router.post("/definition", (req, res) => {
 
                     client.close();
 
+                    definition.isSaved = true;
+
                     return res.send({ success: true, definition });
                 })
                 .catch(error => {
