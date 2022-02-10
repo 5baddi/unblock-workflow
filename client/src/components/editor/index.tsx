@@ -143,8 +143,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition._id = oldDefinition._id;
         }
 
-        console.log(definition.clusters);
-
         await API.post(`${PUBLIC_URL}/api/definition`, { definition })
             .then(response => {
                 if (! response.data.definition) {
