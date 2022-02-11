@@ -156,7 +156,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submitedDefinition)));
-
         if (typeof definition.clusters === "undefined" && (typeof oldDefinition === "undefined" || typeof oldDefinition.clusters === "undefined")) {
             this.setDefinition(definition);
 
