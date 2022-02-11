@@ -233,7 +233,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        if (typeof definition.name !== "undefined" && typeof definition.clusters !== "undefined") {
+        if (typeof definition.name === "undefined" && typeof definition.clusters === "undefined") {
             return;
         }
 
