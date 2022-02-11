@@ -2,6 +2,8 @@ import {MongoClient, ObjectId} from "mongodb";
 import { DEFINITION_COLLECTION_NAME, MONGODB_URL, ROOT_USER_ID } from "../settings";
 import { IDefinition } from "../interfaces/definition";
 import { IEntity } from '../interfaces/entity';
+import { id } from "inversify";
+import { IMongoDBFilter } from '../interfaces/index';
 
 const express = require("express");
 const router = express.Router();
@@ -26,11 +28,6 @@ async function connect()
     }
 }
 
-function getCurrentTimestamp(): number
-{
-    return (new ObjectId()).getTimestamp().getTime();
-}
-
 router.get("/definitions", (req, res) => {
     return connect()
         .then(client => {
@@ -38,7 +35,7 @@ router.get("/definitions", (req, res) => {
 
             db.collection(DEFINITION_COLLECTION_NAME)
                 .find({ deleted_at: { $exists: false } })
-                .sort({ name: 1 })
+                .sort("created_at", "desc")
                 .toArray()
                 .then(items => {
 
@@ -59,8 +56,7 @@ router.get("/definitions", (req, res) => {
 
 router.post("/definition", (req, res) => {
     let body = req.body;
-    let definition = Object.assign({} as IDefinition, body.definition);
-    if (! definition) {
+    if (! body.definition) {
         res.status(401)
             .send({
                 success: false,
@@ -68,24 +64,29 @@ router.post("/definition", (req, res) => {
             });
     }
 
+    let definition: IDefinition = Object.assign({} as IDefinition, body.definition);
+
     return connect()
         .then(client => {
             let db = client.db();
+            let now: Date = new Date();
 
             if (typeof definition.userId === "undefined") {
                 definition.userId = ROOT_USER_ID;
             }
             
             if (typeof definition.created_at === "undefined") {
-                definition.created_at = getCurrentTimestamp();
+                definition.created_at = now;
             }
 
-            let filters = Object.assign({} as IEntity, { userId: definition.userId });
+            let filters = Object.assign({} as IMongoDBFilter, { userId: definition.userId });
 
             if (typeof definition._id === "string") {
                 filters._id = new ObjectId(definition._id);
+                filters.deleted_at = { $exists: false };
 
-                definition.updated_at = getCurrentTimestamp();
+                definition.updated_at = now;
+                delete definition._id;
             }
 
             db.collection(DEFINITION_COLLECTION_NAME)
@@ -138,9 +139,9 @@ router.put("/definition/:id?", (req, res) => {
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate({ _id: id }, { $set: { _id: id, name: name } }, { upsert: true })
+                .findOneAndUpdate({ _id: id, deleted_at: { $exists: false } }, { $set: { _id: id, name: name, updated_at: new Date() } }, { upsert: true, returnDocument: "after" })
                 .then(result => {
-                    if (! result.ok) {
+                    if (! result.ok || ! result.value) {
                         client.close();
 
                         return res.status(401).send({
@@ -151,7 +152,9 @@ router.put("/definition/:id?", (req, res) => {
 
                     client.close();
 
-                    return res.send({ success: true, id, name });
+                    let definition = Object.assign({} as IDefinition, result.value)
+
+                    return res.send({ success: true, id: definition._id, name: definition.name });
                 })
                 .catch(error => {
                     client.close();
@@ -165,7 +168,6 @@ router.put("/definition/:id?", (req, res) => {
 });
 
 router.get("/definition/:id", (req, res) => {
-    let body = req.body;
     let id = req.params.id;
     if (! id) {
         res.status(401)
@@ -180,7 +182,7 @@ router.get("/definition/:id", (req, res) => {
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOne({ _id: new ObjectId(id) })
+                .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
                 .then(result => {
                     if (! result === null) {
                         client.close();
@@ -223,7 +225,7 @@ router.delete("/definition/:id", (req, res) => {
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndDelete({ _id: new ObjectId(id) })
+                .findOneAndUpdate({ _id: new ObjectId(id), deleted_at: { $exists: false } }, { $set: { deleted_at: new Date() }})
                 .then(result => {
                     if (! result.ok) {
                         client.close();
@@ -269,7 +271,7 @@ router.delete("/definitions", (req, res) => {
             let db = client.db();
             let bulk = db.collection(DEFINITION_COLLECTION_NAME).initializeUnorderedBulkOp();
 
-            bulk.find({ _id: { $in: ids } }).delete();
+            bulk.find({ _id: { $in: ids }, deleted_at: { $exists: false } }).update({ $set: { deleted_at: new Date() } });
             bulk.execute()
                 .then(result => {
                     if (! result.ok) {

@@ -45,7 +45,7 @@ export class MongoDBProvider implements IMongoDBProvider
 
     setDefaultFields(entity: IEntity): IEntity
     {
-        let now = this.getCurrentTimestamp();
+        let now: Date = new Date();
 
         entity.updated_at = now;
 
