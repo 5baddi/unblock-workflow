@@ -85,6 +85,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
+        window.addEventListener("beforeunload", this.beforeUnload);
     }
 
     componentWillUnmount()
@@ -95,10 +96,23 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("orientationchange", this.onResize);
+        window.removeEventListener("beforeunload", this.beforeUnload);
 
         if (typeof this.timer !== "undefined") {
             clearTimeout(this.timer);
         }
+    }
+
+    private beforeUnload(event)
+    {
+        let e = event || window.event;
+        if (! e) {
+            return;
+        }
+
+        e.preventDefault();
+       
+        return e.returnValue = "Are you sure you want to close?";
     }
 
     private async open(): Promise<Builder>
