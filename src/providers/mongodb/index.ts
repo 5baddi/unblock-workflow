@@ -47,10 +47,10 @@ export class MongoDBProvider implements IMongoDBProvider
     {
         let now = this.getCurrentTimestamp();
 
-        entity.modified = now;
+        entity.updated_at = now;
 
-        if (typeof entity.created === "undefined") {
-            entity.created = now;
+        if (typeof entity.created_at === "undefined") {
+            entity.created_at = now;
         }
 
         return entity;

@@ -1,15 +1,7 @@
-import { Container } from "../container";
-import Symbols from "../symbols";
-import { DefinitionController } from "./controllers/definition";
 import {MongoClient, ObjectId} from "mongodb";
-import {
-    DEFINITION_COLLECTION_NAME,
-    MONGODB_URL,
-    ROOT_USER_ID,
-    TASK_COLLECTION_NAME,
-    USER_COLLECTION_NAME
-} from "../settings";
-import {IDefinition} from "../interfaces/definition";
+import { DEFINITION_COLLECTION_NAME, MONGODB_URL, ROOT_USER_ID } from "../settings";
+import { IDefinition } from "../interfaces/definition";
+import { IEntity } from '../interfaces/entity';
 
 const express = require("express");
 const router = express.Router();
@@ -34,13 +26,18 @@ async function connect()
     }
 }
 
+function getCurrentTimestamp(): number
+{
+    return (new ObjectId()).getTimestamp().getTime();
+}
+
 router.get("/definitions", (req, res) => {
     return connect()
         .then(client => {
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .find()
+                .find({ deleted_at: { $exists: false } })
                 .sort({ name: 1 })
                 .toArray()
                 .then(items => {
@@ -62,7 +59,7 @@ router.get("/definitions", (req, res) => {
 
 router.post("/definition", (req, res) => {
     let body = req.body;
-    let definition = body.definition;
+    let definition = Object.assign({} as IDefinition, body.definition);
     if (! definition) {
         res.status(401)
             .send({
@@ -75,22 +72,26 @@ router.post("/definition", (req, res) => {
         .then(client => {
             let db = client.db();
 
-            if (typeof definition._id === "undefined") {
-                definition._id = new ObjectId();
-            }
-
-            if (typeof definition._id === "string") {
-                definition._id = new ObjectId(definition._id);
-            }
-
             if (typeof definition.userId === "undefined") {
                 definition.userId = ROOT_USER_ID;
             }
+            
+            if (typeof definition.created_at === "undefined") {
+                definition.created_at = getCurrentTimestamp();
+            }
+
+            let filters = Object.assign({} as IEntity, { userId: definition.userId });
+
+            if (typeof definition._id === "string") {
+                filters._id = new ObjectId(definition._id);
+
+                definition.updated_at = getCurrentTimestamp();
+            }
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndReplace({ _id: definition._id, userId: definition.userId }, definition, { upsert: true })
+                .findOneAndReplace(filters, definition, { upsert: true, returnDocument: "after" })
                 .then(result => {
-                    if (! result.ok) {
+                    if (! result.ok || ! result.value) {
                         client.close();
 
                         return res.status(401).send({
@@ -101,6 +102,7 @@ router.post("/definition", (req, res) => {
 
                     client.close();
 
+                    let definition = Object.assign({} as IDefinition, result.value);
                     definition.isSaved = true;
 
                     return res.send({ success: true, definition });
@@ -266,7 +268,7 @@ router.delete("/definitions", (req, res) => {
         .then(client => {
             let db = client.db();
             let bulk = db.collection(DEFINITION_COLLECTION_NAME).initializeUnorderedBulkOp();
-            
+
             bulk.find({ _id: { $in: ids } }).delete();
             bulk.execute()
                 .then(result => {
