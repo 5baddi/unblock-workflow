@@ -231,6 +231,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
+        if (typeof definition.name !== "undefined" && typeof definition.clusters !== "undefined") {
+            return;
+        }
+
         if (ENV === "development") {
             console.log("re-send unsaved definition", definition);
         }
