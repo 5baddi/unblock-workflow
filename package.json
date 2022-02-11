@@ -26,6 +26,7 @@
     "inversify": "^6.0.1",
     "inversify-express-utils": "^6.4.3",
     "mongodb": "^4.3.1",
+    "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
     "reflect-metadata": "^0.1.13",
     "tripetto": "^4.4.2",
