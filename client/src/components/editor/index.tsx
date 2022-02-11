@@ -42,6 +42,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.deleteWorkflow = this.deleteWorkflow.bind(this);
         this.openWorkflow = this.openWorkflow.bind(this);
         this.initBuilder = this.initBuilder.bind(this);
+        this.reSaveDefinition = this.reSaveDefinition.bind(this);
     }
 
     render()
@@ -79,9 +80,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.open()
             .catch((error) => console.log(error));
 
-        if (typeof this.editor === "undefined") {
-            return;
-        }
+        this.timer = setInterval(this.reSaveDefinition, 5000);
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
@@ -90,17 +89,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentWillUnmount()
     {
-        if (typeof this.editor === "undefined") {
-            return;
+        if (typeof this.timer !== "undefined") {
+            clearInterval(this.timer);
         }
-
+        
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("orientationchange", this.onResize);
         window.removeEventListener("beforeunload", this.beforeUnload);
-
-        if (typeof this.timer !== "undefined") {
-            clearTimeout(this.timer);
-        }
     }
 
     private beforeUnload(event)
@@ -171,7 +166,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         await this.saveDefinition(definition)
-            .catch((error) => console.log(error));
+            .catch((error) => {
+                definition.isSaved = false;
+
+                this.setDefinition(definition);
+
+                console.log(error);
+            });
     }
 
     private async saveDefinition(definition?: IDefinition): Promise<IDefinition | undefined>
@@ -194,14 +195,38 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private setDefinition(definition?: IDefinition): void
     {
         this.setState({ definition });
+
+        if (typeof definition === "undefined") {
+            window.sessionStorage.removeItem(DEFINITION_KEY);
+
+            return;
+        }
         
-        if (typeof definition !== "undefined") {
-            window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+        window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+    }
+
+    private reSaveDefinition()
+    {
+        let definition = this.state.definition;
+        if (! definition) {
+            definition = window.sessionStorage.getItem(DEFINITION_KEY)
+            ? JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined")
+            : undefined;
         }
 
-        // if (typeof definition !== "undefined") {
-        //     this.timer = setTimeout(() => this.saveDefinition(definition), 5000);
-        // }
+        if (! definition || definition.isSaved) {
+            return;
+        }
+
+        if (ENV === "development") {
+            console.log("re-send unsaved definition", definition);
+        }
+
+        this.saveDefinition(definition)
+            .then(definition => {
+                this.setDefinition(definition);
+            })
+            .catch(error => console.log(error));
     }
 
     private onResize()
