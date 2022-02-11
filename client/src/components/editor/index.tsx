@@ -133,6 +133,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor = Builder.open(definition || this.props.definition, properties);
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
 
+        this.setDefinition(definition);
+
         return this.editor;
     }
 
@@ -193,7 +195,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private setDefinition(definition?: IDefinition): void
     {
         this.setState({ definition });
-        window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+        
+        if (typeof definition !== "undefined") {
+            window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+        }
 
         // if (typeof definition !== "undefined") {
         //     this.timer = setTimeout(() => this.saveDefinition(definition), 5000);
@@ -226,8 +231,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 }
 
                 let definition = Object.assign({} as IDefinition, response.data.definition);
-
-                this.setDefinition(definition);
 
                 return Promise.resolve(definition);
             })
@@ -291,7 +294,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let oldDefinitionId = oldDefinition ? oldDefinition._id : undefined;
-        if (! definitionId || ! oldDefinitionId) {
+        if (! definitionId && ! oldDefinitionId) {
             window.sessionStorage.removeItem(DEFINITION_KEY);
             this.initBuilder();
 
@@ -325,8 +328,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (! definition || typeof this.editor === "undefined") {
             return;
         }
-
-        window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
         this.initBuilder(definition);
         this.toggleModal();
