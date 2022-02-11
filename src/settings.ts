@@ -9,6 +9,15 @@ if (! MONGODB_URL) {
     throw new Error("Unblock Studio: The environment variable 'MONGODB_URL' is not defined.");
 }
 
+export const MYSQL_HOST = process.env.MYSQL_HOST || "127.0.0.1";
+export const MYSQL_USER = process.env.MYSQL_USER;
+export const MYSQL_PASSWORD = process.env.MYSQL_PASSWORD;
+export const MYSQL_DB = process.env.MYSQL_DB;
+
+if (! MYSQL_USER || ! MYSQL_PASSWORD || ! MYSQL_DB) {
+    throw new Error("Unblock Studio: The MySQL connection is not set.");
+}
+
 export const DEFINITION_KEY = "definition";
 export const DEFINITION_COLLECTION_NAME = "definitions";
 export const TASK_COLLECTION_NAME = "tasks";
