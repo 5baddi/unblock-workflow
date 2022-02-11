@@ -10,6 +10,7 @@ const BLOCK_VERSION = "0.0.1";
     icon: ICON,
     alias: BLOCK_NAME,
     version: BLOCK_VERSION,
+    kind: "headless",
     get label() {
         // TODO: use translation
         return "Process task";
