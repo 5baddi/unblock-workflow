@@ -43,6 +43,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.openWorkflow = this.openWorkflow.bind(this);
         this.initBuilder = this.initBuilder.bind(this);
         this.reSaveDefinition = this.reSaveDefinition.bind(this);
+        this.beforeUnload = this.beforeUnload.bind(this);
+        this.onResize = this.onResize.bind(this);
     }
 
     render()
@@ -102,6 +104,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         let e = event || window.event;
         if (! e) {
+            return;
+        }
+
+        let definition = this.getDefinition();
+        if (typeof definition !== "undefined" && definition.isSaved && typeof definition.name === "string" && definition.name !== "Unnamed") {
             return;
         }
 
@@ -205,7 +212,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
     }
 
-    private reSaveDefinition()
+    private getDefinition(): IDefinition | undefined
     {
         let definition = this.state.definition;
         if (! definition) {
@@ -214,6 +221,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             : undefined;
         }
 
+        return definition;
+    }
+
+    private reSaveDefinition()
+    {
+        let definition = this.getDefinition();
         if (! definition || definition.isSaved) {
             return;
         }
