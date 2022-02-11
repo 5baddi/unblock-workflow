@@ -4,7 +4,7 @@ import { IDefinition, IEditorDefinitionsModalProps, IEditorDefinitionsModalState
 import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderOpen, faTrash, faPlayCircle } from "@fortawesome/free-solid-svg-icons";
+import { faFolderOpen, faTrash, faPlayCircle, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import PulseLoader from "react-spinners/PulseLoader";
 
@@ -16,13 +16,15 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
         this.state = {
             definitions: [],
-            isLoading: true
+            isLoading: true,
+            selectionModel: []
         }
 
         this.loadDefinitions = this.loadDefinitions.bind(this);
         this.renderDefinitionsTable = this.renderDefinitionsTable.bind(this);
         this.openWorkflow = this.openWorkflow.bind(this);
         this.deleteWorkflow = this.deleteWorkflow.bind(this);
+        this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
     }
 
     componentDidMount()
@@ -39,7 +41,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     render()
     {
-        const {createNewWorkflow, openWorkflow, deleteWorkflow, ...rest} = this.props;
+        const {createNewWorkflow, openWorkflow, deleteWorkflow, bulkDeleteWorkflows, ...rest} = this.props;
 
         return (
             <Modal
@@ -58,6 +60,11 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={createNewWorkflow}>Create New Workflow</Button>
+                    <Button variant="danger" 
+                        disabled={! this.state.selectionModel || this.state.selectionModel.length === 0}
+                        onClick={this.bulkDeleteWorkflows}>
+                        <FontAwesomeIcon icon={faTrashAlt}/>&nbsp;Bulk Delete
+                    </Button>
                     <Button onClick={rest.onHide}>Close</Button>
                 </Modal.Footer>
             </Modal>
@@ -148,9 +155,22 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     pageSize={5}
                     rowsPerPageOptions={[5]}
                     getRowId={(row) => row._id }
+                    disableSelectionOnClick
+                    checkboxSelection
+                    onSelectionModelChange={(newSelectionModel) => {
+                        this.setSelectionModel(newSelectionModel);
+                    }}
+                    selectionModel={this.state.selectionModel}
                 />
             </div>
         );
+    }
+
+    private setSelectionModel(newSelectionModel) 
+    {
+        this.setState({
+            selectionModel: newSelectionModel
+        });
     }
 
     private runDefinition(definitionId?: string)
@@ -175,6 +195,24 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     return;
                 }
 
+                this.loadDefinitions();
+            });
+    }
+
+    private bulkDeleteWorkflows()
+    {
+        this.setState({ isLoading: true });
+
+        this.props
+            .bulkDeleteWorkflows(this.state.selectionModel)
+            .then((result) => {
+                if (! result) {
+                    this.setState({ isLoading: false });
+
+                    return;
+                }
+
+                this.setState({ selectionModel: [] });
                 this.loadDefinitions();
             });
     }

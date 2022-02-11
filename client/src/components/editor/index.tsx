@@ -45,6 +45,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.reSaveDefinition = this.reSaveDefinition.bind(this);
         this.beforeUnload = this.beforeUnload.bind(this);
         this.onResize = this.onResize.bind(this);
+        this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
     }
 
     render()
@@ -69,7 +70,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           onHide={this.toggleModal}
                                           createNewWorkflow={this.createNewWorkflow}
                                           deleteWorkflow={this.deleteWorkflow}
-                                          openWorkflow={this.openWorkflow}/>
+                                          openWorkflow={this.openWorkflow}
+                                          bulkDeleteWorkflows={this.bulkDeleteWorkflows}/>
                     </div>
                 </Grid>
 
@@ -321,6 +323,36 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         this.editor?.tutorial();
+    }
+
+    private bulkDeleteWorkflows(definitionsIds?: string[]): Promise<boolean>
+    {
+        if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
+            return Promise.resolve(false);
+        }
+
+        if (! confirm("Are you sure you want to delete this workflow?")) {
+            return Promise.resolve(false);
+        }
+
+        return API.delete(`${PUBLIC_URL}/api/definitions`, { data: { definitionsIds } })
+            .then(response => {
+                if (! response.data.success) {
+                    return false;
+                }
+
+                let definition = this.getDefinition();
+                if (definition && definition._id && Object.values(definitionsIds).includes(definition._id)) {
+                    this.setDefinition();
+                }
+
+                return true;
+            })
+            .catch(error => {
+                console.log(error);
+
+                return false;
+            });
     }
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>

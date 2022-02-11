@@ -56,10 +56,12 @@ export interface IEditorDefinitionsModalProps extends ModalProps
     createNewWorkflow: () => void;
     openWorkflow: (definition: IDefinition) => void;
     deleteWorkflow: (definitionId: string) => Promise<boolean>;
+    bulkDeleteWorkflows: (definitionsIds: string[]) => Promise<boolean>;
 }
 
 export interface IEditorDefinitionsModalState extends ModalProps
 {
     definitions?: IDefinition[];
     isLoading: boolean;
+    selectionModel: string[];
 }

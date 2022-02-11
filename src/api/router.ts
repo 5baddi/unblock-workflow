@@ -247,4 +247,51 @@ router.delete("/definition/:id", (req, res) => {
         });
 });
 
+router.delete("/definitions", (req, res) => {
+    let body = req.body;
+    let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
+    if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
+        res.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    let ids = Object.values(definitionsIds).map((id) => {
+        return new ObjectId(id);
+    });
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+            let bulk = db.collection(DEFINITION_COLLECTION_NAME).initializeUnorderedBulkOp();
+            
+            bulk.find({ _id: { $in: ids } }).delete();
+            bulk.execute()
+                .then(result => {
+                    if (! result.ok) {
+                        client.close();
+
+                        return res.status(401).send({
+                            success: false,
+                            message: "failed to delete definitions",
+                        });
+                    }
+
+                    client.close();
+
+                    return res.send({ success: true });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return res.status(500).send({
+                        success: false,
+                        message: error.message || "failed to delete definitions",
+                    });
+                });
+        });
+});
+
 module.exports = router;
