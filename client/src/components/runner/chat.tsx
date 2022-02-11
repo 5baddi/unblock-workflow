@@ -26,6 +26,9 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
     {
         super(props);
 
+        this.onSubmit = this.onSubmit.bind(this);
+        this.onChange = this.onChange.bind(this);
+
         this.state = {
             definition: undefined,
             isLoading: true
@@ -49,6 +52,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                         ? <TripettoChatRunner
                             display="inline"
                             definition={this.state.definition}
+                            onChange={this.onChange}
                             onSubmit={this.onSubmit}
                             styles={this.style}
                         />
@@ -109,13 +113,12 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
     private onSubmit(instance: Instance): void
     {
-        // Implement your response handler here.
+        let exportables = Export.exportables(instance);
+    }
 
-        // For this example we output all exportable fields to the browser console
-        console.dir(Export.exportables(instance));
+    private onChange(instance: Instance): void
+    {
 
-        // Or output the data in CSV-format
-        console.dir(Export.CSV(instance));
     }
 
     private loadDefinitionById(definitionId?: string): void
