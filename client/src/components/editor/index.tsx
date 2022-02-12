@@ -106,6 +106,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     componentWillUnmount()
     {
         this.clearTimer();
+
+        window.sessionStorage.removeItem(DEFINITION_KEY);
+        window.sessionStorage.removeItem(DEFINITION_ID_KEY);
         
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("orientationchange", this.onResize);
