@@ -1,20 +1,8 @@
-import { MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB } from '../settings';
 import { migrateResultsTable } from './results';
-const mysql = require("mysql");
+import { db } from "../services/mysql";
 
-export function migrate()
-{
-    if (! MYSQL_USER || ! MYSQL_PASSWORD || ! MYSQL_DB) {
-        throw new Error("Unblock Studio: Missing MySQL environment variables.")
-    }
-
-    let db = mysql.createConnection({
-        host: MYSQL_HOST,
-        user: MYSQL_USER,
-        password: MYSQL_PASSWORD,
-        database: MYSQL_DB
-    });
-    
+export default function migrate()
+{    
     db.connect((error) => {
         if (error) {
             throw error;

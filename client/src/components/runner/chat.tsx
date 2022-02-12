@@ -28,6 +28,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         this.onSubmit = this.onSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.saveResult = this.saveResult.bind(this);
 
         this.state = {
             definition: undefined,
@@ -114,11 +115,37 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
     private onSubmit(instance: Instance): void
     {
         let exportables = Export.exportables(instance);
+
+        this.saveResult(exportables);
     }
 
     private onChange(instance: Instance): void
     {
 
+    }
+
+    private async saveResult(exportables?: Export.IExportables)//: Promise<IDefinition | undefined>
+    {
+        let definitionId = this.state.definition?._id;
+        if (! exportables || ! definitionId) {
+            return Promise.resolve(undefined);
+        }
+
+        this.setState({ isLoading: true });
+
+        return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
+            .then(response => {
+                // if (! response.data.definition) {
+                //     return Promise.resolve(undefined);
+                // }
+
+                // let definition = Object.assign({} as IDefinition, response.data.definition);
+
+                // this.setDefinition(definition);
+
+                // return Promise.resolve(definition);
+            })
+            .catch(error => Promise.reject(error));
     }
 
     private loadDefinitionById(definitionId?: string): void

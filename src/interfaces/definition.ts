@@ -8,3 +8,10 @@ export interface IDefinition extends TripettoIDefinition, IEntity
 }
 
 export interface IEditorProperties extends IBuilderProperties {}
+
+export interface IResult extends IEntity
+{
+    definitionId: string;
+    type?: string;
+    value?: string | object;
+}

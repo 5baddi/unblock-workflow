@@ -1,9 +1,9 @@
 import {MongoClient, ObjectId} from "mongodb";
 import { DEFINITION_COLLECTION_NAME, MONGODB_URL, ROOT_USER_ID } from "../settings";
 import { IDefinition } from "../interfaces/definition";
-import { IEntity } from '../interfaces/entity';
-import { id } from "inversify";
-import { IMongoDBFilter } from '../interfaces/index';
+import { IMongoDBFilter } from '../interfaces';
+import { db as mysqlDB } from "../services/mysql";
+import { v4 as uuidv4 } from "uuid";
 
 const express = require("express");
 const router = express.Router();
@@ -296,6 +296,80 @@ router.delete("/definitions", (req, res) => {
                     });
                 });
         });
+});
+
+router.post("/result/:id", (req, res) => {
+    let id = req.params.id;
+    let fields = req.body.fields;
+    if (! id || ! fields) {
+        res.status(401)
+            .send({
+                success: false,
+                message: "Definition id and fields are required!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+                let db = client.db();
+                
+                db.collection(DEFINITION_COLLECTION_NAME)
+                    .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
+                    .then(result => {
+                        if (! result) {
+                            client.close();
+
+                            return res.status(500).send({
+                                success: false,
+                                message: "Definition not found!",
+                            });
+                        }
+
+                        client.close();
+
+                        mysqlDB.connect((error) => {
+                            try {
+                                if (error) {
+                                    throw error;
+                                }
+
+                                let fieldsQuery = Object.values(fields).map((field) => {
+                                    let data = JSON.parse(JSON.stringify(field));
+
+                                    return `('${uuidv4}', '${id}', '${data.type}', '${data.value}', '${data}', '${new Date()}, '${new Date()}'),`;
+                                });
+
+                                let query = `INSERT INTO results ${fieldsQuery.join(" ")}`;
+
+                                mysqlDB.query(query, (error, result) => {
+                                    if (error) {
+                                        throw error;
+                                    }
+
+                                    console.log(result); 
+                                });
+                            } catch(e) {
+                                return res.status(500).send({
+                                    success: false,
+                                    message: "failed to save result.",
+                                });
+                            }
+                        });
+
+                        // let definition = Object.assign({} as IDefinition, result.value);
+                        // definition.isSaved = true;
+
+                        return res.send({ success: true });
+                    })
+                    .catch(error => {
+                        client.close();
+
+                        return res.status(500).send({
+                            success: false,
+                            message: error.message || "failed to fetch definition",
+                        });
+                    });
+            });
 });
 
 module.exports = router;

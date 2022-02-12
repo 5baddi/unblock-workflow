@@ -1,6 +1,6 @@
 import path from "path";
 import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL } from "./settings";
-import { migrate } from './migrations';
+import migrate from './migrations';
 
 const express = require("express");
 const cors = require("cors");
