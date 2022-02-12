@@ -1,6 +1,6 @@
 import {MongoClient, ObjectId} from "mongodb";
-import { DEFINITION_COLLECTION_NAME, MONGODB_URL, ROOT_USER_ID } from "../settings";
-import { IDefinition } from "../interfaces/definition";
+import { DEFINITION_COLLECTION_NAME, MONGODB_URL, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME } from '../settings';
+import { IDefinition, ISnapshot } from "../interfaces/definition";
 import { IMongoDBFilter } from '../interfaces';
 import { db as mysqlDB } from "../services/mysql";
 import { v4 as uuidv4 } from "uuid";
@@ -71,21 +71,38 @@ router.post("/definition", (req, res) => {
             let db = client.db();
             let now: Date = new Date();
 
-            if (typeof definition.userId === "undefined") {
-                definition.userId = ROOT_USER_ID;
+            if (typeof definition.user_id === "undefined") {
+                definition.user_id = ROOT_USER_ID;
             }
             
             if (typeof definition.created_at === "undefined") {
                 definition.created_at = now;
             }
 
-            let filters = Object.assign({} as IMongoDBFilter, { userId: definition.userId });
+            let filters = Object.assign({} as IMongoDBFilter, { user_id: definition.user_id });
 
             if (typeof definition._id === "string") {
                 filters._id = new ObjectId(definition._id);
                 filters.deleted_at = { $exists: false };
 
                 definition.updated_at = now;
+
+                try {
+                    let snapshot: ISnapshot = Object.assign({} as ISnapshot, definition);
+                    snapshot.definition_id = definition._id;
+                    snapshot.snaped_at = new Date();
+
+                    delete snapshot._id;
+
+                    db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)));
+                } catch(error) {
+                    return res.status(401)
+                        .send({
+                            success: false,
+                            message: error.message || "failed to take snapshot of definition",
+                        });
+                }
+
                 delete definition._id;
             }
 
@@ -327,39 +344,55 @@ router.post("/result/:id", (req, res) => {
 
                         client.close();
 
-                        mysqlDB.connect((error) => {
-                            try {
-                                if (error) {
-                                    throw error;
+                        try {
+                            mysqlDB.connect();
+                            
+                            let params = Object.values(fields).map((field) => {
+                                let data = JSON.parse(JSON.stringify(field));
+
+                                return [
+                                    uuidv4(), 
+                                    id,
+                                    data.type,
+                                    data.value,
+                                    data,
+                                    new Date(),
+                                    new Date(),
+                                ];
+                            });
+                            console.log(params);
+                            
+
+                            let data = null;
+                            let error: any = null;
+
+                            mysqlDB.query("INSERT INTO results VALUES ?", params, (err, result) => {
+                                if (err) {
+                                    error = err;
                                 }
 
-                                let fieldsQuery = Object.values(fields).map((field) => {
-                                    let data = JSON.parse(JSON.stringify(field));
+                                data = result;
+                            });
 
-                                    return `('${uuidv4}', '${id}', '${data.type}', '${data.value}', '${data}', '${new Date()}, '${new Date()}'),`;
-                                });
+                            mysqlDB.end();
 
-                                let query = `INSERT INTO results ${fieldsQuery.join(" ")}`;
-
-                                mysqlDB.query(query, (error, result) => {
-                                    if (error) {
-                                        throw error;
-                                    }
-
-                                    console.log(result); 
-                                });
-                            } catch(e) {
+                            if (error) {
                                 return res.status(500).send({
                                     success: false,
-                                    message: "failed to save result.",
+                                    message: error.message  || "failed to save result.",
                                 });
                             }
-                        });
+
+                            return res.send({ success: true, data });
+                        } catch(error) {
+                            return res.status(500).send({
+                                success: false,
+                                message: error.message  || "failed to save result.",
+                            });
+                        }
 
                         // let definition = Object.assign({} as IDefinition, result.value);
                         // definition.isSaved = true;
-
-                        return res.send({ success: true });
                     })
                     .catch(error => {
                         client.close();
