@@ -126,7 +126,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         window.sessionStorage.removeItem(DEFINITION_KEY);
         
-        if (typeof definition._id === "string") {
+        if (typeof definition !== "undefined" && typeof definition._id === "string") {
             window.sessionStorage.setItem(DEFINITION_ID_KEY, definition._id);
         }
 
