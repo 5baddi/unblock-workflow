@@ -108,7 +108,7 @@ router.post("/definition", (req, res) => {
             }
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndReplace(filters, definition, { upsert: (typeof definition._id !== "string"), returnDocument: "after" })
+                .findOneAndUpdate(filters, { $set: definition }, { upsert: (typeof definition._id !== "string"), returnDocument: "after" })
                 .then(result => {
                     if (! result.ok || ! result.value) {
                         client.close();
