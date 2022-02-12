@@ -310,13 +310,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     
     private createNewWorkflow()
     {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
+        // if (typeof this.editor === "undefined") {
+        //     return;
+        // }
 
-        window.sessionStorage.removeItem(DEFINITION_KEY)
-        this.initBuilder();
-        this.toggleModal();
+        // window.sessionStorage.removeItem(DEFINITION_KEY)
+        // this.initBuilder();
+        // this.toggleModal();
     }
 
     private toggleModal()
