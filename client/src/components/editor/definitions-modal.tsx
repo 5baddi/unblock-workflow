@@ -52,7 +52,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Saved Workflows
+                        Saved workflows
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -148,7 +148,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         ];
 
         return (
-            <div style={{ height: 300, width: '100%' }}>
+            <div style={{display: "table", tableLayout: "fixed", width: "100%", height: 300}}>
                 <DataGrid
                     rows={this.state.definitions}
                     columns={columns}
