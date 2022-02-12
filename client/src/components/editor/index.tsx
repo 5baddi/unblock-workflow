@@ -10,7 +10,7 @@ import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
 import API  from "../../api";
 import { loadDefaultDefinition } from "../../helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faQuestion, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 
 import "./blocks";
@@ -46,6 +46,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.beforeUnload = this.beforeUnload.bind(this);
         this.onResize = this.onResize.bind(this);
         this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
+        this.runDefinition = this.runDefinition.bind(this);
     }
 
     render()
@@ -60,6 +61,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <button onClick={this.editDefinitionProps}>
                             <FontAwesomeIcon icon={faPen}/>
                         </button>
+                        {
+                            this.state.definition && this.state.definition._id
+                            ? (
+                                <button onClick={this.runDefinition}>
+                                    <FontAwesomeIcon icon={faPlay}/>
+                                </button>
+                            )
+                            : undefined
+                        }
                         <button onClick={() => this.deleteWorkflow()}>
                             <FontAwesomeIcon icon={faTrash}/>
                         </button>
@@ -353,6 +363,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 return false;
             });
+    }
+
+    private runDefinition()
+    {
+        if (! this.state.definition || ! this.state.definition._id) {
+            return;
+        }
+
+        window.open(`${PUBLIC_URL}/run/${this.state.definition._id}`, "_blank")?.focus();
     }
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>
