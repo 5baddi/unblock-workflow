@@ -47,6 +47,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.onResize = this.onResize.bind(this);
         this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
         this.runDefinition = this.runDefinition.bind(this);
+        this.clearTimer = this.clearTimer.bind(this);
+        this.startTimer = this.startTimer.bind(this);
     }
 
     render()
@@ -94,7 +96,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.open()
             .catch((error) => console.log(error));
 
-        this.timer = setInterval(this.reSaveDefinition, 5000);
+        this.startTimer();
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
@@ -103,9 +105,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentWillUnmount()
     {
-        if (typeof this.timer !== "undefined") {
-            clearInterval(this.timer);
-        }
+        this.clearTimer();
         
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("orientationchange", this.onResize);
@@ -148,12 +148,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private initBuilder(definition?: IDefinition): Builder
     {
+        this.clearTimer();
+        this.setDefinition(definition);
+
         let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
 
         this.editor = Builder.open(definition || this.props.definition, properties);
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
 
-        this.setDefinition(definition);
+        this.startTimer();
 
         return this.editor;
     }
@@ -235,6 +238,18 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
     }
 
+    private clearTimer()
+    {
+        if (typeof this.timer !== "undefined") {
+            clearInterval(this.timer);
+        }
+    }
+    
+    private startTimer()
+    {
+        this.timer = setInterval(this.reSaveDefinition, 5000);
+    }
+
     private getDefinition(): IDefinition | undefined
     {
         let definition = this.state.definition;
@@ -310,13 +325,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     
     private createNewWorkflow()
     {
-        // if (typeof this.editor === "undefined") {
-        //     return;
-        // }
+        if (typeof this.editor === "undefined") {
+            return;
+        }
 
-        // window.sessionStorage.removeItem(DEFINITION_KEY)
-        // this.initBuilder();
-        // this.toggleModal();
+        this.initBuilder();
+        this.toggleModal();
     }
 
     private toggleModal()
