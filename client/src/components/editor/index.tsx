@@ -106,9 +106,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     componentWillUnmount()
     {
         this.clearTimer();
-
-        window.sessionStorage.removeItem(DEFINITION_KEY);
-        window.sessionStorage.removeItem(DEFINITION_ID_KEY);
         
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("orientationchange", this.onResize);
@@ -299,13 +296,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
     {
-        let previousOpenedDefinitionId = window.sessionStorage.getItem(DEFINITION_ID_KEY);
-        if (! definitionId && typeof previousOpenedDefinitionId === "string") {
-            definitionId = previousOpenedDefinitionId;
-        }
-
+        window.sessionStorage.removeItem(DEFINITION_KEY);
+        window.sessionStorage.removeItem(DEFINITION_ID_KEY);
+        
         if (! definitionId) {
-            return loadDefaultDefinition();
+            return undefined;
         }
 
         return await API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
