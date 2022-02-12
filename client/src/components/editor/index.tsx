@@ -6,7 +6,7 @@ import { Builder } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../../../src/settings";
-import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from "../../global";
+import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY, DEFINITION_ID_KEY } from '../../global';
 import API  from "../../api";
 import { loadDefaultDefinition } from "../../helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -124,6 +124,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
+        window.sessionStorage.removeItem(DEFINITION_KEY);
+        
+        if (typeof definition._id === "string") {
+            window.sessionStorage.setItem(DEFINITION_ID_KEY, definition._id);
+        }
+
         e.preventDefault();
        
         return e.returnValue = "Are you sure you want to close?";
@@ -217,11 +223,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (typeof definition === "undefined") {
             window.sessionStorage.removeItem(DEFINITION_KEY);
+            window.sessionStorage.removeItem(DEFINITION_ID_KEY);
 
             return;
         }
         
         window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
+        if (typeof definition._id === "string") {
+            window.sessionStorage.setItem(DEFINITION_ID_KEY, definition._id);
+        }
     }
 
     private getDefinition(): IDefinition | undefined
@@ -273,6 +284,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
     {
+        let previousOpenedDefinitionId = window.sessionStorage.getItem(DEFINITION_ID_KEY);
+        if (! definitionId && typeof previousOpenedDefinitionId === "string") {
+            definitionId = previousOpenedDefinitionId;
+        }
+
         if (! definitionId) {
             return loadDefaultDefinition();
         }
