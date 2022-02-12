@@ -16,6 +16,7 @@ export const MYSQL_DB = process.env.MYSQL_DB;
 
 export const DEFINITION_KEY = "definition";
 export const DEFINITION_COLLECTION_NAME = "definitions";
+export const SNAPSHOT_COLLECTION_NAME = "snapshots";
 export const TASK_COLLECTION_NAME = "tasks";
 export const USER_COLLECTION_NAME = "users";
 

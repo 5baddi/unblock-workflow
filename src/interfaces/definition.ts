@@ -5,6 +5,7 @@ import { IEntity } from "./entity";
 export interface IDefinition extends TripettoIDefinition, IEntity
 {
     user_id?: string;
+    is_saved?: boolean;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}

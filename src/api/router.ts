@@ -104,6 +104,7 @@ router.post("/definition", (req, res) => {
                 }
 
                 delete definition._id;
+                delete definition.is_saved;
             }
 
             db.collection(DEFINITION_COLLECTION_NAME)
@@ -121,7 +122,7 @@ router.post("/definition", (req, res) => {
                     client.close();
 
                     let definition = Object.assign({} as IDefinition, result.value);
-                    definition.isSaved = true;
+                    definition.is_saved = true;
 
                     return res.send({ success: true, definition });
                 })
@@ -392,7 +393,7 @@ router.post("/result/:id", (req, res) => {
                         }
 
                         // let definition = Object.assign({} as IDefinition, result.value);
-                        // definition.isSaved = true;
+                        // definition.is_saved = true;
                     })
                     .catch(error => {
                         client.close();

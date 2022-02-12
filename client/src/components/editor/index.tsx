@@ -120,7 +120,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let definition = this.getDefinition();
-        if (typeof definition !== "undefined" && definition.isSaved && typeof definition.name === "string" && definition.name !== "Unnamed") {
+        if (typeof definition !== "undefined" && definition.is_saved && typeof definition.name === "string" && definition.name !== "Unnamed") {
             return;
         }
 
@@ -195,7 +195,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         await this.saveDefinition(definition)
             .catch((error) => {
-                definition.isSaved = false;
+                definition.is_saved = false;
 
                 this.setDefinition(definition);
 
@@ -247,7 +247,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     
     private startTimer()
     {
-        this.timer = setInterval(this.reSaveDefinition, 5000);
+        this.timer = setInterval(this.reSaveDefinition, 15000);
     }
 
     private getDefinition(): IDefinition | undefined
@@ -265,7 +265,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private reSaveDefinition()
     {
         let definition = this.getDefinition();
-        if (! definition || definition.isSaved) {
+        if (! definition || definition.is_saved) {
             return;
         }
 
