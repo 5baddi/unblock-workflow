@@ -94,7 +94,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     componentDidMount()
     {
         this.open()
-            .catch((error) => console.log(error));
+            .catch((error) => {
+                if (ENV === "development") {
+                    console.log(error);
+                }
+            });
 
         this.startTimer();
 
@@ -176,12 +180,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         await this.saveDefinition(definition)
             .catch((error) => {
+                if (ENV === "development") {
+                    console.log(error);
+                }
+
                 definition.is_saved = false;
 
-                this.setDefinition(definition);
-
-                console.log(error);
-            });
+                window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+            })
+            .finally(() => this.setDefinition(definition));
     }
 
     private async saveDefinition(definition?: IDefinition): Promise<IDefinition | undefined>
@@ -234,15 +241,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
+        if (definition.is_saved) {
+            return;
+        }
+
         if (ENV === "development") {
             console.log("re-send unsaved definition", definition);
         }
 
-        this.saveDefinition(definition)
-            .then(definition => {
-                this.setDefinition(definition);
-            })
-            .catch(error => console.log(error));
+        this.saveDefinition(definition);
     }
 
     private onResize()
@@ -275,7 +282,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 return Promise.resolve(definition);
             })
             .catch(error => {
-                console.log(error);
+                if (ENV === "development") {
+                    console.log(error);
+                }
             });
     }
     
@@ -345,7 +354,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 return true;
             })
             .catch(error => {
-                console.log(error);
+                if (ENV === "development") {
+                    console.log(error);
+                }
 
                 return false;
             });
@@ -388,7 +399,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 return true;
             })
             .catch(error => {
-                console.log(error);
+                if (ENV === "development") {
+                    console.log(error);
+                }
 
                 return false;
             });
