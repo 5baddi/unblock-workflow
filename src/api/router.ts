@@ -4,6 +4,7 @@ import { IDefinition, ISnapshot } from "../interfaces/definition";
 import { IMongoDBFilter } from '../interfaces';
 import { db as mysqlDB } from "../services/mysql";
 import { v4 as uuidv4 } from "uuid";
+import { version } from "os";
 
 const express = require("express");
 const router = express.Router();
@@ -345,46 +346,47 @@ router.post("/result/:id", (req, res) => {
 
                         client.close();
 
+                        let query = "INSERT INTO `results` (`id`, `definition_id`, `key`, `type`, `version`, `data_type`, `name`, `value`, `snapshot`, `updated_at`, `created_at`) VALUES ?";
+                        let key = uuidv4();
+
                         let rows = Object.values(fields).map((field) => {
                             let data = JSON.parse(JSON.stringify(field));
+                            let type = data.type.replace("tripetto-block-", "");
 
-                            return {
-                                id: uuidv4(), 
-                                definition_id: id,
-                                type: data.type,
-                                value: data.value,
-                                snapshot: JSON.stringify(data),
-                                updated_at: null,
-                                created_at: new Date(),
-                            };
+                            return [
+                                uuidv4(), 
+                                id,
+                                key,
+                                type,
+                                data.version,
+                                data.datatype,
+                                data.name,
+                                data.value,
+                                JSON.stringify(data),
+                                null,
+                                new Date(),
+                            ];
                         });
-                        
-                        let error: any = null;
 
-                        req.getConnection((err, connection) => {
-                            if (err) {
-                                error = err;
-
-                                return;
+                        return req.getConnection((conErr, connection) => {
+                            if (conErr) {
+                                return res.status(500).send({
+                                    success: false,
+                                    message: conErr.message  || "failed to save result.",
+                                });
                             }
 
-                            connection.query("INSERT INTO results SET ?", rows, (err, rows, fields) => {
+                            connection.query(query, [rows], (err) => {
                                 if (err) {
-                                    error = err;
-
-                                    return;
+                                    return res.status(500).send({
+                                        success: false,
+                                        message: err.message  || "failed to save result.",
+                                    });
                                 }
+
+                                return res.send({ success: true});
                             });
                         });
-
-                        if (error) {
-                            return res.status(500).send({
-                                success: false,
-                                message: error.message  || "failed to save result.",
-                            });
-                        }
-
-                        return res.send({ success: true});
                     })
                     .catch(error => {
                         client.close();
