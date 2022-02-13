@@ -345,55 +345,46 @@ router.post("/result/:id", (req, res) => {
 
                         client.close();
 
-                        try {
-                            mysqlDB.connect();
-                            
-                            let params = Object.values(fields).map((field) => {
-                                let data = JSON.parse(JSON.stringify(field));
+                        let rows = Object.values(fields).map((field) => {
+                            let data = JSON.parse(JSON.stringify(field));
 
-                                return [
-                                    uuidv4(), 
-                                    id,
-                                    data.type,
-                                    data.value,
-                                    data,
-                                    new Date(),
-                                    new Date(),
-                                ];
-                            });
-                            console.log(params);
-                            
+                            return {
+                                id: uuidv4(), 
+                                definition_id: id,
+                                type: data.type,
+                                value: data.value,
+                                snapshot: JSON.stringify(data),
+                                updated_at: null,
+                                created_at: new Date(),
+                            };
+                        });
+                        
+                        let error: any = null;
 
-                            let data = null;
-                            let error: any = null;
+                        req.getConnection((err, connection) => {
+                            if (err) {
+                                error = err;
 
-                            mysqlDB.query("INSERT INTO results VALUES ?", params, (err, result) => {
-                                if (err) {
-                                    error = err;
-                                }
-
-                                data = result;
-                            });
-
-                            mysqlDB.end();
-
-                            if (error) {
-                                return res.status(500).send({
-                                    success: false,
-                                    message: error.message  || "failed to save result.",
-                                });
+                                return;
                             }
 
-                            return res.send({ success: true, data });
-                        } catch(error) {
+                            connection.query("INSERT INTO results SET ?", rows, (err, rows, fields) => {
+                                if (err) {
+                                    error = err;
+
+                                    return;
+                                }
+                            });
+                        });
+
+                        if (error) {
                             return res.status(500).send({
                                 success: false,
                                 message: error.message  || "failed to save result.",
                             });
                         }
 
-                        // let definition = Object.assign({} as IDefinition, result.value);
-                        // definition.is_saved = true;
+                        return res.send({ success: true});
                     })
                     .catch(error => {
                         client.close();

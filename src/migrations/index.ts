@@ -10,4 +10,6 @@ export default function migrate()
     
         migrateResultsTable(db);
     });
+
+    db.end();
 }

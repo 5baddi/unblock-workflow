@@ -1363,6 +1363,11 @@ execa@^4.0.0:
     signal-exit "^3.0.2"
     strip-final-newline "^2.0.0"
 
+express-myconnection@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/express-myconnection/-/express-myconnection-1.0.4.tgz#8776049fbf9f262209cffdb535b7c7509733ff55"
+  integrity sha1-h3YEn7+fJiIJz/21NbfHUJcz/1U=
+
 express@^4.17.1, express@^4.17.2:
   version "4.17.2"
   resolved "https://registry.yarnpkg.com/express/-/express-4.17.2.tgz#c18369f265297319beed4e5558753cc8c1364cb3"

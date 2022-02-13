@@ -1,17 +1,33 @@
 import path from "path";
-import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL } from "./settings";
+import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB } from './settings';
 import migrate from './migrations';
 
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const apiRouter = require("./api/router");
+const mysql = require("mysql");
+const connection = require("express-myconnection");
 
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "./../public")));
+
+app.use(
+    connection(
+        mysql, 
+        {
+            host: MYSQL_HOST,
+            user: MYSQL_USER,
+            password: MYSQL_PASSWORD,
+            database: MYSQL_DB,
+            port: 3306
+        },
+        "request"
+    )
+);
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "./../public"));
@@ -62,6 +78,4 @@ app.listen(SERVER_PORT, (error) => {
     if (error) {
         console.log(error);
     }
-
-    migrate();
 });

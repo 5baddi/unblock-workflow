@@ -14,6 +14,10 @@ export const MYSQL_USER = process.env.MYSQL_USER;
 export const MYSQL_PASSWORD = process.env.MYSQL_PASSWORD;
 export const MYSQL_DB = process.env.MYSQL_DB;
 
+if (! MYSQL_USER || ! MYSQL_PASSWORD || ! MYSQL_DB) {
+    throw new Error("Unblock Studio: Missing MySQL environment variables.")
+}
+
 export const DEFINITION_KEY = "definition";
 export const DEFINITION_COLLECTION_NAME = "definitions";
 export const SNAPSHOT_COLLECTION_NAME = "snapshots";

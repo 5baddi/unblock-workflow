@@ -18,7 +18,7 @@ const override = css`
   margin: 0 auto;
 `;
 
-export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean }>
+export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean }>
 {
     private style?: IChatStyles;
 
@@ -32,7 +32,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         this.state = {
             definition: undefined,
-            isLoading: true
+            isLoading: true,
+            isFailed: false,
         };
 
         this.applyStyle();
@@ -124,26 +125,26 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
     }
 
-    private async saveResult(exportables?: Export.IExportables)//: Promise<IDefinition | undefined>
+    private async saveResult(exportables?: Export.IExportables): Promise<boolean>
     {
         let definitionId = this.state.definition?._id;
         if (! exportables || ! definitionId) {
-            return Promise.resolve(undefined);
+            return Promise.resolve(false);
         }
 
-        // this.setState({ isLoading: true });
+        this.setState({ isLoading: true, isFailed: false });
 
         return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
             .then(response => {
-                // if (! response.data.definition) {
-                //     return Promise.resolve(undefined);
-                // }
+                if (! response.data.success) {
+                    this.setState({ isLoading: false, isFailed: true });
 
-                // let definition = Object.assign({} as IDefinition, response.data.definition);
+                    return Promise.resolve(response.data.success);
+                }
 
-                // this.setDefinition(definition);
+                this.setState({ isLoading: false });
 
-                // return Promise.resolve(definition);
+                return Promise.resolve(response.data.success);
             })
             .catch(error => Promise.reject(error));
     }
