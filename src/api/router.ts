@@ -79,7 +79,7 @@ router.post("/definition", (req, res) => {
                 definition.created_at = now;
             }
 
-            let filters = Object.assign({} as IMongoDBFilter, {});
+            let filters = Object.assign({} as IMongoDBFilter, { _id: new ObjectId() });
 
             if (typeof definition._id === "string") {
                 filters._id = new ObjectId(definition._id);
@@ -105,8 +105,6 @@ router.post("/definition", (req, res) => {
 
                 delete definition._id;
                 delete definition.is_saved;
-            }else {
-                filters._id = new ObjectId();
             }
 
             db.collection(DEFINITION_COLLECTION_NAME)
