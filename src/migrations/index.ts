@@ -1,15 +1,6 @@
 import { migrateResultsTable } from './results';
-import { db } from "../services/mysql";
 
-export default function migrate()
+export default function migrate(connection)
 {    
-    db.connect((error) => {
-        if (error) {
-            throw error;
-        }
-    
-        migrateResultsTable(db);
-    });
-
-    db.end();
+    migrateResultsTable(connection);
 }

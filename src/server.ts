@@ -1,6 +1,5 @@
 import path from "path";
 import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB } from './settings';
-import migrate from './migrations';
 
 const express = require("express");
 const cors = require("cors");
