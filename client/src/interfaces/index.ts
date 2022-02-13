@@ -1,5 +1,6 @@
 import { Builder, IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto";
 import { ModalProps } from "react-bootstrap/Modal";
+import { IBuilder } from "@tripetto/map";
 
 export interface IDefinition extends TripettoIDefinition
 {
@@ -7,6 +8,7 @@ export interface IDefinition extends TripettoIDefinition
     name?: string;
     userId?: string;
     is_saved: boolean;
+    builder: IBuilder;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}
