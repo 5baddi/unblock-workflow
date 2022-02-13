@@ -204,7 +204,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
     {
-        return API.post(`${PUBLIC_URL}/api/definition`, { definition })
+        return API.post(`${PUBLIC_URL}/api/definitions`, { definition })
             .then(response => {
                 if (! response.data.definition) {
                     return Promise.resolve(undefined);

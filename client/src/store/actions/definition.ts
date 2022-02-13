@@ -8,7 +8,7 @@ export const getDefinition = () => dispatch => {
         return;
     }
 
-    return fetch(`${PUBLIC_URL}/api/definition/${id}`)
+    return fetch(`${PUBLIC_URL}/api/definitions/${id}`)
         .then(res => {
             console.log(res.json());
         })
