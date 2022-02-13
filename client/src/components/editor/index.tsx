@@ -5,10 +5,9 @@ import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
-import { ENV, PUBLIC_URL } from "../../../../src/settings";
+import { ENV, PUBLIC_URL, VERSION } from "../../../../src/settings";
 import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from '../../global';
 import API  from "../../api";
-import { loadDefaultDefinition } from "../../helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
@@ -19,7 +18,7 @@ import "./style.scss";
 
 const BUILDER_VERSION = {
     "name": "unblock",
-    "version": "0.0.4"
+    "version": VERSION
 };
 
 class Editor extends React.Component<IEditorProps, IEditorState>
