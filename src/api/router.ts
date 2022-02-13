@@ -105,6 +105,8 @@ router.post("/definition", (req, res) => {
 
                 delete definition._id;
                 delete definition.is_saved;
+            }else {
+                filters._id = new ObjectId();
             }
 
             db.collection(DEFINITION_COLLECTION_NAME)
