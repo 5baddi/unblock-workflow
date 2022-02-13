@@ -124,8 +124,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        window.sessionStorage.removeItem(DEFINITION_KEY);
-
         e.preventDefault();
        
         return e.returnValue = "Are you sure you want to close?";
@@ -206,14 +204,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private setDefinition(definition?: IDefinition): void
     {
         this.setState({ definition });
-
-        if (typeof definition === "undefined") {
-            window.sessionStorage.removeItem(DEFINITION_KEY);
-
-            return;
-        }
-        
-        window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
     }
 
     private clearTimer()
@@ -230,14 +220,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private getDefinition(): IDefinition | undefined
     {
-        let definition = this.state.definition;
-        if (! definition) {
-            definition = window.sessionStorage.getItem(DEFINITION_KEY)
-            ? JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined")
-            : undefined;
-        }
-
-        return definition;
+        return this.state.definition || undefined;
     }
 
     private reSaveDefinition()
@@ -277,8 +260,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
     {
-        window.sessionStorage.removeItem(DEFINITION_KEY);
-
         if (! definitionId) {
             return undefined;
         }
@@ -382,20 +363,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private deleteWorkflow(definitionId?: string): Promise<boolean>
     {
         let oldDefinition = this.state.definition;
-        if (! oldDefinition && window.sessionStorage.getItem(DEFINITION_KEY)) {
-            oldDefinition = JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined");
-        }
+        let oldDefinitionId = oldDefinition ? oldDefinition._id : undefined;
 
         if (! confirm("Are you sure you want to delete this workflow?")) {
             return Promise.resolve(false);
         }
 
-        let oldDefinitionId = oldDefinition ? oldDefinition._id : undefined;
         if (! definitionId && ! oldDefinitionId) {
-            window.sessionStorage.removeItem(DEFINITION_KEY);
-            this.initBuilder();
-
-            return Promise.resolve(true);
+            return Promise.resolve(false);
         }
 
         return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}`)
@@ -408,7 +383,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     this.toggleModal();
                 }
 
-                window.sessionStorage.removeItem(DEFINITION_KEY);
                 this.initBuilder();
 
                 return true;
