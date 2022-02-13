@@ -79,7 +79,7 @@ router.post("/definition", (req, res) => {
                 definition.created_at = now;
             }
 
-            let filters = Object.assign({} as IMongoDBFilter, { user_id: definition.user_id });
+            let filters = Object.assign({} as IMongoDBFilter, {});
 
             if (typeof definition._id === "string") {
                 filters._id = new ObjectId(definition._id);
@@ -94,7 +94,7 @@ router.post("/definition", (req, res) => {
 
                     delete snapshot._id;
 
-                    db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)));
+                    db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)))
                 } catch(error) {
                     return res.status(401)
                         .send({

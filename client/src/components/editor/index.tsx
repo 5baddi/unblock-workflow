@@ -6,7 +6,7 @@ import { Builder } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../../../src/settings";
-import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY, DEFINITION_ID_KEY } from '../../global';
+import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from '../../global';
 import API  from "../../api";
 import { loadDefaultDefinition } from "../../helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -125,7 +125,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         window.sessionStorage.removeItem(DEFINITION_KEY);
-        window.sessionStorage.removeItem(DEFINITION_ID_KEY);
 
         e.preventDefault();
        
@@ -168,26 +167,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submitedDefinition: TripettoDefinition): Promise<void>
     {
-        let oldDefinition = this.state.definition;
-        if (! oldDefinition) {
-            oldDefinition = window.sessionStorage.getItem(DEFINITION_KEY)
-                ? JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined")
-                : undefined;
-        }
-
         let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submitedDefinition)));
-        if (typeof definition.clusters === "undefined" && (typeof oldDefinition === "undefined" || typeof oldDefinition.clusters === "undefined")) {
-            this.setDefinition(definition);
-
-            return Promise.resolve();
+        if (this.state.definition && typeof this.state.definition?._id === "string") {
+            definition._id = this.state.definition._id;
         }
 
         if (ENV === "development") {
             console.log("saving workflow definition", definition);
-        }
-
-        if (oldDefinition && typeof oldDefinition._id === "string") {
-            definition._id = oldDefinition._id;
         }
 
         await this.saveDefinition(definition)
@@ -223,16 +209,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (typeof definition === "undefined") {
             window.sessionStorage.removeItem(DEFINITION_KEY);
-            window.sessionStorage.removeItem(DEFINITION_ID_KEY);
 
             return;
         }
         
         window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
-
-        if (typeof definition._id === "string") {
-            window.sessionStorage.setItem(DEFINITION_ID_KEY, definition._id);
-        }
     }
 
     private clearTimer()
@@ -297,8 +278,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
     {
         window.sessionStorage.removeItem(DEFINITION_KEY);
-        window.sessionStorage.removeItem(DEFINITION_ID_KEY);
-        
+
         if (! definitionId) {
             return undefined;
         }
