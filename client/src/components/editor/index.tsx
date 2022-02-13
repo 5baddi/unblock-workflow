@@ -17,6 +17,11 @@ import "./blocks";
 
 import "./style.scss";
 
+const BUILDER_VERSION = {
+    "name": "unblock",
+    "version": "0.0.4"
+};
+
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
     private editor?: Builder;
@@ -174,6 +179,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition._id = this.state.definition._id;
         }
 
+        definition.builder = BUILDER_VERSION;
+
+        this.setDefinition(definition);
+
+        if (typeof definition.clusters === "undefined") {
+            return Promise.resolve();
+        }
+
         if (ENV === "development") {
             console.log("saving workflow definition", definition);
         }
@@ -187,11 +200,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 definition.is_saved = false;
 
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
-            })
-            .finally(() => this.setDefinition(definition));
+            });
     }
 
-    private async saveDefinition(definition?: IDefinition): Promise<IDefinition | undefined>
+    private async saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
     {
         return API.post(`${PUBLIC_URL}/api/definition`, { definition })
             .then(response => {
