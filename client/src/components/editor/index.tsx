@@ -282,7 +282,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return undefined;
         }
 
-        return await API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
+        return await API.get(`${PUBLIC_URL}/api/definitions/${definitionId}`)
             .then(response => {
                 if (! response.data.definition) {
                     return Promise.resolve(undefined);
@@ -395,7 +395,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve(false);
         }
 
-        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}`)
+        return API.delete(`${PUBLIC_URL}/api/definitions/${definitionId || oldDefinitionId}`)
             .then(response => {
                 if (! response.data.success) {
                     return false;
