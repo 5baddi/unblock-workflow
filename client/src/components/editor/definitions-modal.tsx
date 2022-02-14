@@ -82,13 +82,15 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                 }
 
                 let definitions = response.data.definitions;
-                if (typeof this.props.currentOpenedDefinition === "string") {
-                    definitions = Object.values(definitions).filter((value) => {
-                        let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(value)));
 
-                        return definition._id !== this.props.currentOpenedDefinition;
-                    });
-                }
+                // Filter forms and ignore current opened
+                // if (typeof this.props.currentOpenedDefinition === "string") {
+                //     definitions = Object.values(definitions).filter((value) => {
+                //         let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(value)));
+
+                //         return definition._id !== this.props.currentOpenedDefinition;
+                //     });
+                // }
 
                 this.setState({ definitions, isLoading: false });
             })
@@ -138,7 +140,8 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                 renderCell: (cellValues) => {
                     return (
                         <div>
-                            <Button variant="outline-primary" className="btn-sm mr-2"
+                            <Button disabled={typeof this.props.currentOpenedDefinition === "string" && this.props.currentOpenedDefinition === cellValues.row._id} 
+                                    variant="outline-primary" className="btn-sm mr-2"
                                     onClick={() => this.openWorkflow(cellValues.row)}>
                                 <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
                             </Button>

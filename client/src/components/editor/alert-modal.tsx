@@ -21,10 +21,10 @@ class AlertModal extends React.Component<IEditorAlertModalProps>
                 centered
             >
                 <Modal.Body>
-                    <h4>Form already opened by another user!</h4>
+                    <h5 className="text-muted text-center">Form already opened by another user!</h5>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success">Request editing permission</Button>
+                    <Button disabled={true} variant="success">Request editing permission</Button>
                     <Button onClick={rest.onHide}>Close</Button>
                 </Modal.Footer>
             </Modal>
