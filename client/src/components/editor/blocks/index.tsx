@@ -49,7 +49,7 @@ import "./autopilot";
 import "./aws-lambda";
 import "./aws-sns";
 import "./aws-comprehend";
-import "./aws-dynamodb";
+// import "./aws-dynamodb";
 import "./aws-rekognition";
 import "./aws-s3";
 import "./aws-ses";
