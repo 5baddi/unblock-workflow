@@ -1,5 +1,5 @@
 import { NodeBlock, tripetto } from "tripetto";
-import ICON  from "./assets/icon.svg";
+import ICON  from "./assets/at-icon.svg";
 
 const BLOCK_NAME = "activation-trigger";
 const BLOCK_VERSION = "0.0.1";

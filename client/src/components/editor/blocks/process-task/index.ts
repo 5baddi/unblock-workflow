@@ -1,5 +1,5 @@
 import { NodeBlock, tripetto, editor, Forms } from "tripetto";
-import ICON  from "./assets/icon.svg";
+import ICON  from "./assets/pt-icon.svg";
 
 const BLOCK_NAME = "process-task";
 const BLOCK_VERSION = "0.0.1";
