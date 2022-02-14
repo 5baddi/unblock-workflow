@@ -5,7 +5,7 @@ import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
-import { ENV, PUBLIC_URL, VERSION } from "../../../../src/settings";
+import { ENV, PUBLIC_URL, VERSION } from "../../settings";
 import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
