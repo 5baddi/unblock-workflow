@@ -78,3 +78,8 @@ import "./compression";
 import "./contentful";
 import "./convertkit";
 import "./copper";
+import "./cortex";
+import "./cratedb";
+import "./cron";
+import "./customer-datastore";
+import "./customer-messenger";
