@@ -1,7 +1,7 @@
 import { NodeBlock, tripetto } from "tripetto";
 import ICON  from "./assets/icon.svg";
 
-const BLOCK_NAME = "automation";
+const BLOCK_NAME = "activation-trigger";
 const BLOCK_VERSION = "0.0.1";
 
 @tripetto({
@@ -13,10 +13,10 @@ const BLOCK_VERSION = "0.0.1";
     kind: "headless",
     get label() {
         // TODO: use translation
-        return "Automation";
+        return "Activation trigger";
     }
 })
-export class Automation extends NodeBlock
+export class ActivationTrigger extends NodeBlock
 {
 
 }

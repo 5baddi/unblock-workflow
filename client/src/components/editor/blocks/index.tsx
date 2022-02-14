@@ -34,3 +34,5 @@ import "tripetto-block-variable";
 import "tripetto-block-calculator";
 
 import "./process-task";
+import "./action-network";
+import "./activation-trigger";
