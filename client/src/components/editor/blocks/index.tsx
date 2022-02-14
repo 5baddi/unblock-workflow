@@ -51,3 +51,8 @@ import "./aws-dynamoDB";
 import "./aws-lambda";
 import "./aws-s3";
 import "./aws-ses";
+import "./aws-sns";
+import "./aws-sqs";
+import "./aws-textract";
+import "./aws-transcribe";
+import "./bamboohr";
