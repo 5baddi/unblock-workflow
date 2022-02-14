@@ -15,7 +15,7 @@ import { NodeBlock, tripetto } from "tripetto";
             return "AWS DynamoDB";
         }
     })
-    export class AWSDynamodb extends NodeBlock
+    export class AWSDynamoDB extends NodeBlock
     {
     
     }
