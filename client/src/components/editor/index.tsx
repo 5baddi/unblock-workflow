@@ -145,6 +145,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             this.setDefinitionIsOpened(definition);
         }, 1000);
 
+        if (typeof definition === "undefined") {
+            return;
+        }
+        
         if (typeof definition !== "undefined" && definition.is_saved && typeof definition.name === "string" && definition.name !== "Unnamed") {
             return;
         }
