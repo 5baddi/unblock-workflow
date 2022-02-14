@@ -11,6 +11,7 @@ import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
+import AlertModal from "./alert-modal";
 
 import "./blocks";
 
@@ -33,7 +34,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition: {
                 name: "Unnamed"
             } as IDefinition,
-            showModal: false
+            showModal: false,
+            showAlertModal: false
         };
 
         this.onChange = this.onChange.bind(this);
@@ -82,12 +84,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <button onClick={this.openTutorial}>
                             <FontAwesomeIcon icon={faQuestion}/>
                         </button>
-                        <DefinitionsModal show={this.state.showModal} 
+                        <DefinitionsModal currentOpenedDefinition={this.state.definition?._id}
+                                          show={this.state.showModal} 
                                           onHide={this.toggleModal}
                                           createNewWorkflow={this.createNewWorkflow}
                                           deleteWorkflow={this.deleteWorkflow}
                                           openWorkflow={this.openWorkflow}
                                           bulkDeleteWorkflows={this.bulkDeleteWorkflows}/>
+                        <AlertModal show={this.state.showAlertModal}
+                                    onHide={() => { this.setState({ showAlertModal: false }) }}/>
                     </div>
                 </Grid>
 
@@ -128,6 +133,18 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let definition = this.getDefinition();
+        if (definition && typeof definition._id === "string") {
+            this.closeOpenedDefinition(definition);
+        }
+
+        setTimeout(() => {
+            if (! definition) {
+                return;
+            }
+
+            this.setDefinitionIsOpened(definition);
+        }, 1000);
+
         if (typeof definition !== "undefined" && definition.is_saved && typeof definition.name === "string" && definition.name !== "Unnamed") {
             return;
         }
@@ -137,7 +154,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return e.returnValue = "Are you sure you want to close?";
     }
 
-    private async open(): Promise<Builder>
+    private async open(): Promise<Builder | void>
     {
         if (ENV === "development") {
             console.log("opening the editor");
@@ -148,9 +165,22 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return this.initBuilder(definition);
     }
 
-    private initBuilder(definition?: IDefinition): Builder
+    private initBuilder(definition?: IDefinition): Builder | void
     {
+        if (typeof definition !== "undefined" && definition.is_opened === true) {
+            this.setState({ showAlertModal: true });
+
+            return this.editor;
+        }
+
         this.clearTimer();
+
+        if (typeof definition !== "undefined" && typeof definition._id === "string") {
+            definition.is_opened = true;
+
+            this.setDefinitionIsOpened(definition);
+        }
+
         this.setDefinition(definition);
 
         let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
@@ -161,6 +191,25 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.startTimer();
 
         return this.editor;
+    }
+
+    private setDefinitionIsOpened(definition: IDefinition): void
+    {
+        API.post(`${PUBLIC_URL}/api/definitions`, { definition });
+
+        let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
+        if (oldOpenedDefinition && oldOpenedDefinition._id !== definition._id) {
+            oldOpenedDefinition.is_opened = false;
+
+            API.post(`${PUBLIC_URL}/api/definitions`, { definition: oldOpenedDefinition });
+        }
+    }
+    
+    private closeOpenedDefinition(definition: IDefinition): void
+    {
+        definition.is_opened = false;
+
+        API.post(`${PUBLIC_URL}/api/definitions`, { definition });
     }
 
     private mergeProperties(config: IEditorProperties): IEditorProperties
@@ -288,7 +337,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     return Promise.resolve(undefined);
                 }
 
-                let definition = Object.assign({} as IDefinition, response.data.definition);
+                let definition: IDefinition = Object.assign({} as IDefinition, response.data.definition);
 
                 return Promise.resolve(definition);
             })
@@ -296,6 +345,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 if (ENV === "development") {
                     console.log(error);
                 }
+
+                return Promise.reject(error);
             });
     }
     

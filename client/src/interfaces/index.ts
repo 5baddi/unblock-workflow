@@ -9,6 +9,7 @@ export interface IDefinition extends TripettoIDefinition
     userId?: string;
     is_saved: boolean;
     builder: IBuilder;
+    is_opened: boolean;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}
@@ -28,6 +29,7 @@ export interface IEditorState
 {
     definition?: IDefinition;
     showModal: boolean;
+    showAlertModal: boolean;
 }
 
 export interface IHeaderProps
@@ -55,6 +57,8 @@ export interface IEditorMenuState {}
 
 export interface IEditorDefinitionsModalProps extends ModalProps
 {
+    currentOpenedDefinition: string | undefined;
+
     createNewWorkflow: () => void;
     openWorkflow: (definition: IDefinition) => void;
     deleteWorkflow: (definitionId: string) => Promise<boolean>;
@@ -66,4 +70,9 @@ export interface IEditorDefinitionsModalState extends ModalProps
     definitions?: IDefinition[];
     isLoading: boolean;
     selectionModel: string[];
+}
+
+export interface IEditorAlertModalProps extends ModalProps
+{
+
 }
