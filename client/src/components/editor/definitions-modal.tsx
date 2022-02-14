@@ -81,7 +81,16 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     this.setState({ definitions: [], isLoading: false });
                 }
 
-                this.setState({ definitions: response.data.definitions, isLoading: false });
+                let definitions = response.data.definitions;
+                if (typeof this.props.currentOpenedDefinition === "string") {
+                    definitions = Object.values(definitions).filter((value) => {
+                        let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(value)));
+
+                        return definition._id !== this.props.currentOpenedDefinition;
+                    });
+                }
+
+                this.setState({ definitions, isLoading: false });
             })
             .catch(error => {
                 console.log(error);
