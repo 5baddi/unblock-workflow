@@ -268,9 +268,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return this.state.definition || undefined;
     }
 
-    private async onChange(submitedDefinition: TripettoDefinition): Promise<void>
+    private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
-        let definition = parseDefinition(submitedDefinition);
+        let definition = parseDefinition(submittedDefinition);
 
         if (ENV === "development") {
             console.log("definition has been changed", definition);
