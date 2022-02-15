@@ -3,6 +3,7 @@ const path = require("path");
 const Copy = require("copy-webpack-plugin");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const BrotliPlugin = require("brotli-webpack-plugin");
 const dotenv = require("dotenv");
 
 const dotenvParsed = dotenv.config({ path: path.resolve("./../.env") }).parsed;
@@ -77,12 +78,27 @@ module.exports = {
         new webpack.DefinePlugin({
             "process.env": JSON.stringify(dotenvParsed),
             "process.env.NODE_DEBUG": JSON.stringify(process.env.NODE_DEBUG)
-        })
+        }),
+        new BrotliPlugin({
+			asset: '[path].br[query]',
+			test: /\.(js|css|html|svg)$/,
+			threshold: 10240,
+			minRatio: 0.8
+		})
     ],
     optimization: {
         minimize: true,
-        mangleExports: false,
+        mangleExports: true,
         minimizer: [new TerserPlugin()],
+        splitChunks: {
+			cacheGroups: {
+				commons: {
+					test: /[\\/]node_modules[\\/]/,
+					name: 'vendors',
+					chunks: 'all'
+				}
+			}
+		}
     },
     stats: {
         children: true
