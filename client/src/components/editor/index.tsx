@@ -16,11 +16,7 @@ import AlertModal from "./alert-modal";
 import "./blocks";
 
 import "./style.scss";
-
-const BUILDER_VERSION = {
-    "name": "unblock",
-    "version": VERSION
-};
+import { parseDefinition, saveDefinition } from "../../services/definition";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -224,12 +220,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submitedDefinition: TripettoDefinition): Promise<void>
     {
-        let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submitedDefinition)));
+        let definition = parseDefinition(submitedDefinition);
+
+        if (ENV === "development") {
+            console.log("Definition changed", definition);
+        }
+
         if (this.state.definition && typeof this.state.definition?._id === "string") {
             definition._id = this.state.definition._id;
         }
-
-        definition.builder = BUILDER_VERSION;
 
         this.setDefinition(definition);
 
@@ -237,11 +236,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
-        if (ENV === "development") {
-            console.log("saving workflow definition", definition);
-        }
-
-        await this.saveDefinition(definition)
+        await saveDefinition(definition)
             .catch((error) => {
                 if (ENV === "development") {
                     console.log(error);
@@ -251,6 +246,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
             });
+
+        return Promise.resolve();
     }
 
     private async saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
