@@ -101,7 +101,7 @@ function save(request, response)
                 definition.created_at = now;
             }
 
-            let filters = Object.assign({} as IMongoDBFilter, { _id: new ObjectId() });
+            let filters = Object.assign({} as IMongoDBFilter, {});
 
             if (typeof definition._id === "string") {
                 filters._id = new ObjectId(definition._id);
@@ -129,8 +129,12 @@ function save(request, response)
                 delete definition.is_saved;
             }
 
+            if (typeof definition._id === "undefined") {
+                definition._id = new ObjectId();
+            }
+
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate(filters, { $set: definition }, { upsert: (typeof definition._id === "undefined"), returnDocument: "after" })
+                .findOneAndUpdate(filters, { $set: definition }, { upsert: true, returnDocument: "after" })
                 .then(result => {
                     if (! result.ok || ! result.value) {
                         client.close();
