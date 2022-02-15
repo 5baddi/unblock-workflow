@@ -226,15 +226,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         if (typeof definition !== "undefined" && definition.is_opened === true) {
             this.setState({ showAlertModal: true, isLoading: false });
-
-            return Promise.resolve();
         }
 
         this.editor?.close();
 
         this.clearTimer();
 
-        if (typeof definition !== "undefined" && typeof definition._id === "string") {
+        if (typeof definition !== "undefined" && typeof definition._id === "string" && ! definition.is_opened) {
             definition.is_opened = true;
 
             await saveDefinition(definition);
@@ -273,6 +271,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private onClose()
     {
+        let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
+        if (oldOpenedDefinition && oldOpenedDefinition._id) {
+            oldOpenedDefinition.is_opened = false;
+
+            saveDefinition(oldOpenedDefinition);
+        }
+
         this.setDefinition();
     }
 
@@ -298,6 +303,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (currentDefinition && typeof currentDefinition?._id === "string") {
             definition._id = currentDefinition._id;
             definition.is_opened = currentDefinition.is_opened;
+        }
+
+        if (definition.is_opened === true) {
+            return Promise.resolve();
         }
 
         if (typeof definition.clusters === "undefined") {

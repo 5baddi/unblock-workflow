@@ -25,7 +25,7 @@ class AlertModal extends React.Component<IEditorAlertModalProps>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button disabled={true} variant="success">Request editing permission</Button>
-                    <Button onClick={rest.onHide}>Close</Button>
+                    <Button onClick={rest.onHide}>View mode</Button>
                 </Modal.Footer>
             </Modal>
         );

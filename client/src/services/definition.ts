@@ -11,10 +11,15 @@ const BUILDER_VERSION = {
 function parseDefinition(submittedDefinition: TripettoDefinition): IDefinition
 {
     let definition: IDefinition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submittedDefinition)));
-    
+
     definition.builder = BUILDER_VERSION;
 
     return definition;
+}
+
+function checkDefinitionIsUpdated(definition: IDefinition): boolean
+{
+    return true;
 }
 
 function saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
@@ -72,4 +77,5 @@ export {
     parseDefinition,
     saveDefinition,
     loadDefinitionById,
+    checkDefinitionIsUpdated
 }
