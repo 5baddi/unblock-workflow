@@ -1,8 +1,13 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME } from '../../settings';
+import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION } from '../../settings';
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
+
+function checkDefinitionVersion(definition: IDefinition): boolean
+{
+    return definition.builder.version >= SUPPORTED_VERSION;
+}
 
 function index(request, response) 
 {
@@ -87,6 +92,13 @@ function save(request, response)
     }
 
     let definition: IDefinition = Object.assign({} as IDefinition, body.definition);
+    if (! checkDefinitionVersion(definition)) {
+        response.status(400)
+            .send({
+                success: false,
+                message: "Unsupported version of the definition!",
+            });
+    }
 
     return connect()
         .then(client => {

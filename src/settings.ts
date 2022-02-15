@@ -29,3 +29,5 @@ export const ROOT_USER_ID = "root-user-id";
 export const LOG_FILE = "unblock-workflow-%DATE%.log";
 export const LOG_FOLDER = "./logs";
 export const LOG_LEVEL = "error";
+
+export const SUPPORTED_VERSION = "0.0.6";
