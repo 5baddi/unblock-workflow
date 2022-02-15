@@ -230,6 +230,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
+        this.editor?.close();
+
         this.clearTimer();
 
         if (typeof definition !== "undefined" && typeof definition._id === "string") {
@@ -252,11 +254,26 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.editor = new Builder(properties);
         this.editor.open(definition || this.props.definition);
-        this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
+        this.editor.onReady = () => this.ready();
 
         this.setState({ isLoading: false });
 
         return this.editor;
+    }
+
+    private ready()
+    {
+        if (typeof this.editor === "undefined") {
+            return;
+        }
+
+        this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
+        this.editor.onClose = () => this.onClose();
+    }
+
+    private onClose()
+    {
+        this.setDefinition();
     }
 
     private setDefinition(definition?: IDefinition): void
