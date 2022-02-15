@@ -9,7 +9,6 @@ import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
-import AlertModal from "./alert-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
