@@ -1,22 +1,24 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { getDefinition } from "../../store/actions/definition";
 import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
-import { IDefinition, IEditorProperties, IEditorProps, IEditorState } from "../../interfaces";
-import { ENV, PUBLIC_URL, VERSION } from "../../settings";
-import { DEFAULT_EDITOR_PROPERTIES, DEFINITION_KEY } from '../../global';
+import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
+import { ENV, PUBLIC_URL } from "../../settings";
+import { DEFINITION_KEY } from '../../global';
+import { getDefinition } from "../../store/actions/definition";
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import AlertModal from "./alert-modal";
 
+import { parseDefinition, saveDefinition, loadDefinitionById } from "../../services/definition";
+import { mergeProperties } from "../../services/builder";
+
 import "./blocks";
 
 import "./style.scss";
-import { parseDefinition, saveDefinition } from "../../services/definition";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -44,7 +46,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.deleteWorkflow = this.deleteWorkflow.bind(this);
         this.openWorkflow = this.openWorkflow.bind(this);
         this.initBuilder = this.initBuilder.bind(this);
-        this.reSaveDefinition = this.reSaveDefinition.bind(this);
         this.beforeUnload = this.beforeUnload.bind(this);
         this.onResize = this.onResize.bind(this);
         this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
@@ -98,12 +99,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentDidMount()
     {
-        this.open()
-            .catch((error) => {
-                if (ENV === "development") {
-                    console.log(error);
-                }
-            });
+        this.open();
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
@@ -119,7 +115,36 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         window.removeEventListener("beforeunload", this.beforeUnload);
     }
 
-    private beforeUnload(event)
+    onResize() 
+    {
+        this.editor?.resize();
+    }
+
+    openTutorial()
+    {
+        this.editor?.tutorial();
+    }
+
+    editDefinitionProps()
+    {
+        this.editor?.edit("properties");
+    }
+
+    showDefinitionsModal()
+    {
+        this.setState({
+            showModal: ! this.state.showModal
+        })
+    }
+
+    toggleModal()
+    {
+        this.setState({
+            showModal: ! this.state.showModal
+        })
+    }
+
+    async beforeUnload(event)
     {
         let e = event || window.event;
         if (! e) {
@@ -128,16 +153,21 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let definition = this.getDefinition();
         if (definition && typeof definition._id === "string") {
-            this.closeOpenedDefinition(definition);
+            definition.is_opened = false;
+
+            await saveDefinition(definition);
         }
 
-        setTimeout(() => {
+        setTimeout(async () => {
             if (! definition) {
                 return;
             }
 
-            this.setDefinitionIsOpened(definition);
-        }, 1000);
+            definition.is_opened = true;
+
+            await saveDefinition(definition)
+                .then((definition) => this.setDefinition(definition));
+        }, 2000);
 
         if (typeof definition === "undefined") {
             return;
@@ -152,70 +182,83 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return e.returnValue = "Are you sure you want to close?";
     }
 
-    private async open(): Promise<Builder | void>
+    clearTimer()
+    {
+        if (typeof this.timer !== "undefined") {
+            clearInterval(this.timer);
+        }
+    }
+
+    startTimer()
+    {
+        this.timer = setInterval(() => {
+            let definition: IDefinition | undefined = this.getDefinition();
+
+            if (! definition || definition.is_saved) {
+                return;
+            }
+            
+            if (ENV === "development") {
+                console.log("re-send unsaved definition", definition);
+            }
+
+            saveDefinition(definition);
+        }, 15000);
+    }
+
+    async open(): Promise<Builder | void>
     {
         if (ENV === "development") {
             console.log("opening the editor");
         }
 
-        let definition = await this.loadDefinitionById(this.props.definitionId);
+        let definition = await loadDefinitionById(this.props.definitionId);
 
         return this.initBuilder(definition);
     }
 
-    private initBuilder(definition?: IDefinition): Builder | void
+    async initBuilder(definition?: IDefinition): Promise<Builder | void>
     {
         if (typeof definition !== "undefined" && definition.is_opened === true) {
             this.setState({ showAlertModal: true });
 
-            return this.editor;
+            return Promise.resolve();
         }
 
-        // this.clearTimer();
+        this.clearTimer();
 
         if (typeof definition !== "undefined" && typeof definition._id === "string") {
             definition.is_opened = true;
 
-            this.setDefinitionIsOpened(definition);
+            await saveDefinition(definition);
+
+            let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
+
+            if (oldOpenedDefinition && oldOpenedDefinition._id !== definition._id) {
+                oldOpenedDefinition.is_opened = false;
+
+                await saveDefinition(oldOpenedDefinition);
+            }
         }
 
         this.setDefinition(definition);
 
-        let properties = this.mergeProperties(DEFAULT_EDITOR_PROPERTIES);
+        let properties = mergeProperties(this.props.element);
 
         this.editor = Builder.open(definition || this.props.definition, properties);
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
 
-        // this.startTimer();
-
         return this.editor;
     }
 
-    private setDefinitionIsOpened(definition: IDefinition): void
+    private setDefinition(definition?: IDefinition): void
     {
-        API.post(`${PUBLIC_URL}/api/definitions`, { definition });
-
-        let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
-        if (oldOpenedDefinition && oldOpenedDefinition._id !== definition._id) {
-            oldOpenedDefinition.is_opened = false;
-
-            API.post(`${PUBLIC_URL}/api/definitions`, { definition: oldOpenedDefinition });
-        }
-    }
-    
-    private closeOpenedDefinition(definition: IDefinition): void
-    {
-        definition.is_opened = false;
-
-        API.post(`${PUBLIC_URL}/api/definitions`, { definition });
+        this.setState({ definition });
     }
 
-    private mergeProperties(config: IEditorProperties): IEditorProperties
+    private getDefinition(): IDefinition | undefined
     {
-        let properties = Object.assign({}, JSON.parse(JSON.stringify(config)));
-        properties.element = document.getElementById(this.props.element);
-
-        return properties as IEditorProperties;
+        return this.state.definition || undefined;
     }
 
     private async onChange(submitedDefinition: TripettoDefinition): Promise<void>
@@ -223,7 +266,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let definition = parseDefinition(submitedDefinition);
 
         if (ENV === "development") {
-            console.log("Definition changed", definition);
+            console.log("definition has been changed", definition);
         }
 
         if (this.state.definition && typeof this.state.definition?._id === "string") {
@@ -237,124 +280,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         await saveDefinition(definition)
+            .then((definition) => {
+                this.setDefinition(definition);
+            })
             .catch((error) => {
-                if (ENV === "development") {
-                    console.log(error);
-                }
-
                 definition.is_saved = false;
 
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
             });
 
         return Promise.resolve();
-    }
-
-    private async saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
-    {
-        return API.post(`${PUBLIC_URL}/api/definitions`, { definition })
-            .then(response => {
-                if (! response.data.definition) {
-                    return Promise.resolve(undefined);
-                }
-
-                let definition = Object.assign({} as IDefinition, response.data.definition);
-
-                this.setDefinition(definition);
-
-                return Promise.resolve(definition);
-            })
-            .catch(error => {
-                if (typeof this.timer === "undefined") {
-                    // this.startTimer();
-                }
-                
-                Promise.reject(error);
-            });
-    }
-
-    private setDefinition(definition?: IDefinition): void
-    {
-        this.setState({ definition });
-    }
-
-    private clearTimer()
-    {
-        if (typeof this.timer !== "undefined") {
-            clearInterval(this.timer);
-        }
-    }
-    
-    private startTimer()
-    {
-        this.timer = setInterval(this.reSaveDefinition, 15000);
-    }
-
-    private getDefinition(): IDefinition | undefined
-    {
-        return this.state.definition || undefined;
-    }
-
-    private reSaveDefinition()
-    {
-        return; 
-
-        // let definition = this.getDefinition();
-        // if (! definition || definition.is_saved) {
-        //     return;
-        // }
-
-        // if (typeof definition.name === "undefined" && typeof definition.clusters === "undefined") {
-        //     return;
-        // }
-
-        // if (definition.is_saved) {
-        //     return;
-        // }
-
-        // if (ENV === "development") {
-        //     console.log("re-send unsaved definition", definition);
-        // }
-
-        // this.saveDefinition(definition);
-    }
-
-    private onResize()
-    {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
-
-        if (ENV === "development") {
-            console.log("resizing the editor");
-        }
-
-        this.editor.resize();
-    }
-
-    private async loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
-    {
-        if (! definitionId) {
-            return undefined;
-        }
-
-        return await API.get(`${PUBLIC_URL}/api/definitions/${definitionId}`)
-            .then(response => {
-                if (! response.data.definition) {
-                    return Promise.resolve(undefined);
-                }
-
-                let definition: IDefinition = Object.assign({} as IDefinition, response.data.definition);
-
-                return Promise.resolve(definition);
-            })
-            .catch(error => {
-                if (ENV === "development") {
-                    console.log(error);
-                }
-
-                return Promise.reject(error);
-            });
     }
     
     private createNewWorkflow()
@@ -365,38 +300,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.initBuilder();
         this.toggleModal();
-    }
-
-    private toggleModal()
-    {
-        this.setState({
-            showModal: ! this.state.showModal
-        })
-    }
-
-    private showDefinitionsModal()
-    {
-        this.setState({
-            showModal: ! this.state.showModal
-        })
-    }
-
-    private editDefinitionProps()
-    {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
-
-        this.editor?.edit("properties");
-    }
-
-    private openTutorial()
-    {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
-
-        this.editor?.tutorial();
     }
 
     private bulkDeleteWorkflows(definitionsIds?: string[]): Promise<boolean>
@@ -442,7 +345,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>
     {
-        let oldDefinition = this.state.definition;
+        let oldDefinition = this.getDefinition();
         let oldDefinitionId = oldDefinition ? oldDefinition._id : undefined;
 
         if (! confirm("Are you sure you want to delete this workflow?")) {
@@ -463,9 +366,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 if (oldDefinitionId && oldDefinitionId === definitionId) {
                     this.toggleModal();
+                    this.initBuilder();
                 }
-
-                this.initBuilder();
 
                 return true;
             })
@@ -484,7 +386,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        this.loadDefinitionById(definitionId)
+        loadDefinitionById(definitionId)
             .then(definition => {
                 this.initBuilder(definition);
                 this.toggleModal();
@@ -492,11 +394,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     }
 }
 
-
 const mapStateToProps = (state) => ({
     definition: state.definition
 });
-
 const dispatchToProps = (dispatch) => ({
     getDefinition: () => dispatch(getDefinition())
 });
