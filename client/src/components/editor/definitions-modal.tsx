@@ -149,7 +149,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                                     onClick={() => this.runDefinition(cellValues.row._id)}>
                                 <FontAwesomeIcon icon={faPlayCircle}/>&nbsp;Run
                             </Button>
-                            <Button disabled={cellValues.row.is_opened} variant="outline-danger" className="btn-sm"
+                            <Button variant="outline-danger" className="btn-sm"
                                     onClick={() => this.deleteWorkflow(cellValues.row._id)}>
                                 <FontAwesomeIcon icon={faTrash}/>&nbsp;Delete
                             </Button>

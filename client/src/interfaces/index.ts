@@ -9,7 +9,6 @@ export interface IDefinition extends TripettoIDefinition
     user_id?: string;
     is_saved: boolean;
     builder: IBuilder;
-    is_opened: boolean;
     updated_at?: Date;
 }
 

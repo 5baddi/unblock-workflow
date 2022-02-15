@@ -155,23 +155,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let definition = this.getDefinition();
-        if (definition && typeof definition._id === "string") {
-            definition.is_opened = false;
-
-            await saveDefinition(definition);
-        }
-
-        setTimeout(async () => {
-            if (! definition) {
-                return;
-            }
-
-            definition.is_opened = true;
-
-            await saveDefinition(definition)
-                .then((definition) => this.setDefinition(definition));
-        }, 2000);
-
         if (typeof definition === "undefined") {
             return;
         }
@@ -224,27 +207,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     async initBuilder(definition?: IDefinition): Promise<Builder | void>
     {
-        if (typeof definition !== "undefined" && definition.is_opened === true) {
-            this.setState({ showAlertModal: true, isLoading: false });
-        }
-
         this.editor?.close();
 
         this.clearTimer();
-
-        if (typeof definition !== "undefined" && typeof definition._id === "string" && ! definition.is_opened) {
-            definition.is_opened = true;
-
-            await saveDefinition(definition);
-
-            let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
-
-            if (oldOpenedDefinition && oldOpenedDefinition._id !== definition._id) {
-                oldOpenedDefinition.is_opened = false;
-
-                await saveDefinition(oldOpenedDefinition);
-            }
-        }
 
         this.setDefinition(definition);
 
@@ -271,13 +236,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private onClose()
     {
-        let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
-        if (oldOpenedDefinition && oldOpenedDefinition._id) {
-            oldOpenedDefinition.is_opened = false;
-
-            saveDefinition(oldOpenedDefinition);
-        }
-
         this.setDefinition();
     }
 
@@ -302,11 +260,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let currentDefinition = this.getDefinition();
         if (currentDefinition && typeof currentDefinition?._id === "string") {
             definition._id = currentDefinition._id;
-            definition.is_opened = currentDefinition.is_opened;
-        }
-
-        if (definition.is_opened === true) {
-            return Promise.resolve();
         }
 
         if (typeof definition.clusters === "undefined") {
@@ -338,13 +291,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.toggleModal();
 
         this.setState({ isLoading: true });
-
-        let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
-        if (oldOpenedDefinition && oldOpenedDefinition._id) {
-            oldOpenedDefinition.is_opened = false;
-
-            await saveDefinition(oldOpenedDefinition);
-        }
 
         this.initBuilder();
     }
