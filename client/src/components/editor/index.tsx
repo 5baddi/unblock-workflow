@@ -365,6 +365,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve(false);
         }
 
+        this.setState({ isLoading: true });
+
         return API.delete(`${PUBLIC_URL}/api/definitions/${definitionId || oldDefinitionId}`)
             .then(response => {
                 if (! response.data.success) {
@@ -373,8 +375,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 if (oldDefinitionId && oldDefinitionId === definitionId) {
                     this.toggleModal();
+                }
+
+                if (! definitionId && oldDefinitionId) {
                     this.initBuilder();
                 }
+
+                this.setState({ isLoading: false });
 
                 return true;
             })
@@ -382,6 +389,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 if (ENV === "development") {
                     console.log(error);
                 }
+
+                this.setState({ isLoading: false });
 
                 return false;
             });
