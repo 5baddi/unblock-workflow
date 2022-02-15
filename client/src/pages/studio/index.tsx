@@ -7,7 +7,7 @@ import { GlueContext } from '@glue42/react-hooks';
 
 export default function Studio ()
 {
-    let { id } = useParams();
+    const { id } = useParams();
     const glue = React.useContext(GlueContext);
 
     return (
