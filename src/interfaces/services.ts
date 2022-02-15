@@ -17,5 +17,5 @@ export interface IMongoDBService
 
 export interface IDefinitionService
 {
-    saveDefinition(definition: IDefinition, userId?: string): Promise<IEntity | undefined>;
+    saveDefinition(definition: IDefinition, user_id?: string): Promise<IEntity | undefined>;
 }

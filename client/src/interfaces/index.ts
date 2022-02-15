@@ -6,10 +6,11 @@ export interface IDefinition extends TripettoIDefinition
 {
     _id?: string;
     name?: string;
-    userId?: string;
+    user_id?: string;
     is_saved: boolean;
     builder: IBuilder;
     is_opened: boolean;
+    updated_at?: Date;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}

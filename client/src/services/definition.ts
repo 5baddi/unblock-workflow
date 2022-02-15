@@ -17,11 +17,6 @@ function parseDefinition(submittedDefinition: TripettoDefinition): IDefinition
     return definition;
 }
 
-function checkDefinitionIsUpdated(definition: IDefinition): boolean
-{
-    return true;
-}
-
 function saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
 {
     if (typeof definition.name === "undefined" && typeof definition.clusters === "undefined") {
@@ -76,6 +71,5 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
 export {
     parseDefinition,
     saveDefinition,
-    loadDefinitionById,
-    checkDefinitionIsUpdated
+    loadDefinitionById
 }
