@@ -32,7 +32,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             } as IDefinition,
             isLoading: true,
             showModal: false,
-            showAlertModal: false,
             workspace: undefined
         };
 
@@ -89,8 +88,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           deleteWorkflow={this.deleteWorkflow}
                                           openWorkflow={this.openWorkflow}
                                           bulkDeleteWorkflows={this.bulkDeleteWorkflows}/>
-                        <AlertModal show={this.state.showAlertModal}
-                                    onHide={() => { this.setState({ showAlertModal: false }) }}/>
                     </div>
                 </Grid>
 

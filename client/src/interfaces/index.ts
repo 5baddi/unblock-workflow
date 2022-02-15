@@ -26,7 +26,6 @@ export interface IEditorState
     definition?: IDefinition;
     isLoading: boolean;
     showModal: boolean;
-    showAlertModal: boolean;
     workspace: any;
 }
 
