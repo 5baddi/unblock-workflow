@@ -250,7 +250,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let properties = mergeProperties(this.props.element);
 
-        this.editor = Builder.open(definition || this.props.definition, properties);
+        this.editor = new Builder(properties);
+        this.editor.open(definition || this.props.definition);
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
 
         this.setState({ isLoading: false });
