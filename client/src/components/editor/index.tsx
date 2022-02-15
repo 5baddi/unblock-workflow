@@ -109,8 +109,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 }
             });
 
-        this.startTimer();
-
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
         window.addEventListener("beforeunload", this.beforeUnload);
@@ -269,7 +267,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 return Promise.resolve(definition);
             })
-            .catch(error => Promise.reject(error));
+            .catch(error => {
+                if (typeof this.timer === "undefined") {
+                    this.startTimer();
+                }
+                
+                Promise.reject(error);
+            });
     }
 
     private setDefinition(definition?: IDefinition): void
