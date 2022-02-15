@@ -1,12 +1,10 @@
 import * as React from "react";
-import { connect } from "react-redux";
 import { Grid } from "@mui/material";
 import { Builder } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
 import { DEFINITION_KEY } from '../../global';
-import { getDefinition } from "../../store/actions/definition";
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
@@ -15,8 +13,6 @@ import AlertModal from "./alert-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
-import { GlueContext } from '@glue42/react-hooks';
-import { Glue42Workspaces } from '@glue42/workspaces-api';
 
 import "./blocks";
 
