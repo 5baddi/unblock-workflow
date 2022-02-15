@@ -226,7 +226,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let properties = mergeProperties(this.props.element);
 
-        this.editor = new Builder(properties);
+        if (typeof this.editor === "undefined") {
+            this.editor = new Builder(properties);
+        }
+
+        // Prevent dispatch on change hook
+        this.editor.onChange = () => {};
+
         this.editor.open(definition);
         this.editor.onReady = () => this.ready();
 
