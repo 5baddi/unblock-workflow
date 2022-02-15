@@ -23,6 +23,8 @@ export interface IEditorProps
     definition?: IDefinition;
 
     getDefinition(): IDefinition | undefined;
+
+    glue?: any;
 }
 
 export interface IEditorState
@@ -31,6 +33,7 @@ export interface IEditorState
     isLoading: boolean;
     showModal: boolean;
     showAlertModal: boolean;
+    workspace: any;
 }
 
 export interface IHeaderProps

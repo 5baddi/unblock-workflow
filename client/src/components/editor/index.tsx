@@ -13,9 +13,10 @@ import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-
 import DefinitionsModal from "./definitions-modal";
 import AlertModal from "./alert-modal";
 import Loader from "../loader";
-
 import { parseDefinition, saveDefinition, loadDefinitionById } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
+import { GlueContext } from '@glue42/react-hooks';
+import { Glue42Workspaces } from '@glue42/workspaces-api';
 
 import "./blocks";
 
@@ -35,7 +36,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             } as IDefinition,
             isLoading: true,
             showModal: false,
-            showAlertModal: false
+            showAlertModal: false,
+            workspace: undefined
         };
 
         this.onChange = this.onChange.bind(this);
@@ -202,6 +204,23 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let definition = await loadDefinitionById(this.props.definitionId);
 
+        if (this.props.glue) {
+            this.setState({
+                workspace: await this.props.glue.workspaces?.getMyWorkspace()
+            });
+
+            if (definition) {
+                const currentContext = await this.state.workspace?.getContext();
+                await this.state.workspace?.updateContext({
+                    ...currentContext,
+                    workflow: {
+                        id: definition._id,
+                        action: "open"
+                    } 
+                });
+            }
+        }
+
         return this.initBuilder(definition);
     }
 
@@ -260,6 +279,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let currentDefinition = this.getDefinition();
         if (currentDefinition && typeof currentDefinition?._id === "string") {
             definition._id = currentDefinition._id;
+
+            const currentContext = await this.state.workspace?.getContext();
+            await this.state.workspace?.updateContext({
+                ...currentContext,
+                workflow: {
+                    id: definition._id,
+                    action: "change"
+                } 
+            });
         }
 
         if (typeof definition.clusters === "undefined") {

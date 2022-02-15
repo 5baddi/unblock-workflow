@@ -6,10 +6,12 @@ import { CssBaseline, withStyles } from "@material-ui/core";
 import store from "../../store";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
+import { BASE_NAME, ENV } from "../../settings";
+import GlueWeb from '@glue42/web';
+import GlueWorkspaces from "@glue42/workspaces-api";
+import { GlueProvider } from '@glue42/react-hooks';
 
 import "./style.scss";
-import {ENV} from "../../../../src/settings";
-import {BASE_NAME} from "../../settings";
 
 const styles = theme => ({
     main: {
@@ -42,24 +44,52 @@ const logProfile = (
     console.log("Profiling interactions", interactions);
 };
 
+const settings = {
+    web: {
+        config: { libraries: [GlueWorkspaces] },
+        factory: GlueWeb,
+    },
+};
+
 const App = ({ classes }) => {
-    return (
+    return window.location !== window.parent.location
+    ? (
+        <GlueProvider settings={settings}>
+            <Profiler id="application" onRender={logProfile}>
+                <Provider store={ store }>
+                    <React.Fragment>
+                        <CssBaseline/>
+                        <main className={classes.main}>
+                            <BrowserRouter basename={ BASE_NAME }>
+                                <Routes>
+                                    <Route path="/run/:id" element={<ChatRunner />} />
+                                    <Route path="/:id" element={<Studio />}/>
+                                    <Route path="/" element={<Studio />}/>
+                                </Routes>
+                            </BrowserRouter>
+                        </main>
+                    </React.Fragment>
+                </Provider>
+            </Profiler>
+        </GlueProvider>
+    )
+    : (
         <Profiler id="application" onRender={logProfile}>
-            <Provider store={ store }>
-                <React.Fragment>
-                    <CssBaseline/>
-                    <main className={classes.main}>
-                        <BrowserRouter basename={ BASE_NAME }>
-                            <Routes>
-                                <Route path="/run/:id" element={<ChatRunner />} />
-                                <Route path="/:id" element={<Studio />}/>
-                                <Route path="/" element={<Studio />}/>
-                            </Routes>
-                        </BrowserRouter>
-                    </main>
-                </React.Fragment>
-            </Provider>
-        </Profiler>
+                <Provider store={ store }>
+                    <React.Fragment>
+                        <CssBaseline/>
+                        <main className={classes.main}>
+                            <BrowserRouter basename={ BASE_NAME }>
+                                <Routes>
+                                    <Route path="/run/:id" element={<ChatRunner />} />
+                                    <Route path="/:id" element={<Studio />}/>
+                                    <Route path="/" element={<Studio />}/>
+                                </Routes>
+                            </BrowserRouter>
+                        </main>
+                    </React.Fragment>
+                </Provider>
+            </Profiler>
     );
 };
 
