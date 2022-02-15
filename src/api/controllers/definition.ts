@@ -130,7 +130,7 @@ function save(request, response)
             }
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate(filters, { $set: definition }, { upsert: (typeof definition._id !== "string"), returnDocument: "after" })
+                .findOneAndUpdate(filters, { $set: definition }, { upsert: (typeof definition._id === "undefined"), returnDocument: "after" })
                 .then(result => {
                     if (! result.ok || ! result.value) {
                         client.close();
