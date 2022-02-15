@@ -294,14 +294,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("definition has been changed", definition);
         }
 
-        if (this.state.definition && typeof this.state.definition?._id === "string") {
-            definition._id = this.state.definition._id;
-            definition.is_opened = this.state.definition.is_opened;
+        let currentDefinition = this.getDefinition();
+        if (currentDefinition && typeof currentDefinition?._id === "string") {
+            definition._id = currentDefinition._id;
+            definition.is_opened = currentDefinition.is_opened;
         }
 
-        this.setDefinition(definition);
-
         if (typeof definition.clusters === "undefined") {
+            this.setDefinition(definition);
+
             return Promise.resolve();
         }
 
@@ -312,6 +313,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             .catch((error) => {
                 definition.is_saved = false;
 
+                this.setDefinition(definition);
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
                 if (typeof this.timer === "undefined") {
