@@ -402,18 +402,18 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             });
     }
 
-    private openWorkflow(definitionId?: string)
+    private async openWorkflow(definitionId?: string)
     {
         if (! definitionId || typeof this.editor === "undefined") {
             return;
         }
 
-        this.setState({ isLoading: true, showModal: false });
+        this.clearTimer();
+        this.setState({ isLoading: true, showModal: false, definition: undefined });
 
-        loadDefinitionById(definitionId)
-            .then(definition => {
-                this.initBuilder(definition);
-            });
+        let definition: IDefinition | undefined = await loadDefinitionById(definitionId);
+
+        this.initBuilder(definition);
     }
 }
 
