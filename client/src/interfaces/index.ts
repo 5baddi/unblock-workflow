@@ -17,13 +17,7 @@ export interface IEditorProperties extends IBuilderProperties {}
 export interface IEditorProps
 {
     element: string;
-
     definitionId?: string;
-
-    definition?: IDefinition;
-
-    getDefinition(): IDefinition | undefined;
-
     glue?: any;
 }
 

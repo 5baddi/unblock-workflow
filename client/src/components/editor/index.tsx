@@ -425,11 +425,4 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     }
 }
 
-const mapStateToProps = (state) => ({
-    definition: state.definition
-});
-const dispatchToProps = (dispatch) => ({
-    getDefinition: () => dispatch(getDefinition())
-});
-
-export default connect(mapStateToProps, dispatchToProps)(Editor);
+export default Editor;

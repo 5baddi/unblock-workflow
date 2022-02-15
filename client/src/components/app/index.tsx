@@ -1,9 +1,7 @@
 import * as React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Profiler } from "react";
-import { Provider } from "react-redux";
 import { CssBaseline, withStyles } from "@material-ui/core";
-import store from "../../store";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
 import { BASE_NAME, ENV } from "../../settings";
@@ -56,39 +54,35 @@ const App = ({ classes }) => {
     ? (
         <GlueProvider settings={settings}>
             <Profiler id="application" onRender={logProfile}>
-                <Provider store={ store }>
-                    <React.Fragment>
-                        <CssBaseline/>
-                        <main className={classes.main}>
-                            <BrowserRouter basename={ BASE_NAME }>
-                                <Routes>
-                                    <Route path="/run/:id" element={<ChatRunner />} />
-                                    <Route path="/:id" element={<Studio />}/>
-                                    <Route path="/" element={<Studio />}/>
-                                </Routes>
-                            </BrowserRouter>
-                        </main>
-                    </React.Fragment>
-                </Provider>
+                <React.Fragment>
+                    <CssBaseline/>
+                    <main className={classes.main}>
+                        <BrowserRouter basename={ BASE_NAME }>
+                            <Routes>
+                                <Route path="/run/:id" element={<ChatRunner />} />
+                                <Route path="/:id" element={<Studio />}/>
+                                <Route path="/" element={<Studio />}/>
+                            </Routes>
+                        </BrowserRouter>
+                    </main>
+                </React.Fragment>
             </Profiler>
         </GlueProvider>
     )
     : (
         <Profiler id="application" onRender={logProfile}>
-                <Provider store={ store }>
-                    <React.Fragment>
-                        <CssBaseline/>
-                        <main className={classes.main}>
-                            <BrowserRouter basename={ BASE_NAME }>
-                                <Routes>
-                                    <Route path="/run/:id" element={<ChatRunner />} />
-                                    <Route path="/:id" element={<Studio />}/>
-                                    <Route path="/" element={<Studio />}/>
-                                </Routes>
-                            </BrowserRouter>
-                        </main>
-                    </React.Fragment>
-                </Provider>
+                <React.Fragment>
+                    <CssBaseline/>
+                    <main className={classes.main}>
+                        <BrowserRouter basename={ BASE_NAME }>
+                            <Routes>
+                                <Route path="/run/:id" element={<ChatRunner />} />
+                                <Route path="/:id" element={<Studio />}/>
+                                <Route path="/" element={<Studio />}/>
+                            </Routes>
+                        </BrowserRouter>
+                    </main>
+                </React.Fragment>
             </Profiler>
     );
 };
