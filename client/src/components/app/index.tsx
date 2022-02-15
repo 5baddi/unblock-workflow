@@ -35,13 +35,13 @@ const logProfile = (
         return;
     }
 
-    console.log("Profiling ID", id);
-    console.log("Profiling phase", phase);
-    console.log("Profiling actualDuration", actualDuration);
-    console.log("Profiling baseDuration", baseDuration);
-    console.log("Profiling startTime", startTime);
-    console.log("Profiling commitTime", commitTime);
-    console.log("Profiling interactions", interactions);
+    // console.log("Profiling ID", id);
+    // console.log("Profiling phase", phase);
+    // console.log("Profiling actualDuration", actualDuration);
+    // console.log("Profiling baseDuration", baseDuration);
+    // console.log("Profiling startTime", startTime);
+    // console.log("Profiling commitTime", commitTime);
+    // console.log("Profiling interactions", interactions);
 };
 
 const settings = {
