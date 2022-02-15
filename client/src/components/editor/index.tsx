@@ -305,9 +305,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     
     private async createNewWorkflow()
     {
-        if (typeof this.editor === "undefined") {
-            return;
-        }
+        this.toggleModal();
 
         this.setState({ isLoading: true });
 
@@ -319,7 +317,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         this.initBuilder();
-        this.toggleModal();
     }
 
     private bulkDeleteWorkflows(definitionsIds?: string[]): Promise<boolean>
