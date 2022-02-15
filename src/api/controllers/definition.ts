@@ -104,7 +104,7 @@ function save(request, response)
             let filters = Object.assign({} as IMongoDBFilter, {});
 
             if (typeof definition._id === "undefined") {
-                definition._id = new ObjectId();
+                filters._id = definition._id = new ObjectId();
             }
 
             if (typeof definition._id === "string") {
