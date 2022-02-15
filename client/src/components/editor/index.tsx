@@ -296,9 +296,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
-        let ip = await API.get('https://geolocation-db.com/json/');
-        definition.ip = ip.data.IPv4 || null;
-
         await saveDefinition(definition)
             .then((definition) => {
                 this.setDefinition(definition);

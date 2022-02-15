@@ -10,7 +10,6 @@ export interface IDefinition extends TripettoIDefinition
     is_saved: boolean;
     builder: IBuilder;
     updated_at?: Date;
-    ip?: string;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}
