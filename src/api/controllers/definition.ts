@@ -103,6 +103,10 @@ function save(request, response)
 
             let filters = Object.assign({} as IMongoDBFilter, {});
 
+            if (typeof definition._id === "undefined") {
+                definition._id = new ObjectId();
+            }
+
             if (typeof definition._id === "string") {
                 filters._id = new ObjectId(definition._id);
                 filters.deleted_at = { $exists: false };
@@ -127,10 +131,6 @@ function save(request, response)
 
                 delete definition._id;
                 delete definition.is_saved;
-            }
-
-            if (typeof definition._id === "undefined") {
-                definition._id = new ObjectId();
             }
 
             db.collection(DEFINITION_COLLECTION_NAME)
