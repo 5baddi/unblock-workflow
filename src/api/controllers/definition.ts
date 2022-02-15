@@ -191,7 +191,7 @@ function remove(request, response)
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate({ _id: new ObjectId(id), deleted_at: { $exists: false }, is_opened: false }, { $set: { deleted_at: new Date() }})
+                .findOneAndUpdate({ _id: new ObjectId(id), deleted_at: { $exists: false } }, { $set: { deleted_at: new Date() }})
                 .then(result => {
                     if (! result.ok) {
                         client.close();
@@ -238,7 +238,7 @@ function bulkRemove(request, response)
             let db = client.db();
             let bulk = db.collection(DEFINITION_COLLECTION_NAME).initializeUnorderedBulkOp();
 
-            bulk.find({ _id: { $in: ids }, deleted_at: { $exists: false }, is_opened: false }).update({ $set: { deleted_at: new Date() } });
+            bulk.find({ _id: { $in: ids }, deleted_at: { $exists: false } }).update({ $set: { deleted_at: new Date() } });
             bulk.execute()
                 .then(result => {
                     if (! result.ok) {
