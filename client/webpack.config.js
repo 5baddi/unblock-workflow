@@ -81,7 +81,7 @@ module.exports = {
     ],
     optimization: {
         minimize: true,
-        mangleExports: false,
+        mangleExports: true,
         minimizer: [new TerserPlugin()],
     },
     stats: {
