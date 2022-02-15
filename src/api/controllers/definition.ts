@@ -105,8 +105,6 @@ function save(request, response)
             let db = client.db();
             let now: Date = new Date();
 
-            definition.ip = request.socket.remoteAddress || null;
-
             if (typeof definition.user_id === "undefined") {
                 definition.user_id = ROOT_USER_ID;
             }
@@ -131,7 +129,6 @@ function save(request, response)
                     let snapshot: ISnapshot = Object.assign({} as ISnapshot, definition);
                     snapshot.definition_id = definition._id;
                     snapshot.snaped_at = new Date();
-                    snapshot.ip = request.socket.remoteAddress || null;
 
                     delete snapshot._id;
 
