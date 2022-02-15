@@ -4,7 +4,7 @@ import { Builder } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
-import { DEFINITION_KEY, DEFINITION_ID_KEY } from '../../global';
+import { DEFINITION_KEY } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
@@ -173,13 +173,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         this.timer = setInterval(() => {
             let definition: IDefinition | undefined = this.getDefinition();
-            let currentDefinitionId: string | null = window.sessionStorage.getItem(DEFINITION_ID_KEY);
 
             if (! definition || definition.is_saved) {
-                return;
-            }
-
-            if (! currentDefinitionId || currentDefinitionId !== definition._id) {
                 return;
             }
             
@@ -257,13 +252,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private setDefinition(definition?: IDefinition): void
     {
-        window.sessionStorage.removeItem(DEFINITION_ID_KEY);
-
         this.setState({ definition });
-
-        if (typeof definition?._id === "string") {
-            window.sessionStorage.setItem(DEFINITION_ID_KEY, definition._id);
-        }
     }
 
     private getDefinition(): IDefinition | undefined
@@ -280,8 +269,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let currentDefinition = this.getDefinition();
-        let currentDefinitionId = window.sessionStorage.getItem(DEFINITION_ID_KEY);
-
         if (currentDefinition && typeof currentDefinition?._id === "string") {
             definition._id = currentDefinition._id;
 
@@ -298,10 +285,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (typeof definition.clusters === "undefined") {
             this.setDefinition(definition);
 
-            return Promise.resolve();
-        }
-
-        if (currentDefinitionId !== definition._id) {
             return Promise.resolve();
         }
 
