@@ -30,4 +30,4 @@ export const LOG_FILE = "unblock-workflow-%DATE%.log";
 export const LOG_FOLDER = "./logs";
 export const LOG_LEVEL = "error";
 
-export const SUPPORTED_VERSION = "0.0.6";
+export const SUPPORTED_VERSION = "0.0.7";
