@@ -228,18 +228,20 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.editor = new Builder(properties);
         this.editor.open(definition);
-        this.editor.onReady = () => this.ready();
+        this.editor.onReady = async() => await this.ready();
 
         this.setState({ isLoading: false });
 
         return this.editor;
     }
 
-    private ready()
+    async ready()
     {
         if (typeof this.editor === "undefined") {
             return;
         }
+
+        await new Promise(r => setTimeout(r, 2000));
 
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
         this.editor.onClose = () => this.onClose();

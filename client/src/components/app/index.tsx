@@ -1,10 +1,9 @@
 import * as React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Profiler } from "react";
 import { CssBaseline, withStyles } from "@material-ui/core";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
-import { BASE_NAME, ENV } from "../../settings";
+import { BASE_NAME } from "../../settings";
 import GlueWeb from '@glue42/web';
 import GlueWorkspaces from "@glue42/workspaces-api";
 import { GlueProvider } from '@glue42/react-hooks';
@@ -20,28 +19,6 @@ const styles = theme => ({
     },
 });
 
-const logProfile = (
-    id: string,
-    phase: "mount" | "update",
-    actualDuration: number,
-    baseDuration: number,
-    startTime: number,
-    commitTime: number,
-    interactions: Set<any>
-) => {
-    if (ENV !== "production") {
-        return;
-    }
-
-    // console.log("Profiling ID", id);
-    // console.log("Profiling phase", phase);
-    // console.log("Profiling actualDuration", actualDuration);
-    // console.log("Profiling baseDuration", baseDuration);
-    // console.log("Profiling startTime", startTime);
-    // console.log("Profiling commitTime", commitTime);
-    // console.log("Profiling interactions", interactions);
-};
-
 const settings = {
     web: {
         config: { libraries: [GlueWorkspaces] },
@@ -53,37 +30,33 @@ const App = ({ classes }) => {
     return window.location !== window.parent.location
     ? (
         <GlueProvider settings={settings}>
-            <Profiler id="application" onRender={logProfile}>
-                <React.Fragment>
-                    <CssBaseline/>
-                    <main className={classes.main}>
-                        <BrowserRouter basename={ BASE_NAME }>
-                            <Routes>
-                                <Route path="/run/:id" element={<ChatRunner />} />
-                                <Route path="/:id" element={<Studio />}/>
-                                <Route path="/" element={<Studio />}/>
-                            </Routes>
-                        </BrowserRouter>
-                    </main>
-                </React.Fragment>
-            </Profiler>
+            <React.Fragment>
+                <CssBaseline/>
+                <main className={classes.main}>
+                    <BrowserRouter basename={ BASE_NAME }>
+                        <Routes>
+                            <Route path="/run/:id" element={<ChatRunner />} />
+                            <Route path="/:id" element={<Studio />}/>
+                            <Route path="/" element={<Studio />}/>
+                        </Routes>
+                    </BrowserRouter>
+                </main>
+            </React.Fragment>
         </GlueProvider>
     )
     : (
-        <Profiler id="application" onRender={logProfile}>
-                <React.Fragment>
-                    <CssBaseline/>
-                    <main className={classes.main}>
-                        <BrowserRouter basename={ BASE_NAME }>
-                            <Routes>
-                                <Route path="/run/:id" element={<ChatRunner />} />
-                                <Route path="/:id" element={<Studio />}/>
-                                <Route path="/" element={<Studio />}/>
-                            </Routes>
-                        </BrowserRouter>
-                    </main>
-                </React.Fragment>
-            </Profiler>
+        <React.Fragment>
+            <CssBaseline/>
+            <main className={classes.main}>
+                <BrowserRouter basename={ BASE_NAME }>
+                    <Routes>
+                        <Route path="/run/:id" element={<ChatRunner />} />
+                        <Route path="/:id" element={<Studio />}/>
+                        <Route path="/" element={<Studio />}/>
+                    </Routes>
+                </BrowserRouter>
+            </main>
+        </React.Fragment>
     );
 };
 
