@@ -414,7 +414,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 let definition = this.getDefinition();
                 if (definition && definition._id && Object.values(definitionsIds).includes(definition._id)) {
-                    this.setDefinition();
+                    this.initBuilder();
                 }
 
                 return true;
@@ -447,6 +447,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (! definitionId && ! oldDefinitionId) {
+            this.initBuilder();
+
             return Promise.resolve(false);
         }
 

@@ -41,7 +41,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     render()
     {
-        const {createNewWorkflow, openWorkflow, deleteWorkflow, bulkDeleteWorkflows, ...rest} = this.props;
+        const {currentOpenedDefinition, createNewWorkflow, openWorkflow, deleteWorkflow, bulkDeleteWorkflows, ...rest} = this.props;
 
         return (
             <Modal
