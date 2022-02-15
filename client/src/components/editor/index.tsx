@@ -303,10 +303,19 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return Promise.resolve();
     }
     
-    private createNewWorkflow()
+    private async createNewWorkflow()
     {
         if (typeof this.editor === "undefined") {
             return;
+        }
+
+        this.setState({ isLoading: true });
+
+        let oldOpenedDefinition: IDefinition | undefined = this.getDefinition();
+        if (oldOpenedDefinition && oldOpenedDefinition._id) {
+            oldOpenedDefinition.is_opened = false;
+
+            await saveDefinition(oldOpenedDefinition);
         }
 
         this.initBuilder();
