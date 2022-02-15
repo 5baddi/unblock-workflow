@@ -296,6 +296,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (this.state.definition && typeof this.state.definition?._id === "string") {
             definition._id = this.state.definition._id;
+            definition.is_opened = this.state.definition.is_opened;
         }
 
         this.setDefinition(definition);
