@@ -116,7 +116,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentWillUnmount()
     {
-        this.clearTimer();
+        // this.clearTimer();
         
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("orientationchange", this.onResize);
@@ -175,7 +175,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return this.editor;
         }
 
-        this.clearTimer();
+        // this.clearTimer();
 
         if (typeof definition !== "undefined" && typeof definition._id === "string") {
             definition.is_opened = true;
@@ -190,7 +190,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor = Builder.open(definition || this.props.definition, properties);
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
 
-        this.startTimer();
+        // this.startTimer();
 
         return this.editor;
     }
@@ -269,7 +269,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             })
             .catch(error => {
                 if (typeof this.timer === "undefined") {
-                    this.startTimer();
+                    // this.startTimer();
                 }
                 
                 Promise.reject(error);
@@ -300,24 +300,26 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private reSaveDefinition()
     {
-        let definition = this.getDefinition();
-        if (! definition || definition.is_saved) {
-            return;
-        }
+        return; 
 
-        if (typeof definition.name === "undefined" && typeof definition.clusters === "undefined") {
-            return;
-        }
+        // let definition = this.getDefinition();
+        // if (! definition || definition.is_saved) {
+        //     return;
+        // }
 
-        if (definition.is_saved) {
-            return;
-        }
+        // if (typeof definition.name === "undefined" && typeof definition.clusters === "undefined") {
+        //     return;
+        // }
 
-        if (ENV === "development") {
-            console.log("re-send unsaved definition", definition);
-        }
+        // if (definition.is_saved) {
+        //     return;
+        // }
 
-        this.saveDefinition(definition);
+        // if (ENV === "development") {
+        //     console.log("re-send unsaved definition", definition);
+        // }
+
+        // this.saveDefinition(definition);
     }
 
     private onResize()
