@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import AlertModal from "./alert-modal";
+import Loader from "../loader";
 
 import { parseDefinition, saveDefinition, loadDefinitionById } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
@@ -32,6 +33,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition: {
                 name: "Unnamed"
             } as IDefinition,
+            isLoading: true,
             showModal: false,
             showAlertModal: false
         };
@@ -58,6 +60,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         return (
             <Grid container>
+                <Loader isLoading={this.state.isLoading}/>
                 <Grid item md={12} id={this.props.element}>
                     <div className="editor-menu">
                         <button onClick={this.showDefinitionsModal}>
@@ -212,6 +215,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("opening the editor");
         }
 
+        this.setState({ isLoading: true });
+
         let definition = await loadDefinitionById(this.props.definitionId);
 
         return this.initBuilder(definition);
@@ -220,7 +225,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     async initBuilder(definition?: IDefinition): Promise<Builder | void>
     {
         if (typeof definition !== "undefined" && definition.is_opened === true) {
-            this.setState({ showAlertModal: true });
+            this.setState({ showAlertModal: true, isLoading: false });
 
             return Promise.resolve();
         }
@@ -247,6 +252,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.editor = Builder.open(definition || this.props.definition, properties);
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
+
+        this.setState({ isLoading: false });
 
         return this.editor;
     }
@@ -386,10 +393,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
+        this.setState({ isLoading: true, showModal: false });
+
         loadDefinitionById(definitionId)
             .then(definition => {
                 this.initBuilder(definition);
-                this.toggleModal();
             });
     }
 }
