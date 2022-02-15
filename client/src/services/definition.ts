@@ -11,10 +11,8 @@ const BUILDER_VERSION = {
 function parseDefinition(submittedDefinition: TripettoDefinition): IDefinition
 {
     let definition: IDefinition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submittedDefinition)));
-
-    if (typeof definition.builder === "undefined") {
-        definition.builder = BUILDER_VERSION;
-    }
+    
+    definition.builder = BUILDER_VERSION;
 
     return definition;
 }
