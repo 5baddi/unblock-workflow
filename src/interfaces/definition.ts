@@ -6,6 +6,7 @@ export interface IDefinition extends TripettoIDefinition, IEntity
 {
     user_id?: string;
     is_saved?: boolean;
+    ip?: string;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}
@@ -21,4 +22,5 @@ export interface ISnapshot extends IDefinition
 {
     definition_id: string;
     snaped_at?: Date;
+    ip?: string;
 }
