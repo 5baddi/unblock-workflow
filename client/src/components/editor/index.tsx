@@ -230,8 +230,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor.open(definition);
         this.editor.onReady = () => this.ready();
 
-        this.setState({ isLoading: false });
-
         return this.editor;
     }
 
@@ -243,6 +241,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
         this.editor.onClose = () => this.onClose();
+
+        this.setState({ isLoading: false });
     }
 
     private onClose()
