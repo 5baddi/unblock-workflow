@@ -294,6 +294,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 definition.is_saved = false;
 
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
+                if (typeof this.timer === "undefined") {
+                    this.startTimer();
+                }
             });
 
         return Promise.resolve();
