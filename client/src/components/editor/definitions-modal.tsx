@@ -142,7 +142,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                         <div>
                             <Button disabled={typeof this.props.currentOpenedDefinition === "string" && this.props.currentOpenedDefinition === cellValues.row._id} 
                                     variant="outline-primary" className="btn-sm mr-2"
-                                    onClick={() => this.openWorkflow(cellValues.row)}>
+                                    onClick={() => this.openWorkflow(cellValues.row._id)}>
                                 <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
                             </Button>
                             <Button variant="outline-primary" className="btn-sm mr-2"
@@ -229,9 +229,9 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             });
     }
 
-    private openWorkflow(definition: IDefinition)
+    private openWorkflow(definitionId: string)
     {
-        this.props.openWorkflow(definition);
+        this.props.openWorkflow(definitionId);
     }
 }
 

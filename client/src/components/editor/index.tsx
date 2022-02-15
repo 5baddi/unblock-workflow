@@ -479,14 +479,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             });
     }
 
-    private openWorkflow(definition?: IDefinition)
+    private openWorkflow(definitionId?: string)
     {
-        if (! definition || typeof this.editor === "undefined") {
+        if (! definitionId || typeof this.editor === "undefined") {
             return;
         }
 
-        this.initBuilder(definition);
-        this.toggleModal();
+        this.loadDefinitionById(definitionId)
+            .then(definition => {
+                this.initBuilder(definition);
+                this.toggleModal();
+            });
     }
 }
 
