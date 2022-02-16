@@ -19,6 +19,7 @@ export interface IEditorProps
     element: string;
     definitionId?: string;
     glue?: any;
+    user?: any;
 }
 
 export interface IEditorState
