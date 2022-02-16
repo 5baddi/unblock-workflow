@@ -13,6 +13,10 @@ export default function Studio ()
     const glue = React.useContext(GlueContext);
 
     React.useEffect(() => {
+        if (! glue) {
+            return;
+        }
+
         const syncContext = async () => {
             const workspace = await glue.workspaces?.getMyWorkspace();
             const context = { user: Object } = await workspace?.getContext();
@@ -20,9 +24,7 @@ export default function Studio ()
             setUser(context.user);
         }
 
-        syncContext();
-        }, 
-        []
+        syncContext();}, []
     );
 
     return (
