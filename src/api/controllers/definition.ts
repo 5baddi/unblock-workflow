@@ -3,7 +3,7 @@ import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUP
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
-import { generateHash } from "helpers";
+import { generateHash } from "../../helpers";
 
 function checkDefinitionVersion(definition: IDefinition): boolean
 {
@@ -101,14 +101,52 @@ function save(request, response)
             });
     }
 
-    definition.hash = generateHash();
-
     return connect()
         .then(client => {
             let db = client.db();
+            let existDefinitionByHash: IDefinition | null = null;
+
+            if (typeof definition.hash !== "string") {
+                return {
+                    client,
+                    db,
+                    definition,
+                    existDefinitionByHash
+                };
+            }
+
+            return db.collection(DEFINITION_COLLECTION_NAME)
+                .findOne({ hash: definition.hash })
+                .then(result => {
+                    if (result !== null) {
+                        existDefinitionByHash = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(result)));
+                    }
+
+                    return {
+                        client,
+                        db,
+                        definition,
+                        existDefinitionByHash
+                    };
+                });
+        })
+        .then(query => {
             let now: Date = new Date();
+            let definition: IDefinition = query.definition;
+
+            if (
+                query.existDefinitionByHash !== null && typeof query.existDefinitionByHash.hash === "string"
+                && definition.hash !== query.existDefinitionByHash.hash
+            ) {
+                return response.status(409)
+                    .send({
+                        success: false,
+                        message: "Definition mis-match with our records! please make sure to reload the page",
+                    });
+            }
 
             definition.ip = request.headers['x-forwarded-for'] || null;
+            definition.hash = generateHash();
 
             if (typeof definition.user_id === "undefined") {
                 definition.user_id = ROOT_USER_ID;
@@ -138,7 +176,7 @@ function save(request, response)
 
                     delete snapshot._id;
 
-                    db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)))
+                    query.db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)));
                 } catch(error) {
                     return response.status(401)
                         .send({
@@ -151,11 +189,11 @@ function save(request, response)
                 delete definition.is_saved;
             }
 
-            db.collection(DEFINITION_COLLECTION_NAME)
+            query.db.collection(DEFINITION_COLLECTION_NAME)
                 .findOneAndUpdate(filters, { $set: definition }, { upsert: true, returnDocument: "after" })
                 .then(result => {
                     if (! result.ok || ! result.value) {
-                        client.close();
+                        query.client.close();
 
                         return response.status(401).send({
                             success: false,
@@ -163,7 +201,7 @@ function save(request, response)
                         });
                     }
 
-                    client.close();
+                    query.client.close();
 
                     let definition = Object.assign({} as IDefinition, result.value);
                     definition.is_saved = true;
@@ -171,13 +209,19 @@ function save(request, response)
                     return response.send({ success: true, definition });
                 })
                 .catch(error => {
-                    client.close();
+                    query.client.close();
 
                     return response.status(500).send({
                         success: false,
                         message: error.message || "failed to save definition",
                     });
                 });
+        })
+        .catch(error => {
+            return response.status(500).send({
+                success: false,
+                message: error.message || "failed to save definition",
+            });
         });
 }
 

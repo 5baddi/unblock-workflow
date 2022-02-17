@@ -290,6 +290,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             });
         }
 
+        if (currentDefinition && typeof currentDefinition?.hash === "string") {
+            definition.hash = currentDefinition.hash;
+        }
+
         if (typeof definition.clusters === "undefined") {
             this.setDefinition(definition);
 
