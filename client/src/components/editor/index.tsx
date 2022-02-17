@@ -179,7 +179,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.timer = setInterval(() => {
             let definition: IDefinition | undefined = this.getDefinition();
 
-            if (! definition || definition.is_saved) {
+            if (! definition || definition.is_saved === true) {
+                this.clearTimer();
+
                 return;
             }
             
@@ -187,7 +189,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 console.log("re-send unsaved definition", definition);
             }
 
-            saveDefinition(definition);
+            saveDefinition(definition)
+                .then(definition => {
+                    if (typeof definition === "undefined") {
+                        return;
+                    }
+                    
+                    this.setDefinition(definition);
+                });
         }, 15000);
     }
 
@@ -300,7 +309,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (typeof definition.clusters === "undefined" || metaFieldsHasChanged(definition, currentDefinition)) {
             this.setDefinition(definition);
 
-            await sleep(5000);
+            await sleep(3000);
 
             if (typeof this.timer === "undefined") {
                 this.startTimer();
