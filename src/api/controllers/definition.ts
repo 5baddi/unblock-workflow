@@ -104,29 +104,29 @@ function save(request, response)
     return connect()
         .then(client => {
             let db = client.db();
-            let existDefinitionByHash: IDefinition | null = null;
+            let existDefinition: IDefinition | null = null;
 
-            if (typeof definition.hash !== "string") {
+            if (typeof definition._id === "undefined") {
                 return {
                     client,
                     db,
                     definition,
-                    existDefinitionByHash
+                    existDefinition
                 };
             }
 
             return db.collection(DEFINITION_COLLECTION_NAME)
-                .findOne({ hash: definition.hash })
+                .findOne({ _id: new ObjectId(definition._id) })
                 .then(result => {
                     if (result !== null) {
-                        existDefinitionByHash = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(result)));
+                        existDefinition = result as IDefinition;
                     }
 
                     return {
                         client,
                         db,
                         definition,
-                        existDefinitionByHash
+                        existDefinition
                     };
                 });
         })
@@ -134,10 +134,7 @@ function save(request, response)
             let now: Date = new Date();
             let definition: IDefinition = query.definition;
 
-            if (
-                query.existDefinitionByHash !== null && typeof query.existDefinitionByHash.hash === "string"
-                && definition.hash !== query.existDefinitionByHash.hash
-            ) {
+            if (query.existDefinition !== null && query.existDefinition.hash !== definition.hash) {
                 return response.status(409)
                     .send({
                         success: false,
