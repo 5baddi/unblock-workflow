@@ -3,29 +3,18 @@ import { Grid } from "@mui/material";
 import Editor from "../../components/editor";
 import { EDITOR_CONTAINER_ID } from "../../global";
 import { useParams } from "react-router-dom";
-import { GlueContext } from '@glue42/react-hooks';
+import { GlueContext } from "@glue42/react-hooks";
+import { useAuth } from "@frontegg/react";
 
 export default function Studio ()
 {
-    const [user, setUser] = React.useState<{}>({});
-
     const { id } = useParams();
     const glue = React.useContext(GlueContext);
+    const { user, isAuthenticated } = useAuth();
 
-    React.useEffect(() => {
-        if (! glue) {
-            return;
-        }
-
-        const syncContext = async () => {
-            const workspace = await glue.workspaces?.getMyWorkspace();
-            const context = { user: Object } = await workspace?.getContext();
-
-            setUser(context.user);
-        }
-
-        syncContext();}, []
-    );
+    if (! isAuthenticated) {
+        // TODO: redirect to login page
+    }
 
     return (
         <Grid container>
