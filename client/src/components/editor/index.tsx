@@ -10,12 +10,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
-import { parseDefinition, saveDefinition, loadDefinitionById } from "../../services/definition";
+import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
+import { sleep } from "../../helpers";
 
 import "./blocks";
 
 import "./style.scss";
+
+const DEFAULT_NAME = "Unnamed";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -26,9 +29,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         super(props);
 
         this.state = {
-            definition: {
-                name: "Unnamed"
-            } as IDefinition,
+            definition: { name: DEFAULT_NAME } as IDefinition,
             isLoading: true,
             showModal: false,
             workspace: undefined
@@ -294,14 +295,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition.hash = currentDefinition.hash;
         }
 
-        if (typeof definition.clusters === "undefined") {
+        if (typeof definition.clusters === "undefined" || metaFieldsHasChanged(definition, currentDefinition)) {
             this.setDefinition(definition);
 
-            return Promise.resolve();
-        }
-
-        if (currentDefinition && typeof definition.name !== "undefined" && definition.name !== currentDefinition.name) {
-            setTimeout(() => {}, 5000);
+            await sleep(5000);
 
             return Promise.resolve();
         }

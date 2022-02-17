@@ -1,7 +1,7 @@
 import { DEFINITION_KEY } from "../global";
 import { IDefinition } from "../interfaces";
 
-export function loadDefaultDefinition(): IDefinition | undefined
+function loadDefaultDefinition(): IDefinition | undefined
 {
     let localDefinition = window.sessionStorage.getItem(DEFINITION_KEY)
         ? JSON.parse(window.sessionStorage.getItem(DEFINITION_KEY) || "undefined")
@@ -12,4 +12,14 @@ export function loadDefaultDefinition(): IDefinition | undefined
     }
 
     return Object.assign({} as IDefinition, localDefinition);
+}
+
+function sleep(ms: number): Promise<void>
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export {
+    loadDefaultDefinition,
+    sleep
 }

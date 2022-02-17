@@ -17,6 +17,27 @@ function parseDefinition(submittedDefinition: TripettoDefinition): IDefinition
     return definition;
 }
 
+function metaFieldsHasChanged(submittedDefinition?: TripettoDefinition, stateDefinition?: IDefinition): boolean
+{
+    if (! submittedDefinition && ! stateDefinition) {
+        return false;
+    }
+
+    if (submittedDefinition?.name !== stateDefinition?.name) {
+        return true;
+    }
+    
+    if (submittedDefinition?.description !== stateDefinition?.description) {
+        return true;
+    }
+    
+    if (submittedDefinition?.keywords?.join("") !== stateDefinition?.keywords?.join("")) {
+        return true;
+    }
+
+    return false;
+}
+
 function saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
 {
     if (typeof definition.name === "undefined" && typeof definition.clusters === "undefined") {
@@ -71,5 +92,6 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
 export {
     parseDefinition,
     saveDefinition,
-    loadDefinitionById
+    loadDefinitionById,
+    metaFieldsHasChanged
 }
