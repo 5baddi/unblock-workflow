@@ -300,7 +300,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
-        if (currentDefinition && definition.name !== currentDefinition.name) {
+        if (currentDefinition && typeof definition.name !== "undefined" && definition.name !== currentDefinition.name) {
             setTimeout(() => {}, 5000);
 
             return Promise.resolve();
