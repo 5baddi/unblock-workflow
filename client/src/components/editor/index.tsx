@@ -300,6 +300,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
+        if (! currentDefinition || definition.name !== currentDefinition.name) {
+            setTimeout(() => {}, 5000);
+
+            return Promise.resolve();
+        }
+
         await saveDefinition(definition)
             .then((definition) => {
                 this.setDefinition(definition);
