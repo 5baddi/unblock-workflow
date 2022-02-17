@@ -169,6 +169,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         if (typeof this.timer !== "undefined") {
             clearInterval(this.timer);
+
+            this.timer = undefined;
         }
     }
 
@@ -310,6 +312,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         await saveDefinition(definition)
             .then((definition) => {
                 this.setDefinition(definition);
+
+                if (typeof this.timer !== "undefined") {
+                    this.clearTimer();
+                }
             })
             .catch((error) => {
                 definition.is_saved = false;
