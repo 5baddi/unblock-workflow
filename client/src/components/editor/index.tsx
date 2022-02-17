@@ -50,6 +50,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.runDefinition = this.runDefinition.bind(this);
         this.clearTimer = this.clearTimer.bind(this);
         this.startTimer = this.startTimer.bind(this);
+
+        console.log(this.props.user);
     }
 
     render()
