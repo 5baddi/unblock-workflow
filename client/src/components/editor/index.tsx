@@ -300,6 +300,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
             await sleep(5000);
 
+            if (typeof this.timer === "undefined") {
+                this.startTimer();
+            }
+
             return Promise.resolve();
         }
 
