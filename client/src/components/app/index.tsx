@@ -3,11 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline, withStyles } from "@material-ui/core";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
-import { BASE_NAME, FRONTEGG_BASE_URL } from "../../settings";
+import { BASE_NAME } from "../../settings";
 import GlueWeb from '@glue42/web';
 import GlueWorkspaces from "@glue42/workspaces-api";
 import { GlueProvider } from '@glue42/react-hooks';
-import { FronteggProvider } from "@frontegg/react";
 
 import "./style.scss";
 
@@ -27,32 +26,10 @@ const settings = {
     },
 };
 
-const contextOptions = {
-    baseUrl: FRONTEGG_BASE_URL,
-};
-
 const App = ({ classes }) => {
     return window.location !== window.parent.location
     ? (
         <GlueProvider settings={settings}>
-            <FronteggProvider contextOptions={contextOptions}>
-                <React.Fragment>
-                    <CssBaseline/>
-                    <main className={classes.main}>
-                        <BrowserRouter basename={ BASE_NAME }>
-                            <Routes>
-                                <Route path="/run/:id" element={<ChatRunner />} />
-                                <Route path="/:id" element={<Studio />}/>
-                                <Route path="/" element={<Studio />}/>
-                            </Routes>
-                        </BrowserRouter>
-                    </main>
-                </React.Fragment>
-            </FronteggProvider>
-        </GlueProvider>
-    )
-    : (
-        <FronteggProvider contextOptions={contextOptions}>
             <React.Fragment>
                 <CssBaseline/>
                 <main className={classes.main}>
@@ -65,7 +42,21 @@ const App = ({ classes }) => {
                     </BrowserRouter>
                 </main>
             </React.Fragment>
-        </FronteggProvider>
+        </GlueProvider>
+    )
+    : (
+        <React.Fragment>
+            <CssBaseline/>
+            <main className={classes.main}>
+                <BrowserRouter basename={ BASE_NAME }>
+                    <Routes>
+                        <Route path="/run/:id" element={<ChatRunner />} />
+                        <Route path="/:id" element={<Studio />}/>
+                        <Route path="/" element={<Studio />}/>
+                    </Routes>
+                </BrowserRouter>
+            </main>
+        </React.Fragment>
     );
 };
 
