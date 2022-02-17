@@ -3,6 +3,7 @@ import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUP
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
+import { generateHash } from "helpers";
 
 function checkDefinitionVersion(definition: IDefinition): boolean
 {
@@ -99,6 +100,8 @@ function save(request, response)
                 message: "Unsupported version of the definition!",
             });
     }
+
+    definition.hash = generateHash();
 
     return connect()
         .then(client => {

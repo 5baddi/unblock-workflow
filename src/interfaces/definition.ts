@@ -7,6 +7,7 @@ export interface IDefinition extends TripettoIDefinition, IEntity
     user_id?: string;
     is_saved?: boolean;
     ip?: string;
+    hash?: string;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}
