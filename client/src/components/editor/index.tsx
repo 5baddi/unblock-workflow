@@ -310,6 +310,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 this.setDefinition(definition);
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
+                if (typeof error.response !== "undefined" && error.response.status === 409) {
+                    alert("Form mis-match with our records! please make sure to reload the page");
+
+                    return;
+                }
+
                 if (typeof this.timer === "undefined") {
                     this.startTimer();
                 }
