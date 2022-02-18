@@ -239,8 +239,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        const { user } = await this.state.workspace.getContext();
-        this.setState({ user });
+        const currentContext = await this.state.workspace.getContext();
+        this.setState({ user: currentContext.user || undefined });
     }
 
     async open(): Promise<Builder | void>
