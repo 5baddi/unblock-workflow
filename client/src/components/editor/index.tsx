@@ -100,6 +100,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           deleteWorkflow={this.deleteWorkflow}
                                           openWorkflow={this.openWorkflow}
                                           bulkDeleteWorkflows={this.bulkDeleteWorkflows}
+                                          allowExport={this.props.allowExport}
                                           bulkExportWorkflows={this.bulkExportWorkflows}/>
                     </div>
                 </Grid>
@@ -436,10 +437,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 return false;
             });
     }
-    
+
     private bulkExportWorkflows(definitionsIds?: string[]): Promise<boolean>
     {
-        if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
+        if (! this.props.allowExport || typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
             return Promise.resolve(false);
         }
 

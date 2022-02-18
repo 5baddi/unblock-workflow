@@ -21,6 +21,7 @@ export interface IEditorProps
     element: string;
     definitionId?: string;
     manualSaving?: boolean;
+    allowExport?: boolean;
     glue?: any;
     user?: any;
 }
@@ -63,6 +64,7 @@ export interface IEditorMenuState {}
 export interface IEditorDefinitionsModalProps extends ModalProps
 {
     currentOpenedDefinition: string | undefined;
+    allowExport?: boolean;
 
     createNewWorkflow: () => void;
     openWorkflow: (definitionId: string) => void;
