@@ -318,10 +318,51 @@ function bulkRemove(request, response)
         });
 }
 
+function bulkExport(request, response) 
+{
+    let body = request.body;
+    let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
+    if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
+        response.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    let ids = Object.values(definitionsIds).map((id) => {
+        return new ObjectId(id);
+    });
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .find({ _id: { $in: ids }, deleted_at: { $exists: false } })
+                .sort("created_at", "desc")
+                .toArray()
+                .then(items => {
+                    client.close();
+
+                    return response.send({ success: true, definitions: items || [] });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return response.status(500).send({
+                        success: false,
+                        message: error.message || "failed to export definitions",
+                    });
+                });;
+        });
+}
+
 export {
     index,
     find,
     save,
     remove,
-    bulkRemove
+    bulkRemove,
+    bulkExport
 }

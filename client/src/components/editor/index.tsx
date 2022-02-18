@@ -45,6 +45,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.openWorkflow = this.openWorkflow.bind(this);
         this.deleteWorkflow = this.deleteWorkflow.bind(this);
         this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
+        this.bulkExportWorkflows = this.bulkExportWorkflows.bind(this);
     }
 
     render()
@@ -98,7 +99,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           createNewWorkflow={() => this.createNewWorkflow()}
                                           deleteWorkflow={this.deleteWorkflow}
                                           openWorkflow={this.openWorkflow}
-                                          bulkDeleteWorkflows={this.bulkDeleteWorkflows}/>
+                                          bulkDeleteWorkflows={this.bulkDeleteWorkflows}
+                                          bulkExportWorkflows={this.bulkExportWorkflows}/>
                     </div>
                 </Grid>
 
@@ -233,7 +235,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         await this.getGlueWorkspace();
 
         let user = this.state.glueContext?.user;
-        console.log(user);
         this.setState({ isLoading: true, user });
 
         let definition = await loadDefinitionById(this.props.definitionId);
@@ -424,6 +425,31 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 if (definition && definition._id && Object.values(definitionsIds).includes(definition._id)) {
                     this.initBuilder();
                 }
+
+                return true;
+            })
+            .catch(error => {
+                if (ENV === "development") {
+                    console.log(error);
+                }
+
+                return false;
+            });
+    }
+    
+    private bulkExportWorkflows(definitionsIds?: string[]): Promise<boolean>
+    {
+        if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
+            return Promise.resolve(false);
+        }
+
+        return API.post(`${PUBLIC_URL}/api/definitions/export`, { definitionsIds })
+            .then(response => {
+                if (! response.data.success || ! response.data.definitions) {
+                    return false;
+                }
+
+                exportDefinitionAsJsonFile(response.data.definitions);
 
                 return true;
             })

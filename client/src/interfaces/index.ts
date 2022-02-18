@@ -68,6 +68,7 @@ export interface IEditorDefinitionsModalProps extends ModalProps
     openWorkflow: (definitionId: string) => void;
     deleteWorkflow: (definitionId: string) => Promise<boolean>;
     bulkDeleteWorkflows: (definitionsIds: string[]) => Promise<boolean>;
+    bulkExportWorkflows: (definitionsIds: string[]) => Promise<boolean>;
 }
 
 export interface IEditorDefinitionsModalState extends ModalProps

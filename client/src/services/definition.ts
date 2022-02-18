@@ -102,13 +102,28 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
         });
 }
 
+function omitUniqueFields(definition?: IDefinition | IDefinition[]): object | undefined
+{
+    if (! definition) {
+        return undefined;
+    }
+
+    if (definition instanceof Array) {
+        return definition.map(value => {
+            return omitUniqueFields(value);
+        });
+    }
+
+    return omit(definition, ["_id", "user_id", "hash", "ip", "is_saved", "snaped_at", "tenant_id", "definition_id", "is_opened", "deleted_at", "created_at", "updated_at"]);
+}
+
 function exportDefinitionAsJsonFile(data?: IDefinition | IDefinition[]): void
 {
     if (! data) {
         return;
     }
 
-    let exportable = omit(data, ["_id", "user_id", "ip", "is_saved", "snaped_at", "tenant_id", "definition_id", "is_opened", "deleted_at", "created_at", "updated_at"]);
+    let exportable = omitUniqueFields(data);
 
     let dataStr = JSON.stringify(exportable);
     let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -127,5 +142,6 @@ export {
     saveDefinition,
     loadDefinitionById,
     metaFieldsHasChanged,
-    exportDefinitionAsJsonFile
+    exportDefinitionAsJsonFile,
+    omitUniqueFields
 }
