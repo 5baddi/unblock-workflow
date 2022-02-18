@@ -12,21 +12,6 @@ export default function Studio ()
     const { id } = useParams();
     const glue = React.useContext(GlueContext);
 
-    React.useEffect(() => {
-        if (! glue) {
-            return;
-        }
-
-        const syncContext = async () => {
-            const workspace = await glue.workspaces?.getMyWorkspace();
-            const context = { user: Object } = await workspace?.getContext();
-
-            setUser(context.user);
-        }
-
-        syncContext();}, []
-    );
-
     return (
         <Grid container>
             <Editor element={ EDITOR_CONTAINER_ID } 

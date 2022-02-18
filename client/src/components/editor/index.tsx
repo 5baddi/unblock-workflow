@@ -229,9 +229,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 workspace: await this.props.glue.workspaces?.getMyWorkspace()
             });
 
-            if (definition) {
-                const currentContext = await this.state.workspace?.getContext();
-                await this.state.workspace?.updateContext({
+            if (definition && this.state.workspace) {
+                const currentContext = await this.state.workspace.getContext();
+                await this.state.workspace.updateContext({
                     ...currentContext,
                     workflow: {
                         id: definition._id,
@@ -302,7 +302,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         let definition = parseDefinition(submittedDefinition);
         this.setDefinition(definition);
-        
+
         if (this.state.definitionChanged) {
             return Promise.resolve();
         }
