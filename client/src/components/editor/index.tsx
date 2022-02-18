@@ -7,7 +7,7 @@ import { ENV, PUBLIC_URL } from "../../settings";
 import { DEFINITION_KEY } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faQuestion, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faQuestion, faTrash, faPlay, faSave } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged } from "../../services/definition";
@@ -39,6 +39,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.setDefinition = this.setDefinition.bind(this);
         this.editDefinitionProps = this.editDefinitionProps.bind(this);
         this.openTutorial = this.openTutorial.bind(this);
+        this.saveDefinition = this.saveDefinition.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
         this.showDefinitionsModal = this.showDefinitionsModal.bind(this);
         this.createNewWorkflow = this.createNewWorkflow.bind(this);
@@ -67,6 +68,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         </button>
                         <button onClick={this.editDefinitionProps}>
                             <FontAwesomeIcon icon={faPen}/>
+                        </button>
+                        <button onClick={this.saveDefinition}>
+                            <FontAwesomeIcon icon={faSave}/>
                         </button>
                         {
                             this.state.definition && this.state.definition._id
@@ -238,6 +242,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         this.editor?.close();
 
+        window.sessionStorage.removeItem(DEFINITION_KEY);
+
         this.clearTimer();
 
         this.setDefinition(definition);
@@ -248,8 +254,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             this.editor = new Builder(properties);
         }
 
-        // Prevent dispatch on change hook
+        // Prevent dispatch on change & save hook
         this.editor.onChange = () => {};
+        this.editor.onSave = () => {};
 
         this.editor.open(definition);
         this.editor.onReady = () => this.ready();
@@ -263,7 +270,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
+        // this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
+        this.editor.onSave = (definition: TripettoDefinition) => this.onChange(definition);
         this.editor.onClose = () => this.onClose();
 
         this.setState({ isLoading: false });
@@ -282,6 +290,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private getDefinition(): IDefinition | undefined
     {
         return this.state.definition || undefined;
+    }
+
+    private saveDefinition(): void
+    {
+        this.editor?.save();
     }
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
