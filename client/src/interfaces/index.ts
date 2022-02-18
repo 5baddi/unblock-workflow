@@ -7,6 +7,7 @@ export interface IDefinition extends TripettoIDefinition
     _id?: string;
     name?: string;
     user_id?: string;
+    tenant_id?: string;
     is_saved: boolean;
     builder: IBuilder;
     updated_at?: Date;

@@ -8,11 +8,19 @@ const BUILDER_VERSION = {
     "version": VERSION
 };
 
-function parseDefinition(submittedDefinition: TripettoDefinition): IDefinition
+function parseDefinition(submittedDefinition: TripettoDefinition, user?): IDefinition
 {
     let definition: IDefinition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submittedDefinition)));
 
     definition.builder = BUILDER_VERSION;
+
+    if (typeof user.id === "string") {
+        definition.user_id = user.id;
+    }
+    
+    if (typeof user.tenantId === "string") {
+        definition.tenant_id = user.tenantId;
+    }
 
     return definition;
 }

@@ -328,7 +328,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
-        let definition = parseDefinition(submittedDefinition);
+        let definition = parseDefinition(submittedDefinition, this.state.user);
         this.setDefinition(definition);
 
         if (this.state.definitionChanged) {
