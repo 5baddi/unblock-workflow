@@ -24,7 +24,7 @@ export class Modal extends React.Component<IModalProps>
                         <BtsModal.Header closeButton></BtsModal.Header>
                     )
                 }
-                { props.children ? (<BtsModal.Body>{props.children}</BtsModal.Body>) : undefined}
+                { props && props.children ? (<BtsModal.Body>{props.children}</BtsModal.Body>) : undefined}
                 <BtsModal.Footer>
                     <Button onClick={onHide}>Close</Button>
                 </BtsModal.Footer>
