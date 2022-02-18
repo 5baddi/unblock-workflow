@@ -35,7 +35,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             isSaving: false,
             definitionChanged: false,
             showModal: false,
-            workspace: undefined,
+            glueWorkspace: undefined,
             glueContext: undefined,
             user: undefined,
         };
@@ -108,20 +108,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentDidMount()
     {
-        this.getAuthenticatedUser();
-
         this.open();
-
-        console.log(this.state.user);
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
         window.addEventListener("beforeunload", this.beforeUnload);
-    }
-
-    componentDidUpdate()
-    {
-        this.getAuthenticatedUser();
     }
 
     componentWillUnmount()
@@ -227,27 +218,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        let workspace = await this.props.glue.workspaces?.getMyWorkspace();
-        let glueContext = await workspace?.getContext();
+        let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
+        let glueContext = await glueWorkspace?.getContext();
+        let user = this.state.glueContext?.user;
 
-        this.setState({ workspace, glueContext });
-    }
-    
-    async getAuthenticatedUser()
-    {
-        if (! this.props.glue) {
-            return;
-        }
-
-        await this.getGlueWorkspace();
-
-        if (! this.state.glueContext) {
-            return;
-        }
-
-        let user = this.state.glueContext.user || undefined;
-        
-        this.setState({ user });
+        this.setState({ glueWorkspace, glueContext, user });
     }
 
     async open(): Promise<Builder | void>
@@ -255,6 +230,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (ENV === "development") {
             console.log("opening the editor");
         }
+
+        await this.getGlueWorkspace();
+
+        console.log(this.state.glueWorkspace, this.state.glueContext, this.state.user);
 
         this.setState({ isLoading: true });
 
@@ -264,8 +243,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
 
-        if (definition && this.state.workspace && this.state.glueContext) {
-            await this.state.workspace.updateContext({
+        if (definition && this.state.glueWorkspace && this.state.glueContext) {
+            await this.state.glueWorkspace.updateContext({
                 ...this.state.glueContext,
                 workflow: {
                     id: definition._id,
@@ -350,8 +329,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (currentDefinition && typeof currentDefinition?._id === "string") {
             definition._id = currentDefinition._id;
 
-            if (this.state.workspace && this.state.glueContext) {
-                await this.state.workspace.updateContext({
+            if (this.state.glueWorkspace && this.state.glueContext) {
+                await this.state.glueWorkspace.updateContext({
                     ...this.state.glueContext,
                     workflow: {
                         id: definition._id,

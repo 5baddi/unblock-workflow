@@ -32,7 +32,7 @@ export interface IEditorState
     isSaving: boolean;
     definitionChanged: boolean;
     showModal: boolean;
-    workspace?: any;
+    glueWorkspace?: any;
     glueContext?: any;
     user?: any;
 }
