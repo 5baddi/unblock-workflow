@@ -43,8 +43,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.openWorkflow = this.openWorkflow.bind(this);
         this.deleteWorkflow = this.deleteWorkflow.bind(this);
         this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
-
-        console.log(this.props.user);
     }
 
     render()
