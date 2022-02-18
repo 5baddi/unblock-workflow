@@ -304,7 +304,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
-        this.setState({ isSaving: true });
+        this.setState({ isSaving: true, definitionChanged: true });
 
         let definition = parseDefinition(submittedDefinition);
 
@@ -333,16 +333,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.setDefinition(definition);
 
         if (typeof definition.clusters === "undefined" || metaFieldsHasChanged(definition, currentDefinition)) {
-            this.setState({ isSaving: false, definitionChanged: true });
-
             await sleep(5000);
-
-            this.setState({ definitionChanged: false });
         }
+
+        await sleep(5000);
 
         if (typeof this.timer === "undefined") {
             this.startTimer();
         }
+
+        this.setState({ isSaving: false });
 
         return Promise.resolve();
     }
@@ -350,7 +350,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private onSuccessfulSaving(definition?: IDefinition): void
     {
         this.setDefinition(definition);
-        this.setState({ isSaving: false });
+        this.setState({ isSaving: false, definitionChanged: false });
 
         if (typeof this.timer !== "undefined") {
             this.clearTimer();
@@ -364,7 +364,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         this.setDefinition(definition);
-        this.setState({ isSaving: false });
+        this.setState({ isSaving: false, definitionChanged: false });
         window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
         if (typeof error.response !== "undefined" && error.response.status === 409) {
