@@ -125,7 +125,27 @@ function save(request, response)
         })
         .then(query => {
             let now: Date = new Date();
+            let ip = request.headers['x-forwarded-for'] || null;
             let definition: IDefinition = query.definition;
+
+            if (typeof definition._id === "string") {
+                try {
+                    let snapshot: ISnapshot = Object.assign({} as ISnapshot, definition);
+                    snapshot.definition_id = definition._id;
+                    snapshot.snaped_at = new Date();
+                    snapshot.ip = ip;
+    
+                    delete snapshot._id;
+    
+                    query.db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)));
+                } catch(error) {
+                    return response.status(401)
+                        .send({
+                            success: false,
+                            message: error.message || "failed to take snapshot of definition",
+                        });
+                }
+            }
 
             if (query.existDefinition !== null && query.existDefinition.hash !== definition.hash) {
                 return response.status(409)
@@ -136,7 +156,16 @@ function save(request, response)
                     });
             }
 
-            definition.ip = request.headers['x-forwarded-for'] || null;
+            if (! checkDefinitionVersion(definition)) {
+                return response.status(505)
+                    .send({
+                        success: false,
+                        key: "unsupported-version",
+                        message: "Unsupported version! please reload the page",
+                    });
+            }
+
+            definition.ip = ip;
             definition.hash = generateHash();
 
             if (typeof definition.user_id === "undefined") {
@@ -159,34 +188,8 @@ function save(request, response)
 
                 definition.updated_at = now;
 
-                try {
-                    let snapshot: ISnapshot = Object.assign({} as ISnapshot, definition);
-                    snapshot.definition_id = definition._id;
-                    snapshot.snaped_at = new Date();
-                    snapshot.ip = request.headers['x-forwarded-for'] || null;
-
-                    delete snapshot._id;
-
-                    query.db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)));
-                } catch(error) {
-                    return response.status(401)
-                        .send({
-                            success: false,
-                            message: error.message || "failed to take snapshot of definition",
-                        });
-                }
-
                 delete definition._id;
                 delete definition.is_saved;
-            }
-
-            if (! checkDefinitionVersion(definition)) {
-                return response.status(505)
-                    .send({
-                        success: false,
-                        key: "unsupported-version",
-                        message: "Unsupported version! please reload the page",
-                    });
             }
 
             query.db.collection(DEFINITION_COLLECTION_NAME)

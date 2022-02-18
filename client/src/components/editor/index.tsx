@@ -337,15 +337,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
                 if (typeof error.response !== "undefined" && error.response.status === 409) {
-                    alert("Form mis-match with our records! please make sure to reload the page");
+                    alert("The form you're currently editing is not the latest version. Please refresh your page to access it.");
 
                     return;
                 }
                 
                 if (typeof error.response !== "undefined" && error.response.status === 505) {
-                    alert("Unsupported version! please make sure to reload the page");
-
-                    window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+                    alert("A new update has been released. Please refresh your page to continue editing your form.");
 
                     return;
                 }
