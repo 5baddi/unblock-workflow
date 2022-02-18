@@ -300,13 +300,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
+        let definition = parseDefinition(submittedDefinition);
+        this.setDefinition(definition);
+        
         if (this.state.definitionChanged) {
             return Promise.resolve();
         }
 
         this.setState({ isSaving: true, definitionChanged: true });
-
-        let definition = parseDefinition(submittedDefinition);
 
         if (ENV === "development") {
             console.log("definition has been changed", definition);
@@ -329,8 +330,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (currentDefinition && typeof currentDefinition?.hash === "string") {
             definition.hash = currentDefinition.hash;
         }
-
-        this.setDefinition(definition);
 
         if (typeof definition.clusters === "undefined" || metaFieldsHasChanged(definition, currentDefinition)) {
             await sleep(5000);
