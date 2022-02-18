@@ -240,10 +240,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         const currentContext = await this.state.workspace.getContext();
+        let { user } = await currentContext.get("user");
         
-        this.setState({
-            user: await currentContext.get("user")
-        });
+        this.setState({ user });
     }
 
     async open(): Promise<Builder | void>
