@@ -93,13 +93,6 @@ function save(request, response)
     }
 
     let definition: IDefinition = Object.assign({} as IDefinition, body.definition);
-    if (! checkDefinitionVersion(definition)) {
-        response.status(400)
-            .send({
-                success: false,
-                message: "Unsupported version of the definition!",
-            });
-    }
 
     return connect()
         .then(client => {
@@ -185,6 +178,14 @@ function save(request, response)
 
                 delete definition._id;
                 delete definition.is_saved;
+            }
+
+            if (! checkDefinitionVersion(definition)) {
+                return response.status(400)
+                    .send({
+                        success: false,
+                        message: "Unsupported version! please reload the page",
+                    });
             }
 
             query.db.collection(DEFINITION_COLLECTION_NAME)
