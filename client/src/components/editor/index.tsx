@@ -12,7 +12,7 @@ import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
-import { sleep } from "../../helpers";
+import { loadDefaultDefinition, sleep } from "../../helpers";
 
 import "./blocks";
 
@@ -194,7 +194,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     if (typeof definition === "undefined") {
                         return;
                     }
-                    
+
                     this.setDefinition(definition);
                 });
         }, 15000);
@@ -209,6 +209,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.setState({ isLoading: true });
 
         let definition = await loadDefinitionById(this.props.definitionId);
+        if (typeof definition === "undefined") {
+            definition = loadDefaultDefinition();
+        }
+
 
         if (this.props.glue) {
             this.setState({
@@ -334,6 +338,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 if (typeof error.response !== "undefined" && error.response.status === 409) {
                     alert("Form mis-match with our records! please make sure to reload the page");
+
+                    return;
+                }
+                
+                if (typeof error.response !== "undefined" && error.response.status === 505) {
+                    alert("Unsupported version! please make sure to reload the page");
+
+                    window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
                     return;
                 }

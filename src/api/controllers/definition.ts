@@ -181,9 +181,10 @@ function save(request, response)
             }
 
             if (! checkDefinitionVersion(definition)) {
-                return response.status(400)
+                return response.status(505)
                     .send({
                         success: false,
+                        key: "unsupported-version",
                         message: "Unsupported version! please reload the page",
                     });
             }
