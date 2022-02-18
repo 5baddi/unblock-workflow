@@ -2,6 +2,7 @@ import { IDefinition } from "../interfaces";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { VERSION, PUBLIC_URL, ENV } from "../settings";
 import API  from "../api";
+import { omit } from "lodash";
 
 const BUILDER_VERSION = {
     "name": "unblock",
@@ -13,6 +14,10 @@ function parseDefinition(submittedDefinition: TripettoDefinition, user?): IDefin
     let definition: IDefinition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submittedDefinition)));
 
     definition.builder = BUILDER_VERSION;
+
+    if (! user) {
+        return definition;
+    }
 
     if (typeof user.id === "string") {
         definition.user_id = user.id;
@@ -97,9 +102,30 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
         });
 }
 
+function exportDefinitionAsJsonFile(data?: IDefinition | IDefinition[]): void
+{
+    if (! data) {
+        return;
+    }
+
+    let exportable = omit(data, ["_id", "user_id", "ip", "is_saved", "snaped_at", "tenant_id", "definition_id", "is_opened", "deleted_at", "created_at", "updated_at"]);
+
+    let dataStr = JSON.stringify(exportable);
+    let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    let now = new Date();
+
+    let exportFileDefaultName = `export-${now.toISOString().substring(0, 10)}.json`;
+
+    let linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+
 export {
     parseDefinition,
     saveDefinition,
     loadDefinitionById,
-    metaFieldsHasChanged
+    metaFieldsHasChanged,
+    exportDefinitionAsJsonFile
 }

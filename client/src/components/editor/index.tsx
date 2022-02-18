@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
-import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged } from "../../services/definition";
+import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
 import { loadDefaultDefinition, sleep } from "../../helpers";
 import { Modal } from "../modal";
