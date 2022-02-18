@@ -33,29 +33,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition: { name: DEFAULT_NAME } as IDefinition,
             isLoading: true,
             isSaving: false,
+            definitionChanged: false,
             showModal: false,
-            workspace: undefined
+            workspace: undefined,
         };
 
-        this.onChange = this.onChange.bind(this);
-        this.setDefinition = this.setDefinition.bind(this);
-        this.editDefinitionProps = this.editDefinitionProps.bind(this);
-        this.openTutorial = this.openTutorial.bind(this);
-        this.saveDefinition = this.saveDefinition.bind(this);
-        this.toggleModal = this.toggleModal.bind(this);
-        this.showDefinitionsModal = this.showDefinitionsModal.bind(this);
-        this.createNewWorkflow = this.createNewWorkflow.bind(this);
-        this.deleteWorkflow = this.deleteWorkflow.bind(this);
-        this.openWorkflow = this.openWorkflow.bind(this);
-        this.initBuilder = this.initBuilder.bind(this);
-        this.beforeUnload = this.beforeUnload.bind(this);
         this.onResize = this.onResize.bind(this);
+        this.beforeUnload = this.beforeUnload.bind(this);
+        this.openWorkflow = this.openWorkflow.bind(this);
+        this.deleteWorkflow = this.deleteWorkflow.bind(this);
         this.bulkDeleteWorkflows = this.bulkDeleteWorkflows.bind(this);
-        this.runDefinition = this.runDefinition.bind(this);
-        this.clearTimer = this.clearTimer.bind(this);
-        this.startTimer = this.startTimer.bind(this);
-
-        console.log(this.props.user);
     }
 
     render()
@@ -63,13 +50,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return (
             <Grid container>
                 <Loader isLoading={this.state.isLoading}/>
-                <Modal show={this.state.showModal} onHide={this.toggleModal}/>
+                <Modal show={this.state.showModal} onHide={() => this.toggleModal()}/>
                 <Grid item md={12} id={this.props.element}>
                     <div className="editor-menu">
-                        <button onClick={this.showDefinitionsModal} title="Home page">
+                        <button onClick={() => this.showDefinitionsModal()} title="Home page">
                             <img src={`${PUBLIC_URL}/logo.png`} />
                         </button>
-                        <button onClick={this.editDefinitionProps} title="Edit properties">
+                        <button onClick={() => this.editProps()} title="Edit properties">
                             <FontAwesomeIcon icon={faPen}/>
                         </button>
                         {
@@ -79,16 +66,19 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                     <FontAwesomeIcon icon={faSpinner} spin={true}/>
                                 </button>
                             )
-                            : (
-                                <button onClick={this.saveDefinition} title="Save workflow">
+                            : 
+                            this.props.manualSaving === true 
+                            ? (
+                                <button onClick={() => this.save()} title="Save workflow">
                                     <FontAwesomeIcon icon={faSave}/>
                                 </button>
                             )
+                            : (undefined)
                         }
                         {
                             this.state.definition && this.state.definition._id
                             ? (
-                                <button onClick={this.runDefinition} title="Run workflow">
+                                <button onClick={() => this.run()} title="Run workflow">
                                     <FontAwesomeIcon icon={faPlay}/>
                                 </button>
                             )
@@ -97,13 +87,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <button onClick={() => this.deleteWorkflow()} title="Delete workflow">
                             <FontAwesomeIcon icon={faTrash}/>
                         </button>
-                        <button onClick={this.openTutorial} title="Open tutorial">
+                        <button onClick={() => this.openTutorial()} title="Open tutorial">
                             <FontAwesomeIcon icon={faQuestion}/>
                         </button>
                         <DefinitionsModal currentOpenedDefinition={this.state.definition?._id}
                                           show={this.state.showModal} 
-                                          onHide={this.toggleModal}
-                                          createNewWorkflow={this.createNewWorkflow}
+                                          onHide={() => this.toggleModal()}
+                                          createNewWorkflow={() => this.createNewWorkflow()}
                                           deleteWorkflow={this.deleteWorkflow}
                                           openWorkflow={this.openWorkflow}
                                           bulkDeleteWorkflows={this.bulkDeleteWorkflows}/>
@@ -142,7 +132,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor?.tutorial();
     }
 
-    editDefinitionProps()
+    editProps()
     {
         this.editor?.edit("properties");
     }
@@ -152,6 +142,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.setState({
             showModal: ! this.state.showModal
         })
+    }
+
+    save(): void
+    {
+        this.editor?.save();
     }
 
     toggleModal()
@@ -210,17 +205,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             }
 
             saveDefinition(definition)
-                .then(definition => {
-                    if (typeof definition === "undefined") {
-                        return;
-                    }
-
-                    this.setDefinition(definition);
-                    this.setState({ isSaving: false });
-                })
-                .catch(error => {
-                    this.setState({ isSaving: false });
-                });
+                .then(definition => this.onSuccessfulSaving(definition))
+                .catch(error => this.onFailedSaving(error, definition));
         }, 15000);
     }
 
@@ -312,13 +298,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return this.state.definition || undefined;
     }
 
-    private saveDefinition(): void
-    {
-        this.editor?.save();
-    }
-
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
+        if (this.state.definitionChanged) {
+            return Promise.resolve();
+        }
+
         this.setState({ isSaving: true });
 
         let definition = parseDefinition(submittedDefinition);
@@ -345,53 +330,58 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition.hash = currentDefinition.hash;
         }
 
+        this.setDefinition(definition);
+
         if (typeof definition.clusters === "undefined" || metaFieldsHasChanged(definition, currentDefinition)) {
-            this.setDefinition(definition);
-            this.setState({ isSaving: false });
+            this.setState({ isSaving: false, definitionChanged: true });
 
-            await sleep(3000);
+            await sleep(5000);
 
-            if (typeof this.timer === "undefined") {
-                this.startTimer();
-            }
-
-            return Promise.resolve();
+            this.setState({ definitionChanged: false });
         }
 
-        await saveDefinition(definition)
-            .then((definition) => {
-                this.setDefinition(definition);
-                this.setState({ isSaving: false });
-
-                if (typeof this.timer !== "undefined") {
-                    this.clearTimer();
-                }
-            })
-            .catch((error) => {
-                definition.is_saved = false;
-
-                this.setDefinition(definition);
-                this.setState({ isSaving: false });
-                window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
-
-                if (typeof error.response !== "undefined" && error.response.status === 409) {
-                    alert("The form you're currently editing is not the latest version. Please refresh your page to access it.");
-
-                    return;
-                }
-                
-                if (typeof error.response !== "undefined" && error.response.status === 505) {
-                    alert("A new update has been released. Please refresh your page to continue editing your form.");
-
-                    return;
-                }
-
-                if (typeof this.timer === "undefined") {
-                    this.startTimer();
-                }
-            });
+        if (typeof this.timer === "undefined") {
+            this.startTimer();
+        }
 
         return Promise.resolve();
+    }
+
+    private onSuccessfulSaving(definition?: IDefinition): void
+    {
+        this.setDefinition(definition);
+        this.setState({ isSaving: false });
+
+        if (typeof this.timer !== "undefined") {
+            this.clearTimer();
+        }
+    }
+
+    private onFailedSaving(error: any, definition?: IDefinition): void
+    {
+        if (typeof definition !== "undefined") {
+            definition.is_saved = false;
+        }
+
+        this.setDefinition(definition);
+        this.setState({ isSaving: false });
+        window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
+        if (typeof error.response !== "undefined" && error.response.status === 409) {
+            alert("The form you're currently editing is not the latest version. Please refresh your page to access it.");
+
+            return;
+        }
+        
+        if (typeof error.response !== "undefined" && error.response.status === 505) {
+            alert("A new update has been released. Please refresh your page to continue editing your form.");
+
+            return;
+        }
+
+        if (typeof this.timer === "undefined") {
+            this.startTimer();
+        }
     }
     
     private async createNewWorkflow()
@@ -435,7 +425,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             });
     }
 
-    private runDefinition()
+    private run()
     {
         if (! this.state.definition || ! this.state.definition._id) {
             return;
