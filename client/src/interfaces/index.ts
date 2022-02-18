@@ -27,6 +27,7 @@ export interface IEditorState
 {
     definition?: IDefinition;
     isLoading: boolean;
+    isSaving: boolean;
     showModal: boolean;
     workspace: any;
 }
@@ -71,7 +72,9 @@ export interface IEditorDefinitionsModalState extends ModalProps
     selectionModel: string[];
 }
 
-export interface IEditorAlertModalProps extends ModalProps
+export interface IModalProps extends ModalProps
 {
+    title?: string;
 
+    onHide(): void;
 }

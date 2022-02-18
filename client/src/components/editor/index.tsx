@@ -7,12 +7,13 @@ import { ENV, PUBLIC_URL } from "../../settings";
 import { DEFINITION_KEY } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faQuestion, faTrash, faPlay, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
 import { loadDefaultDefinition, sleep } from "../../helpers";
+import { Modal } from "../modal";
 
 import "./blocks";
 
@@ -31,6 +32,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.state = {
             definition: { name: DEFAULT_NAME } as IDefinition,
             isLoading: true,
+            isSaving: false,
             showModal: false,
             workspace: undefined
         };
@@ -61,30 +63,41 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return (
             <Grid container>
                 <Loader isLoading={this.state.isLoading}/>
+                <Modal show={this.state.showModal} onHide={this.toggleModal}/>
                 <Grid item md={12} id={this.props.element}>
                     <div className="editor-menu">
-                        <button onClick={this.showDefinitionsModal}>
+                        <button onClick={this.showDefinitionsModal} title="Home page">
                             <img src={`${PUBLIC_URL}/logo.png`} />
                         </button>
-                        <button onClick={this.editDefinitionProps}>
+                        <button onClick={this.editDefinitionProps} title="Edit properties">
                             <FontAwesomeIcon icon={faPen}/>
                         </button>
-                        <button onClick={this.saveDefinition}>
-                            <FontAwesomeIcon icon={faSave}/>
-                        </button>
+                        {
+                            this.state.isSaving
+                            ? (
+                                <button onClick={() => {}} title="Please wait...">
+                                    <FontAwesomeIcon icon={faSpinner} spin={true}/>
+                                </button>
+                            )
+                            : (
+                                <button onClick={this.saveDefinition} title="Save workflow">
+                                    <FontAwesomeIcon icon={faSave}/>
+                                </button>
+                            )
+                        }
                         {
                             this.state.definition && this.state.definition._id
                             ? (
-                                <button onClick={this.runDefinition}>
+                                <button onClick={this.runDefinition} title="Run workflow">
                                     <FontAwesomeIcon icon={faPlay}/>
                                 </button>
                             )
                             : undefined
                         }
-                        <button onClick={() => this.deleteWorkflow()}>
+                        <button onClick={() => this.deleteWorkflow()} title="Delete workflow">
                             <FontAwesomeIcon icon={faTrash}/>
                         </button>
-                        <button onClick={this.openTutorial}>
+                        <button onClick={this.openTutorial} title="Open tutorial">
                             <FontAwesomeIcon icon={faQuestion}/>
                         </button>
                         <DefinitionsModal currentOpenedDefinition={this.state.definition?._id}
@@ -181,10 +194,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     startTimer()
     {
         this.timer = setInterval(() => {
+            this.setState({ isSaving: true });
+
             let definition: IDefinition | undefined = this.getDefinition();
 
             if (! definition || definition.is_saved === true) {
                 this.clearTimer();
+                this.setState({ isSaving: false });
 
                 return;
             }
@@ -200,6 +216,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     }
 
                     this.setDefinition(definition);
+                    this.setState({ isSaving: false });
+                })
+                .catch(error => {
+                    this.setState({ isSaving: false });
                 });
         }, 15000);
     }
@@ -299,6 +319,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
+        this.setState({ isSaving: true });
+
         let definition = parseDefinition(submittedDefinition);
 
         if (ENV === "development") {
@@ -325,6 +347,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (typeof definition.clusters === "undefined" || metaFieldsHasChanged(definition, currentDefinition)) {
             this.setDefinition(definition);
+            this.setState({ isSaving: false });
 
             await sleep(3000);
 
@@ -338,6 +361,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         await saveDefinition(definition)
             .then((definition) => {
                 this.setDefinition(definition);
+                this.setState({ isSaving: false });
 
                 if (typeof this.timer !== "undefined") {
                     this.clearTimer();
@@ -347,6 +371,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 definition.is_saved = false;
 
                 this.setDefinition(definition);
+                this.setState({ isSaving: false });
                 window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
                 if (typeof error.response !== "undefined" && error.response.status === 409) {
