@@ -228,7 +228,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         let workspace = await this.props.glue.workspaces?.getMyWorkspace();
-        let glueContext = await this.state.workspace.getContext();
+        let glueContext = await workspace?.getContext();
 
         this.setState({ workspace, glueContext });
     }
