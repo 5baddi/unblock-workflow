@@ -73,7 +73,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                             <FontAwesomeIcon icon={faPen}/>
                         </button>
                         {
-                            this.state.isSaving
+                            this.state.isSaving && (this.props.manualSaving === true)
                             ? (
                                 <button onClick={() => {}} title="Please wait...">
                                     <FontAwesomeIcon icon={faSpinner} spin={true}/>
@@ -290,8 +290,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        // this.editor.onChange = (definition: TripettoDefinition) => this.onChange(definition);
-        this.editor.onSave = (definition: TripettoDefinition) => this.onChange(definition);
+        this.editor.onChange = (definition: TripettoDefinition) => (! this.props.manualSaving ? this.onChange(definition) : {});
+        this.editor.onSave = (definition: TripettoDefinition) => (this.props.manualSaving === true ? this.onChange(definition) : {});
         this.editor.onClose = () => this.onClose();
 
         this.setState({ isLoading: false });

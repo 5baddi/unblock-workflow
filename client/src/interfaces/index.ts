@@ -19,6 +19,7 @@ export interface IEditorProps
 {
     element: string;
     definitionId?: string;
+    manualSaving?: boolean;
     glue?: any;
     user?: any;
 }
