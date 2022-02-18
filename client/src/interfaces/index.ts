@@ -33,6 +33,7 @@ export interface IEditorState
     definitionChanged: boolean;
     showModal: boolean;
     workspace?: any;
+    glueContext?: any;
     user?: any;
 }
 

@@ -36,6 +36,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definitionChanged: false,
             showModal: false,
             workspace: undefined,
+            glueContext: undefined,
             user: undefined,
         };
 
@@ -107,7 +108,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentDidMount()
     {
-        this.getGlueWorkspace();
         this.getAuthenticatedUser();
 
         this.open();
@@ -121,7 +121,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentDidUpdate()
     {
-        this.getGlueWorkspace();
         this.getAuthenticatedUser();
     }
 
@@ -228,9 +227,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        this.setState({
-            workspace: await this.props.glue.workspaces?.getMyWorkspace()
-        });
+        let workspace = await this.props.glue.workspaces?.getMyWorkspace();
+        let glueContext = await this.state.workspace.getContext();
+
+        this.setState({ workspace, glueContext });
     }
     
     async getAuthenticatedUser()
@@ -239,8 +239,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        const currentContext = await this.state.workspace.getContext();
-        this.setState({ user: currentContext.user || undefined });
+        await this.getGlueWorkspace();
+
+        if (! this.state.glueContext) {
+            return;
+        }
+
+        let user = this.state.glueContext.user || undefined;
+        
+        this.setState({ user });
     }
 
     async open(): Promise<Builder | void>
@@ -257,11 +264,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
 
-        if (definition && this.state.workspace) {
-            const currentContext = await this.state.workspace.getContext();
-
+        if (definition && this.state.workspace && this.state.glueContext) {
             await this.state.workspace.updateContext({
-                ...currentContext,
+                ...this.state.glueContext,
                 workflow: {
                     id: definition._id,
                     action: "open"
@@ -345,11 +350,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (currentDefinition && typeof currentDefinition?._id === "string") {
             definition._id = currentDefinition._id;
 
-            if (this.state.workspace) {
-                const currentContext = await this.state.workspace.getContext();
-    
+            if (this.state.workspace && this.state.glueContext) {
                 await this.state.workspace.updateContext({
-                    ...currentContext,
+                    ...this.state.glueContext,
                     workflow: {
                         id: definition._id,
                         action: "change"
