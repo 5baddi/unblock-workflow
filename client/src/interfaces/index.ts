@@ -31,7 +31,8 @@ export interface IEditorState
     isSaving: boolean;
     definitionChanged: boolean;
     showModal: boolean;
-    workspace: any;
+    workspace?: any;
+    user?: any;
 }
 
 export interface IHeaderProps

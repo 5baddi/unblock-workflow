@@ -36,6 +36,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definitionChanged: false,
             showModal: false,
             workspace: undefined,
+            user: undefined,
         };
 
         this.onResize = this.onResize.bind(this);
@@ -106,11 +107,22 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentDidMount()
     {
+        this.getGlueWorkspace();
+        this.getAuthenticatedUser();
+
         this.open();
+
+        console.log(this.state.user);
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
         window.addEventListener("beforeunload", this.beforeUnload);
+    }
+
+    componentDidUpdate()
+    {
+        this.getGlueWorkspace();
+        this.getAuthenticatedUser();
     }
 
     componentWillUnmount()
@@ -210,6 +222,30 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }, 15000);
     }
 
+    async getGlueWorkspace()
+    {
+        if (! this.props.glue) {
+            return;
+        }
+
+        this.setState({
+            workspace: await this.props.glue.workspaces?.getMyWorkspace()
+        });
+    }
+    
+    async getAuthenticatedUser()
+    {
+        if (! this.props.glue) {
+            return;
+        }
+
+        const currentContext = await this.state.workspace.getContext();
+        
+        this.setState({
+            user: await currentContext.get()
+        });
+    }
+
     async open(): Promise<Builder | void>
     {
         if (ENV === "development") {
@@ -224,21 +260,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
 
-        if (this.props.glue) {
-            this.setState({
-                workspace: await this.props.glue.workspaces?.getMyWorkspace()
-            });
+        if (definition && this.state.workspace) {
+            const currentContext = await this.state.workspace.getContext();
 
-            if (definition && this.state.workspace) {
-                const currentContext = await this.state.workspace.getContext();
-                await this.state.workspace.updateContext({
-                    ...currentContext,
-                    workflow: {
-                        id: definition._id,
-                        action: "open"
-                    } 
-                });
-            }
+            await this.state.workspace.updateContext({
+                ...currentContext,
+                workflow: {
+                    id: definition._id,
+                    action: "open"
+                } 
+            });
         }
 
         return this.initBuilder(definition);
@@ -317,14 +348,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (currentDefinition && typeof currentDefinition?._id === "string") {
             definition._id = currentDefinition._id;
 
-            const currentContext = await this.state.workspace?.getContext();
-            await this.state.workspace?.updateContext({
-                ...currentContext,
-                workflow: {
-                    id: definition._id,
-                    action: "change"
-                } 
-            });
+            if (this.state.workspace) {
+                const currentContext = await this.state.workspace.getContext();
+    
+                await this.state.workspace.updateContext({
+                    ...currentContext,
+                    workflow: {
+                        id: definition._id,
+                        action: "change"
+                    } 
+                });
+            }
         }
 
         if (currentDefinition && typeof currentDefinition?.hash === "string") {

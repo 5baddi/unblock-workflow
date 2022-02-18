@@ -7,8 +7,6 @@ import { GlueContext } from '@glue42/react-hooks';
 
 export default function Studio ()
 {
-    const [user, setUser] = React.useState<{}>({});
-
     const { id } = useParams();
     const glue = React.useContext(GlueContext);
 
@@ -16,8 +14,7 @@ export default function Studio ()
         <Grid container>
             <Editor element={ EDITOR_CONTAINER_ID } 
                 definitionId={id}
-                glue={glue}
-                user={user}/>
+                glue={glue}/>
         </Grid>
     );
 };
