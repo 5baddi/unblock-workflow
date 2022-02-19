@@ -551,11 +551,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         let endpoint = `${PUBLIC_URL}/api/definitions`;
         let user = this.state.user;
-        console.log(user);
 
-        if (user && typeof user.tenantId === "string" && typeof user.Id === "string") {
-            endpoint = endpoint.concat(`/${user.tenantId}/${user.Id}`);
-            console.log(endpoint);
+        if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
+            endpoint = endpoint.concat(`/${user.tenantId}/${user.id}`);
         }
 console.log(endpoint);
         return API.get(endpoint)
