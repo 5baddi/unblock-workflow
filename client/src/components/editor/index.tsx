@@ -86,7 +86,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                             : (undefined)
                         }
                         {
-                            this.state.definition
+                            this.state.definition && this.state.definition._id
                             ? (
                                 <button onClick={() => this.run()} title="Run workflow">
                                     <FontAwesomeIcon icon={faPlay}/>
