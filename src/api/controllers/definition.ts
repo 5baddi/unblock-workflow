@@ -32,7 +32,7 @@ console.log(filter);
                 .then(items => {
 
                     client.close();
-
+console.log(items);
                     return response.send({ success: true, definitions: items });
                 })
                 .catch(error => {
