@@ -17,8 +17,8 @@ function index(request, response)
     let filter = JSON.parse(JSON.stringify({ deleted_at: { $exists: false } }));
 
     if (tenantId && userId) {
-        filter.tenantId = tenantId;
-        filter.userId = tenantId;
+        filter.tenant_id = tenantId;
+        filter.user_id = tenantId;
     }
 
     return connect()
