@@ -239,10 +239,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.setState({ isLoading: true, user });
 
         let definition = await loadDefinitionById(this.props.definitionId);
-        if (typeof definition === "undefined") {
-            definition = loadDefaultDefinition();
-        }
-
 
         if (definition && this.state.glueWorkspace && this.state.glueContext) {
             await this.state.glueWorkspace.updateContext({
@@ -260,8 +256,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     async initBuilder(definition?: IDefinition): Promise<Builder | void>
     {
         this.editor?.close();
-
-        window.sessionStorage.removeItem(DEFINITION_KEY);
 
         this.clearTimer();
 
