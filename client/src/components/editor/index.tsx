@@ -549,10 +549,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private loadWorkflows(): Promise<IDefinition[] | undefined>
     {
-        console.log(this.state.user);
         let endpoint = `${PUBLIC_URL}/api/definitions`;
-        if (typeof this.state.user?.tenantId === "string" && typeof this.state.user?.Id === "string") {
-            endpoint = endpoint.concat(`/${this.state.user?.tenantId}/${this.state.user?.Id}`);
+        let user = this.state.user;
+
+        if (user && typeof this.state.user.tenantId === "string" && typeof this.state.user.Id === "string") {
+            endpoint = endpoint.concat(`/${user.tenantId}/${user.Id}`);
+            console.log(endpoint);
         }
 console.log(endpoint);
         return API.get(endpoint)
