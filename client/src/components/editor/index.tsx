@@ -555,7 +555,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
             endpoint = endpoint.concat(`/${user.tenantId}/${user.id}`);
         }
-console.log(endpoint);
+
         return API.get(endpoint)
             .then(response => {
                 if (! response.data.definitions) {
