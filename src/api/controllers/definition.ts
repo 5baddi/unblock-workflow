@@ -20,7 +20,7 @@ function index(request, response)
         filter.tenant_id = tenantId;
         filter.user_id = tenantId;
     }
-console.log(filter);
+
     return connect()
         .then(client => {
             let db = client.db();
@@ -32,7 +32,7 @@ console.log(filter);
                 .then(items => {
 
                     client.close();
-console.log(items);
+
                     return response.send({ success: true, definitions: items });
                 })
                 .catch(error => {
