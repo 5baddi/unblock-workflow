@@ -79,11 +79,13 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
     private loadDefinitions()
     {
         this.setState({ isLoading: true });
+
         let endpoint = `${PUBLIC_URL}/api/definitions`;
-        if (this.props.user?.tenantId && this.props.user?.Id) {
+    
+        if (typeof this.props.user?.tenantId === "string" && typeof this.props.user?.Id === "string") {
             endpoint = endpoint.concat(`/${this.props.user?.tenantId}/${this.props.user?.Id}`);
         }
-
+console.log(endpoint);
         API.get(endpoint)
             .then(response => {
                 if (! response.data.definitions) {
