@@ -15,24 +15,17 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
 
     definition.builder = BUILDER_VERSION;
 
-    if (! user) {
-        return definition;
-    }
-
-    if (typeof user.id === "string") {
-        definition.user_id = user.id;
-    }
-    
-    if (typeof user.tenantId === "string") {
-        definition.tenant_id = user.tenantId;
-    }
-
-    if (! currentDefinition) {
-        return definition;
-    }
-
-    if (typeof currentDefinition._id === "string") {
+    if (currentDefinition && typeof currentDefinition._id === "string") {
         definition._id = currentDefinition._id;
+    }
+
+    if (currentDefinition && typeof currentDefinition?.hash === "string") {
+        definition.hash = currentDefinition.hash;
+    }
+
+    if (user && typeof user.id === "string" && typeof user.tenantId === "string") {
+        definition.user_id = user.id;
+        definition.tenant_id = user.tenantId;
     }
 
     return definition;

@@ -328,12 +328,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
-        let definition = parseDefinition(submittedDefinition, this.state.user);
-
         let currentDefinition = this.getDefinition();
-        if (currentDefinition && typeof currentDefinition?._id === "string") {
-            definition._id = currentDefinition._id;
+        let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
 
+        if (definition && typeof definition?._id === "string") {
             if (this.state.glueWorkspace && this.state.glueContext) {
                 await this.state.glueWorkspace.updateContext({
                     ...this.state.glueContext,
@@ -343,10 +341,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     } 
                 });
             }
-        }
-
-        if (currentDefinition && typeof currentDefinition?.hash === "string") {
-            definition.hash = currentDefinition.hash;
         }
 
         this.setDefinition(definition);
