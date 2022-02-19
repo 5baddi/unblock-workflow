@@ -23,7 +23,6 @@ export interface IEditorProps
     manualSaving?: boolean;
     allowExport?: boolean;
     glue?: any;
-    user?: any;
 }
 
 export interface IEditorState
