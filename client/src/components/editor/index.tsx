@@ -12,14 +12,21 @@ import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
-import { loadDefaultDefinition, sleep } from "../../helpers";
+import { sleep } from "../../helpers";
 import { Modal } from "../modal";
+import BounceLoader from "react-spinners/BounceLoader";
+import { css } from "@emotion/react";
 
 import "./blocks";
 
 import "./style.scss";
 
 const DEFAULT_NAME = "Unnamed";
+
+const loaderOverride = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -79,7 +86,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                             : (undefined)
                         }
                         {
-                            this.state.definition && this.state.definition._id
+                            this.state.definition
                             ? (
                                 <button onClick={() => this.run()} title="Run workflow">
                                     <FontAwesomeIcon icon={faPlay}/>
@@ -103,6 +110,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           allowExport={this.props.allowExport}
                                           bulkExportWorkflows={this.bulkExportWorkflows}
                                           user={this.state.user}/>
+                    </div>
+                    <div style={{ zIndex: 29999999, position: "absolute", inset: "auto 125px 32px auto" }}>
+                        <BounceLoader loading={this.state.isSaving} color="rgba(44,64,90,0.8)" css={loaderOverride} size={25}/>
                     </div>
                 </Grid>
 
@@ -309,17 +319,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
         let definition = parseDefinition(submittedDefinition, this.state.user);
-        this.setDefinition(definition);
-
-        if (this.state.definitionChanged) {
-            return Promise.resolve();
-        }
-
-        this.setState({ isSaving: true, definitionChanged: true });
-
-        if (ENV === "development") {
-            console.log("definition has been changed", definition);
-        }
 
         let currentDefinition = this.getDefinition();
         if (currentDefinition && typeof currentDefinition?._id === "string") {
@@ -340,17 +339,20 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition.hash = currentDefinition.hash;
         }
 
-        if (typeof definition.clusters === "undefined" || metaFieldsHasChanged(definition, currentDefinition)) {
-            await sleep(5000);
+        this.setDefinition(definition);
+        this.setState({ isSaving: true, definitionChanged: true });
+
+        if (this.state.definitionChanged) {
+            return Promise.resolve();
         }
 
-        await sleep(5000);
+        if (ENV === "development") {
+            console.log("definition has been changed", definition);
+        }
 
         if (typeof this.timer === "undefined") {
             this.startTimer();
         }
-
-        this.setState({ isSaving: false });
 
         return Promise.resolve();
     }
