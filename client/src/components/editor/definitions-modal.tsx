@@ -30,7 +30,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     render()
     {
-        const {currentOpenedDefinition, createNewWorkflow, openWorkflow, deleteWorkflow, bulkDeleteWorkflows, bulkExportWorkflows, allowExport, user, ...rest} = this.props;
+        const {currentOpenedDefinition, loadWorkflows, createNewWorkflow, openWorkflow, deleteWorkflow, bulkDeleteWorkflows, bulkExportWorkflows, allowExport, user, ...rest} = this.props;
 
         return (
             <Modal
@@ -75,36 +75,15 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
     {
         this.setState({ isLoading: true });
 
-        let endpoint = `${PUBLIC_URL}/api/definitions`;
-    
-        if (typeof this.props.user?.tenantId === "string" && typeof this.props.user?.Id === "string") {
-            endpoint = endpoint.concat(`/${this.props.user?.tenantId}/${this.props.user?.Id}`);
-        }
-console.log(endpoint);
-        API.get(endpoint)
-            .then(response => {
-                if (! response.data.definitions) {
+        this.props.loadWorkflows()
+            .then(definitions => {
+                if (typeof definitions !== "undefined") {
                     this.setState({ definitions: [], isLoading: false });
                 }
 
-                let definitions = response.data.definitions;
-
-                // Filter forms and ignore current opened
-                // if (typeof this.props.currentOpenedDefinition === "string") {
-                //     definitions = Object.values(definitions).filter((value) => {
-                //         let definition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(value)));
-
-                //         return definition._id !== this.props.currentOpenedDefinition;
-                //     });
-                // }
-
                 this.setState({ definitions, isLoading: false });
             })
-            .catch(error => {
-                console.log(error);
-
-                this.setState({ isLoading: false  });
-            });
+            .catch(error => this.setState({ isLoading: false  }));
     }
 
     private renderDefinitionsTable()

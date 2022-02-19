@@ -109,7 +109,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           bulkDeleteWorkflows={this.bulkDeleteWorkflows}
                                           allowExport={this.props.allowExport}
                                           bulkExportWorkflows={this.bulkExportWorkflows}
-                                          user={this.state.user}/>
+                                          loadWorkflows={() => this.loadWorkflows()}/>
                     </div>
                     {
                         ! this.props.manualSaving
@@ -366,7 +366,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (this.props.manualSaving === true) {
             this.setState({ isSaving: true });
-            
+
             saveDefinition(definition)
                 .then(definition => this.onSuccessfulSaving(definition))
                 .catch(error => this.onFailedSaving(error, definition));
@@ -544,6 +544,30 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         loadDefinitionById(definitionId)
             .then(definition => {
                 this.initBuilder(definition);
+            });
+    }
+
+    private loadWorkflows(): Promise<IDefinition[] | undefined>
+    {
+        let endpoint = `${PUBLIC_URL}/api/definitions`;
+        if (typeof this.props.user?.tenantId === "string" && typeof this.props.user?.Id === "string") {
+            endpoint = endpoint.concat(`/${this.props.user?.tenantId}/${this.props.user?.Id}`);
+        }
+console.log(endpoint);
+        return API.get(endpoint)
+            .then(response => {
+                if (! response.data.definitions) {
+                    return undefined;
+                }
+
+                return response.data.definitions;
+            })
+            .catch(error => {
+                if (ENV === "development") {
+                    console.log(error);
+                }
+
+                return [undefined];
             });
     }
 }
