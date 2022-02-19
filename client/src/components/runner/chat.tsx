@@ -162,7 +162,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return;
         }
 
-        API.get(`${PUBLIC_URL}/api/definitions/${definitionId}`)
+        API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
             .then(response => {
                 if (! response.data.definition) {
                     this.setState({ isLoading: false, isFailed: true });

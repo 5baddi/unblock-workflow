@@ -84,7 +84,7 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
         return Promise.resolve(undefined);
     }
 
-    return API.get(`${PUBLIC_URL}/api/definitions/${definitionId}`)
+    return API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
         .then(response => {
             if (! response.data.definition) {
                 return Promise.resolve(undefined);

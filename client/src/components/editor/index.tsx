@@ -498,7 +498,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.setState({ isLoading: true });
 
-        return API.delete(`${PUBLIC_URL}/api/definitions/${definitionId || oldDefinitionId}`)
+        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}`)
             .then(response => {
                 if (! response.data.success) {
                     return false;
