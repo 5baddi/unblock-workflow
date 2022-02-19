@@ -35,7 +35,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     render()
     {
-        const {currentOpenedDefinition, createNewWorkflow, openWorkflow, deleteWorkflow, bulkDeleteWorkflows, bulkExportWorkflows, allowExport, ...rest} = this.props;
+        const {currentOpenedDefinition, createNewWorkflow, openWorkflow, deleteWorkflow, bulkDeleteWorkflows, bulkExportWorkflows, allowExport, user, ...rest} = this.props;
 
         return (
             <Modal
@@ -79,8 +79,12 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
     private loadDefinitions()
     {
         this.setState({ isLoading: true });
+        let endpoint = `${PUBLIC_URL}/api/definitions`;
+        if (this.props.user?.tenantId && this.props.user?.Id) {
+            endpoint = endpoint.concat(`/${this.props.user?.tenantId}/${this.props.user?.Id}`);
+        }
 
-        API.get(`${PUBLIC_URL}/api/definitions`)
+        API.get(endpoint)
             .then(response => {
                 if (! response.data.definitions) {
                     this.setState({ definitions: [], isLoading: false });

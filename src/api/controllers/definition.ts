@@ -12,12 +12,21 @@ function checkDefinitionVersion(definition: IDefinition): boolean
 
 function index(request, response) 
 {
+    let tenantId = request.params.tenantId;
+    let userId = request.params.userId;
+    let filter = JSON.parse(JSON.stringify({ deleted_at: { $exists: false } }));
+
+    if (tenantId && userId) {
+        filter.tenantId = tenantId;
+        filter.userId = tenantId;
+    }
+
     return connect()
         .then(client => {
             let db = client.db();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .find({ deleted_at: { $exists: false } })
+                .find(filter)
                 .sort("created_at", "desc")
                 .toArray()
                 .then(items => {

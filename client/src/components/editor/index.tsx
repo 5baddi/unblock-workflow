@@ -101,7 +101,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           openWorkflow={this.openWorkflow}
                                           bulkDeleteWorkflows={this.bulkDeleteWorkflows}
                                           allowExport={this.props.allowExport}
-                                          bulkExportWorkflows={this.bulkExportWorkflows}/>
+                                          bulkExportWorkflows={this.bulkExportWorkflows}
+                                          user={this.state.user}/>
                     </div>
                 </Grid>
 

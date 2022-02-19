@@ -12,6 +12,7 @@ import { css } from "@emotion/react";
 import PulseLoader from "react-spinners/PulseLoader";
 
 import "./style.scss";
+import { ENV } from '../../settings';
 
 const override = css`
   display: block;
@@ -146,7 +147,13 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
                 return Promise.resolve(response.data.success);
             })
-            .catch(error => Promise.reject(error));
+            .catch(error => {
+                if (ENV === "development") {
+                    console.log(error);
+                }
+
+                this.setState({ isLoading: false, isFailed: true });
+            });
     }
 
     private loadDefinitionById(definitionId?: string): void
@@ -158,6 +165,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         API.get(`${PUBLIC_URL}/api/definitions/${definitionId}`)
             .then(response => {
                 if (! response.data.definition) {
+                    this.setState({ isLoading: false, isFailed: true });
+
                     return;
                 }
 
@@ -166,7 +175,11 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                 this.setState({ definition, isLoading: false });
             })
             .catch(error => {
-                console.log(error);
+                if (ENV === "development") {
+                    console.log(error);
+                }
+
+                this.setState({ isLoading: false, isFailed: true });
             });
     }
 }
