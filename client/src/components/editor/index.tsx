@@ -210,6 +210,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     startTimer()
     {
+        if (this.props.manualSaving === true) {
+            return;
+        }
+
         this.timer = setInterval(() => {
             this.setState({ isSaving: true });
 
@@ -358,6 +362,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (typeof this.timer === "undefined") {
             this.startTimer();
+        }
+
+        if (this.props.manualSaving === true) {
+            this.setState({ isSaving: true });
+            
+            saveDefinition(definition)
+                .then(definition => this.onSuccessfulSaving(definition))
+                .catch(error => this.onFailedSaving(error, definition));
         }
 
         return Promise.resolve();
