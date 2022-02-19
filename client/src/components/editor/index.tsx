@@ -111,9 +111,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                           bulkExportWorkflows={this.bulkExportWorkflows}
                                           user={this.state.user}/>
                     </div>
-                    <div style={{ zIndex: 29999999, position: "absolute", inset: "auto 125px 32px auto" }}>
-                        <BounceLoader loading={this.state.isSaving} color="rgba(44,64,90,0.8)" css={loaderOverride} size={25}/>
-                    </div>
+                    {
+                        ! this.props.manualSaving
+                        ? (
+                            <div style={{ zIndex: 29999999, position: "absolute", inset: "auto 125px 32px auto" }}>
+                                <BounceLoader loading={this.state.isSaving} color="rgba(44,64,90,0.8)" css={loaderOverride} size={25}/>
+                            </div>
+                        )
+                        : (undefined)
+                    }
                 </Grid>
 
             </Grid>
