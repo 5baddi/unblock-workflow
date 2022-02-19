@@ -21,14 +21,9 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         }
     }
 
-    componentDidMount()
-    {
-        this.loadDefinitions();
-    }
-
     componentDidUpdate(prevProps, prevState)
     {
-        if (prevProps.show !== this.props.show) {
+        if (prevProps.show !== this.props.show && this.props.show === true) {
             this.loadDefinitions();
         }
     }
