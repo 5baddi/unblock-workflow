@@ -16,9 +16,12 @@ function index(request, response)
     let userId = request.params.userId;
     let filter = JSON.parse(JSON.stringify({ deleted_at: { $exists: false } }));
 
-    if (tenantId && userId) {
+    if (typeof tenantId === "string") {
         filter.tenant_id = tenantId;
-        filter.user_id = tenantId;
+    }
+    
+    if (typeof userId === "string") {
+        filter.user_id = userId;
     }
 
     return connect()
@@ -30,7 +33,6 @@ function index(request, response)
                 .sort("created_at", "desc")
                 .toArray()
                 .then(items => {
-
                     client.close();
 
                     return response.send({ success: true, definitions: items });
