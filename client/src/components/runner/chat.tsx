@@ -133,7 +133,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
-        this.setState({ isLoading: true, isFailed: false });
+        this.setState({ isLoading: false, isFailed: false });
 
         return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
             .then(response => {
