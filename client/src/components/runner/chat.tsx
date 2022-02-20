@@ -10,9 +10,9 @@ import { PUBLIC_URL } from "../../../../src/settings";
 import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
 import { css } from "@emotion/react";
 import PulseLoader from "react-spinners/PulseLoader";
+import { ENV } from "../../settings";
 
 import "./style.scss";
-import { ENV } from '../../settings';
 
 const override = css`
   display: block;
@@ -55,7 +55,6 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                         ? <TripettoChatRunner
                             display="inline"
                             definition={this.state.definition}
-                            onChange={this.onChange}
                             onSubmit={this.onSubmit}
                             styles={this.style}
                         />
@@ -121,11 +120,6 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         this.saveResult(exportables);
     }
 
-    private onChange(instance: Instance): void
-    {
-
-    }
-
     private async saveResult(exportables?: Export.IExportables): Promise<boolean>
     {
         let definitionId = this.state.definition?._id;
@@ -133,18 +127,15 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
-        // if you set `isLoading` to true then false, <TripettoChatRunner> component will be rendered thus the workflow will be repeated
-        this.setState({ isLoading: false, isFailed: false });
+        this.setState({ isFailed: false });
 
         return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
             .then(response => {
                 if (! response.data.success) {
-                    this.setState({ isLoading: false, isFailed: true });
+                    this.setState({ isFailed: true });
 
                     return Promise.resolve(response.data.success);
                 }
-
-                this.setState({ isLoading: false });
 
                 return Promise.resolve(response.data.success);
             })
@@ -153,7 +144,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                     console.log(error);
                 }
 
-                this.setState({ isLoading: false, isFailed: true });
+                this.setState({ isFailed: true });
             });
     }
 
