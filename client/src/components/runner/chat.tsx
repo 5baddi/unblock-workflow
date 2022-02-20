@@ -133,6 +133,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
+        // if you set `isLoading` to true then false, <TripettoChatRunner> component will be rendered thus the workflow will be repeated
         this.setState({ isLoading: false, isFailed: false });
 
         return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
