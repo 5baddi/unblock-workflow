@@ -359,7 +359,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
             return Promise.resolve();
         }
-
+        
+        this.mutateDefinition.cancel();
         this.mutateDefinition.invoke(definition);
 
         return Promise.resolve();
