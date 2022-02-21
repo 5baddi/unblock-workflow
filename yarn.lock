@@ -4561,6 +4561,11 @@ tree-kill@^1.2.2:
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
 
+tripetto-runner-foundation@^6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/tripetto-runner-foundation/-/tripetto-runner-foundation-6.3.0.tgz#d484e730392f70a4902aa686928d8944e966f969"
+  integrity sha512-J6kh1lwyHMwR4P9y2hPbqEFOiK/jvF9Zjq7o4SuTMG2YpWtbsJIBojPwcMkqZnqfxmO5mVs1VtXjplYPinsrHA==
+
 tripetto@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/tripetto/-/tripetto-4.4.2.tgz#f6a89c2c1bc35ac6b97dd78b47ba1a4bd449c920"

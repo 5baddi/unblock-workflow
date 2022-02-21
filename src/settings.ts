@@ -21,6 +21,7 @@ if (! MYSQL_USER || ! MYSQL_PASSWORD || ! MYSQL_DB) {
 export const DEFINITION_KEY = "definition";
 export const DEFINITION_COLLECTION_NAME = "definitions";
 export const SNAPSHOT_COLLECTION_NAME = "snapshots";
+export const RESPONSE_COLLECTION_NAME = "responses";
 export const TASK_COLLECTION_NAME = "tasks";
 export const USER_COLLECTION_NAME = "users";
 

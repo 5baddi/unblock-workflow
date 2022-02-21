@@ -23,8 +23,11 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
         definition.hash = currentDefinition.hash;
     }
 
-    if (user && typeof user.id === "string" && typeof user.tenantId === "string") {
+    if (user && typeof user.id === "string") {
         definition.user_id = user.id;
+    }
+    
+    if (user && typeof user.tenantId === "string") {
         definition.tenant_id = user.tenantId;
     }
 

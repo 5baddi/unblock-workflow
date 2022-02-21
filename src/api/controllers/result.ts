@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME } from '../../settings';
+import { DEFINITION_COLLECTION_NAME, RESPONSE_COLLECTION_NAME } from '../../settings';
 import { connect } from "../../services/mongodb";
 import { v4 as uuidv4 } from 'uuid';
+import { IResponse, IDefinition } from '../../interfaces/definition';
 
 function save(request, response)
 {
@@ -18,6 +19,7 @@ function save(request, response)
     return connect()
         .then(client => {
                 let db = client.db();
+                let ip = request.headers['x-forwarded-for'] || null;
                 
                 db.collection(DEFINITION_COLLECTION_NAME)
                     .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
@@ -30,6 +32,18 @@ function save(request, response)
                                 message: "Definition not found!",
                             });
                         }
+
+                        let definition: IDefinition = Object.assign({} as IDefinition, result);
+
+                        let _response: IResponse = Object.assign({} as IResponse, fields);
+                        _response.definition_id = <string> definition._id;
+                        _response.tenant_id = definition.tenant_id;
+                        _response.tenants_ids = definition.tenants_ids;
+
+                        // TODO: move ip and analytics data to audits collection
+                        _response.ip = ip;
+
+                        db.collection(RESPONSE_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(_response)));
 
                         client.close();
 
