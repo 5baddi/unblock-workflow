@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Button, Modal } from "react-bootstrap";
-import { IDefinition, IEditorDefinitionsModalProps, IEditorDefinitionsModalState } from "../../interfaces";
-import API from "../../api";
+import { IEditorDefinitionsModalProps, IEditorDefinitionsModalState } from "../../interfaces";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen, faTrash, faPlayCircle, faTrashAlt, faUpload } from '@fortawesome/free-solid-svg-icons';
