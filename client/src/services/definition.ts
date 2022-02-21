@@ -99,7 +99,7 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
                 return definition;
             }
 
-            return API.get(`${PUBLIC_URL}/api/definition/${definition._id}/hash`)
+            return API.put(`${PUBLIC_URL}/api/definition/${definition._id}/hash`)
                 .then(response => {
                     if (! response.data.hash) {
                         return undefined;
