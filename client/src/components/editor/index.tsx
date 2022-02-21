@@ -12,7 +12,6 @@ import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
-import { Modal } from "../modal";
 
 import "./blocks";
 
@@ -51,7 +50,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return (
             <Grid container>
                 <Loader isLoading={this.state.isLoading}/>
-                <Modal show={this.state.showModal} onHide={() => this.toggleModal()}/>
                 <Grid item md={12} id={this.props.element}>
                     <div className="editor-menu">
                         <button onClick={() => this.showDefinitionsModal()} title="Home page">
@@ -100,19 +98,18 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         <button onClick={() => this.openTutorial()} title="Open tutorial">
                             <FontAwesomeIcon icon={faQuestion}/>
                         </button>
-                        <DefinitionsModal currentOpenedDefinition={this.state.definition?._id}
-                                          show={this.state.showModal} 
-                                          onHide={() => this.toggleModal()}
-                                          createNewWorkflow={() => this.createNewWorkflow()}
-                                          deleteWorkflow={this.deleteWorkflow}
-                                          openWorkflow={this.openWorkflow}
-                                          bulkDeleteWorkflows={this.bulkDeleteWorkflows}
-                                          allowExport={this.props.allowExport}
-                                          bulkExportWorkflows={this.bulkExportWorkflows}
-                                          loadWorkflows={() => this.loadWorkflows()}/>
                     </div>
+                    <DefinitionsModal currentOpenedDefinition={this.state.definition?._id}
+                        show={this.state.showModal} 
+                        onHide={() => this.toggleModal()}
+                        createNewWorkflow={() => this.createNewWorkflow()}
+                        deleteWorkflow={this.deleteWorkflow}
+                        openWorkflow={this.openWorkflow}
+                        bulkDeleteWorkflows={this.bulkDeleteWorkflows}
+                        allowExport={this.props.allowExport}
+                        bulkExportWorkflows={this.bulkExportWorkflows}
+                        loadWorkflows={() => this.loadWorkflows()}/>
                 </Grid>
-
             </Grid>
         );
     }

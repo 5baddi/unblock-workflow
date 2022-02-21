@@ -79,10 +79,3 @@ export interface IEditorDefinitionsModalState extends ModalProps
     isLoading: boolean;
     selectionModel: string[];
 }
-
-export interface IModalProps extends ModalProps
-{
-    title?: string;
-
-    onHide(): void;
-}
