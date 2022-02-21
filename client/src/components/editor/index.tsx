@@ -10,9 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
-import { parseDefinition, saveDefinition, loadDefinitionById, metaFieldsHasChanged, exportDefinitionAsJsonFile } from "../../services/definition";
+import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
-import { sleep } from "../../helpers";
 import { Modal } from "../modal";
 import BounceLoader from "react-spinners/BounceLoader";
 import { css } from "@emotion/react";
@@ -327,6 +326,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
+        if (ENV === "development") {
+            console.log("definition has been changed", submittedDefinition);
+        }
+
         this.setState({ isSaving: true });
 
         let currentDefinition = this.getDefinition();
@@ -346,16 +349,22 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             }
         }
 
-        if (ENV === "development") {
-            console.log("definition has been changed", definition);
-        }
-
         if (this.props.manualSaving === true) {
             this.setState({ isSaving: true });
 
             saveDefinition(definition)
                 .then(definition => this.onSuccessfulSaving(definition))
                 .catch(error => this.onFailedSaving(error, definition));
+
+            return Promise.resolve();
+        }
+
+        if (typeof definition.clusters === "undefined") {
+            return Promise.resolve();
+        }
+
+        if (typeof this.timer === "undefined") {
+            this.startTimer();
         }
 
         return Promise.resolve();
