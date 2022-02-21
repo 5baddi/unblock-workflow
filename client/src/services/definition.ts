@@ -87,12 +87,12 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
     return API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
         .then(response => {
             if (! response.data.definition) {
-                return Promise.resolve(undefined);
+                return undefined;
             }
 
             let definition: IDefinition = parseDefinition(response.data.definition);
 
-            return Promise.resolve(definition);
+            return definition;
         })
         .then(definition => {
             if (! definition || typeof definition._id === "undefined") {
@@ -102,12 +102,12 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
             return API.get(`${PUBLIC_URL}/api/definition/${definition._id}/hash`)
                 .then(response => {
                     if (! response.data.hash) {
-                        return Promise.resolve(undefined);
+                        return undefined;
                     }
         
                     definition.hash = response.data.hash;
         
-                    return Promise.resolve(definition);
+                    return definition;
                 });
         })
         .catch(error => {
@@ -115,7 +115,7 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
                 console.log(error);
             }
 
-            return Promise.reject(error);
+            return error;
         });
 }
 
