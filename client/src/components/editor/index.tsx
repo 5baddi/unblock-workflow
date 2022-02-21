@@ -13,18 +13,12 @@ import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
 import { Modal } from "../modal";
-import { css } from "@emotion/react";
 
 import "./blocks";
 
 import "./style.scss";
 
 const DEFAULT_NAME = "Unnamed";
-
-const loaderOverride = css`
-  display: block;
-  margin: 0 auto;
-`;
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {

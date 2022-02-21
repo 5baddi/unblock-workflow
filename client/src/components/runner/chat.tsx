@@ -1,24 +1,17 @@
 import * as React from "react";
 import { Navigate } from "react-router-dom";
 import { IRunnerProps } from "../../interfaces";
-import { ChatRunner as TripettoChatRunner } from "tripetto-runner-chat";
+import { run } from "tripetto-runner-chat";
 import { Export } from "tripetto-runner-foundation";
 import { IDefinition } from "../../interfaces";
 import { Instance } from "tripetto-collector";
 import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
 import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
-import { css } from "@emotion/react";
-import PulseLoader from "react-spinners/PulseLoader";
+import Loader from "../loader";
 import { ENV } from "../../settings";
 
 import "./style.scss";
-
-const override = css`
-  display: block;
-  margin: 0 auto;
-  text-align: center;
-`;
 
 export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean }>
 {
@@ -36,9 +29,6 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             isLoading: true,
             isFailed: false,
         };
-
-        this.applyStyle();
-        this.loadDefinitionById(this.props.definitionId);
     }
 
     render()
@@ -49,23 +39,25 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         return (
             <div style={{ width: "100%" }}>
-                <PulseLoader color="#4B5565" css={override} size={15} margin={2} loading={this.state.isLoading}/>
-                {
-                    this.state.isLoading
-                    ? undefined
-                    : (
-                        this.state.definition
-                            ? <TripettoChatRunner
-                                display="inline"
-                                definition={this.state.definition}
-                                onSubmit={this.onSubmit}
-                                styles={this.style}
-                            />
-                            : <Navigate to="/404"/>
-                    )
-                }
+                <Loader isLoading={this.state.isLoading} mode="inline"/>
+                <div id="chat-runner" style={ { display: this.state.isLoading ? "none" : "" } }></div>
             </div>
         );
+    }
+
+    componentDidMount()
+    {
+        this.applyStyle();
+        this.loadDefinitionById(this.props.definitionId)
+            .then(() => {
+                run({
+                    element: document.getElementById("chat-runner"),
+                    styles: this.style,
+                    display: "inline",
+                    definition: this.state.definition,
+                    onSubmit: this.onSubmit,
+                });
+            });
     }
 
     private applyStyle(): void
@@ -126,6 +118,12 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         let exportables = Export.exportables(instance);
 
+        if (ENV === "development") {
+            console.log(exportables);
+
+            return;
+        }
+
         this.saveResult(exportables);
     }
 
@@ -136,7 +134,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
-        this.setState({ isFailed: false, isLoading: false });
+        this.setState({ isFailed: false, isLoading: true });
 
         return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
             .then(response => {
@@ -159,13 +157,13 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             });
     }
 
-    private loadDefinitionById(definitionId?: string): void
+    private loadDefinitionById(definitionId?: string): Promise<void>
     {
         if (! definitionId) {
-            return;
+            return Promise.resolve();
         }
 
-        API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
+        return API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
             .then(response => {
                 if (! response.data.definition) {
                     this.setState({ isLoading: false, isFailed: true });
@@ -176,6 +174,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                 let definition = Object.assign({} as IDefinition, response.data.definition);
 
                 this.setState({ definition, isLoading: false });
+
+                return;
             })
             .catch(error => {
                 if (ENV === "development") {
@@ -183,6 +183,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                 }
 
                 this.setState({ isLoading: false, isFailed: true });
+
+                return error;
             });
     }
 }
