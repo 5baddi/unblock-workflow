@@ -123,7 +123,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
             return;
         }
-
+console.log(exportables.fields);
         this.saveResult(exportables);
     }
 
