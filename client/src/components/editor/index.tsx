@@ -369,7 +369,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         saveDefinition(definition)
             .then(definition => this.onSuccessfulSaving(definition))
             .catch(error => this.onFailedSaving(error, definition));
-    }, 300);
+    }, 500);
 
     private onSuccessfulSaving(definition?: IDefinition): void
     {
