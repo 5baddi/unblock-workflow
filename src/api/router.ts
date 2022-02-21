@@ -1,10 +1,11 @@
-import { index, find, save, remove, bulkRemove, bulkExport } from './controllers/definition';
+import { index, find, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
 import { save as saveResult } from './controllers/result';
 
 const express = require("express");
 const router = express.Router();
 
 router.get("/definition/:id", find);
+router.get("/definition/hash/:id", hash);
 router.get("/definitions/:tenantId?/:userId?", index);
 router.post("/definitions", save);
 router.post("/definitions/export", bulkExport);

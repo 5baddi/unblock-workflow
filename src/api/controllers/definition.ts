@@ -71,7 +71,7 @@ function find(request, response)
 
                         return response.status(401).send({
                             success: false,
-                            message: "failed to update definition name",
+                            message: "failed to find definition",
                         });
                     }
 
@@ -86,7 +86,7 @@ function find(request, response)
 
                     return response.status(500).send({
                         success: false,
-                        message: error.message || "failed to update definition name",
+                        message: error.message || "failed to find definition",
                     });
                 });
         });
@@ -177,7 +177,6 @@ function save(request, response)
             }
 
             definition.ip = ip;
-            definition.hash = generateHash();
 
             if (typeof definition.user_id === "undefined") {
                 definition.user_id = ROOT_USER_ID;
@@ -236,6 +235,49 @@ function save(request, response)
                 success: false,
                 message: error.message || "failed to save definition",
             });
+        });
+}
+
+function hash(request, response)
+{
+    let id = request.params.id;
+    if (! id) {
+        response.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+            let hash = generateHash();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOneAndUpdate({ _id: new ObjectId(id), deleted_at: { $exists: false } }, { $set: { hash } })
+                .then(result => {
+                    if (! result.ok) {
+                        client.close();
+
+                        return response.status(401).send({
+                            success: false,
+                            message: "failed to find definition",
+                        });
+                    }
+
+                    client.close();
+
+                    return response.send({ success: true, hash });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return response.status(500).send({
+                        success: false,
+                        message: error.message || "failed to update definition hash",
+                    });
+                });
         });
 }
 
@@ -373,6 +415,7 @@ export {
     index,
     find,
     save,
+    hash,
     remove,
     bulkRemove,
     bulkExport
