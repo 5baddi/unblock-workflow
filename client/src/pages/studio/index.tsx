@@ -15,7 +15,7 @@ export default function Studio ()
             <Editor element={ EDITOR_CONTAINER_ID } 
                 definitionId={id}
                 glue={glue}
-                manualSaving={false}/>
+                manualSaving={true}/>
         </Grid>
     );
 };
