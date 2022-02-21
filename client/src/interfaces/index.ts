@@ -30,7 +30,6 @@ export interface IEditorState
     definition?: IDefinition;
     isLoading: boolean;
     isSaving: boolean;
-    definitionChanged: boolean;
     showModal: boolean;
     glueWorkspace?: any;
     glueContext?: any;

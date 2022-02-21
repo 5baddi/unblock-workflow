@@ -40,7 +40,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition: { name: DEFAULT_NAME } as IDefinition,
             isLoading: true,
             isSaving: false,
-            definitionChanged: false,
             showModal: false,
             glueWorkspace: undefined,
             glueContext: undefined,
@@ -328,8 +327,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
+        this.setState({ isSaving: true });
+
         let currentDefinition = this.getDefinition();
         let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
+
+        this.setDefinition(definition);
 
         if (definition && typeof definition?._id === "string") {
             if (this.state.glueWorkspace && this.state.glueContext) {
@@ -343,19 +346,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             }
         }
 
-        this.setDefinition(definition);
-        this.setState({ isSaving: true, definitionChanged: true });
-
-        if (this.state.definitionChanged) {
-            return Promise.resolve();
-        }
-
         if (ENV === "development") {
             console.log("definition has been changed", definition);
-        }
-
-        if (typeof this.timer === "undefined") {
-            this.startTimer();
         }
 
         if (this.props.manualSaving === true) {
@@ -372,7 +364,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private onSuccessfulSaving(definition?: IDefinition): void
     {
         this.setDefinition(definition);
-        this.setState({ isSaving: false, definitionChanged: false });
+        this.setState({ isSaving: false });
 
         if (typeof this.timer !== "undefined") {
             this.clearTimer();
@@ -386,7 +378,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         this.setDefinition(definition);
-        this.setState({ isSaving: false, definitionChanged: false });
+        this.setState({ isSaving: false });
         window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
 
         if (typeof error.response !== "undefined" && error.response.status === 409) {
