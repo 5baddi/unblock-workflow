@@ -498,9 +498,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
                 if (oldDefinitionId && oldDefinitionId === definitionId) {
                     this.toggleModal();
-                }
-
-                if (oldDefinitionId && ! definitionId) {
                     this.initBuilder();
                 }
 
