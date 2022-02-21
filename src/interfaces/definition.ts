@@ -32,6 +32,7 @@ export interface ISnapshot extends IDefinition
 export interface IResponse
 {
     definition_id: string;
+    tenant_id?: string;
     tenants_ids?: Array<string>;
     key: string;
     name: string;
