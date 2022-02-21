@@ -123,7 +123,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
             return;
         }
-console.log(exportables.fields);
+
         this.saveResult(exportables);
     }
 
@@ -131,6 +131,10 @@ console.log(exportables.fields);
     {
         let definitionId = this.state.definition?._id;
         if (! exportables || ! definitionId) {
+            return Promise.resolve(false);
+        }
+
+        if (! exportables.fields || exportables.fields.length === 0) {
             return Promise.resolve(false);
         }
 
