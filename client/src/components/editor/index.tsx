@@ -511,6 +511,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     this.initBuilder();
                 }
 
+                if (! definitionId && oldDefinitionId) {
+                    this.initBuilder();
+                }
+
                 this.setState({ isLoading: false });
 
                 return true;
