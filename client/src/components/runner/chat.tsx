@@ -17,6 +17,7 @@ import "./style.scss";
 const override = css`
   display: block;
   margin: 0 auto;
+  text-align: center;
 `;
 
 export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean }>
@@ -47,18 +48,23 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         }
 
         return (
-            this.state.isLoading
-                ? <PulseLoader color="#4B5565" css={override} size={15} margin={2}/>
-                : (
-                    this.state.definition
-                        ? <TripettoChatRunner
-                            display="inline"
-                            definition={this.state.definition}
-                            onSubmit={this.onSubmit}
-                            styles={this.style}
-                        />
-                        : <Navigate to="/404"/>
-                )
+            <div style={{ width: "100%" }}>
+                <PulseLoader color="#4B5565" css={override} size={15} margin={2} loading={this.state.isLoading}/>
+                {
+                    this.state.isLoading
+                    ? undefined
+                    : (
+                        this.state.definition
+                            ? <TripettoChatRunner
+                                display="inline"
+                                definition={this.state.definition}
+                                onSubmit={this.onSubmit}
+                                styles={this.style}
+                            />
+                            : <Navigate to="/404"/>
+                    )
+                }
+            </div>
         );
     }
 
@@ -114,6 +120,10 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
     private onSubmit(instance: Instance): void
     {
+        if (this.props.previewMode === true) {
+            return;
+        }
+
         let exportables = Export.exportables(instance);
 
         this.saveResult(exportables);
@@ -126,15 +136,17 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
-        this.setState({ isFailed: false });
+        this.setState({ isFailed: false, isLoading: true });
 
         return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
             .then(response => {
                 if (! response.data.success) {
-                    this.setState({ isFailed: true });
+                    this.setState({ isFailed: true, isLoading: false });
 
                     return Promise.resolve(response.data.success);
                 }
+
+                this.setState({ isLoading: false });
 
                 return Promise.resolve(response.data.success);
             })
@@ -143,7 +155,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                     console.log(error);
                 }
 
-                this.setState({ isFailed: true });
+                this.setState({ isFailed: true, isLoading: false });
             });
     }
 

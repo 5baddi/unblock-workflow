@@ -7,7 +7,7 @@ import { ENV, PUBLIC_URL } from "../../settings";
 import { DEFINITION_KEY } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner, faEye } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
@@ -81,6 +81,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                                 </button>
                             )
                             : (undefined)
+                        }
+                        {
+                            this.state.definition && this.state.definition._id
+                            ? (
+                                <button onClick={() => this.preview()} title="Preview workflow">
+                                    <FontAwesomeIcon icon={faEye}/>
+                                </button>
+                            )
+                            : undefined
                         }
                         {
                             this.state.definition && this.state.definition._id
@@ -465,6 +474,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             });
     }
 
+    private preview()
+    {
+        if (! this.state.definition || ! this.state.definition._id) {
+            return;
+        }
+
+        window.open(`${PUBLIC_URL}/preview/${this.state.definition._id}`, "_blank")?.focus();
+    }
+    
     private run()
     {
         if (! this.state.definition || ! this.state.definition._id) {

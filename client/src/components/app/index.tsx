@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline, withStyles } from "@material-ui/core";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
+import ChatPreview from "../../pages/preview";
 import { BASE_NAME } from "../../settings";
 import GlueWeb from '@glue42/web';
 import GlueWorkspaces from "@glue42/workspaces-api";
@@ -36,6 +37,7 @@ const App = ({ classes }) => {
                     <BrowserRouter basename={ BASE_NAME }>
                         <Routes>
                             <Route path="/run/:id" element={<ChatRunner />} />
+                            <Route path="/preview/:id" element={<ChatPreview />} />
                             <Route path="/:id" element={<Studio />}/>
                             <Route path="/" element={<Studio />}/>
                         </Routes>
@@ -51,6 +53,7 @@ const App = ({ classes }) => {
                 <BrowserRouter basename={ BASE_NAME }>
                     <Routes>
                         <Route path="/run/:id" element={<ChatRunner />} />
+                        <Route path="/preview/:id" element={<ChatPreview />} />
                         <Route path="/:id" element={<Studio />}/>
                         <Route path="/" element={<Studio />}/>
                     </Routes>

@@ -50,6 +50,7 @@ export interface IHeaderState
 export interface IRunnerProps
 {
     definitionId?: string;
+    previewMode?: boolean;
 }
 
 export interface IEditorMenuProps
