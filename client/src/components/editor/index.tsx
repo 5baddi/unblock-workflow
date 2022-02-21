@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Grid } from "@mui/material";
-import { Builder } from "tripetto";
+import { Builder, Debounce } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
@@ -312,6 +312,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     private onClose()
     {
         this.setDefinition();
+        this.mutateDefinition.flush();
     }
 
     private setDefinition(definition?: IDefinition): void
@@ -359,16 +360,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
-        if (typeof definition.clusters === "undefined") {
-            return Promise.resolve();
-        }
-
-        if (typeof this.timer === "undefined") {
-            this.startTimer();
-        }
+        this.mutateDefinition.invoke(definition);
 
         return Promise.resolve();
     }
+
+    mutateDefinition = new Debounce((definition: IDefinition) => {
+        saveDefinition(definition)
+            .then(definition => this.onSuccessfulSaving(definition))
+            .catch(error => this.onFailedSaving(error, definition));
+    }, 300);
 
     private onSuccessfulSaving(definition?: IDefinition): void
     {
