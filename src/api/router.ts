@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/definition/:id", find);
-router.get("/definition/hash/:id", hash);
+router.get("/definition/:id/hash", hash);
 router.get("/definitions/:tenantId?/:userId?", index);
 router.post("/definitions", save);
 router.post("/definitions/export", bulkExport);

@@ -94,6 +94,22 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
 
             return Promise.resolve(definition);
         })
+        .then(definition => {
+            if (! definition || typeof definition._id === "undefined") {
+                return definition;
+            }
+
+            return API.get(`${PUBLIC_URL}/api/definition/${definition._id}/hash`)
+                .then(response => {
+                    if (! response.data.hash) {
+                        return Promise.resolve(undefined);
+                    }
+        
+                    definition.hash = response.data.hash;
+        
+                    return Promise.resolve(definition);
+                });
+        })
         .catch(error => {
             if (ENV === "development") {
                 console.log(error);
