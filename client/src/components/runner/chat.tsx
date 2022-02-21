@@ -110,7 +110,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         } as IChatStyles;
     }
 
-    private onSubmit(instance: Instance): void
+    private onSubmit(instance: Instance, language: string, locale: string, namespace?: string): Promise<string | undefined> | boolean | void
     {
         if (this.props.previewMode === true) {
             return;

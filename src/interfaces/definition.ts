@@ -1,6 +1,5 @@
 import { IDefinition as TripettoIDefinition } from "tripetto";
 import { IBuilderProperties } from "tripetto";
-import { TSerializeTypes, Export } from 'tripetto-runner-foundation';
 import { IEntity } from "./entity";
 
 export interface IDefinition extends TripettoIDefinition, IEntity
@@ -38,11 +37,11 @@ export interface IResponse
     name: string;
     type: string;
     version: string;
-    node: Export.IExportableFieldNode;
+    node: any;
     slot: string;
     datatype: string;
     string: string;
-    value: TSerializeTypes;
+    value: any;
     modified: boolean;
     reference?: string;
     time?: number;

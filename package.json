@@ -32,7 +32,6 @@
     "nodemon": "^2.0.15",
     "reflect-metadata": "^0.1.13",
     "tripetto": "^4.4.2",
-    "tripetto-runner-foundation": "^6.3.0",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
     "uuid": "^8.3.2",
