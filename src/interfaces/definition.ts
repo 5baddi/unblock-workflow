@@ -33,6 +33,14 @@ export interface IResponse
     definition_id: string;
     tenant_id?: string;
     tenants_ids?: Array<string>;
+    fields: IResponseField[]
+
+    // TODO: move it to audit
+    ip?: string;
+}
+
+export interface IResponseField 
+{
     key: string;
     name: string;
     type: string;
@@ -45,7 +53,4 @@ export interface IResponse
     modified: boolean;
     reference?: string;
     time?: number;
-
-    // TODO: move it to audit
-    ip?: string;
 }

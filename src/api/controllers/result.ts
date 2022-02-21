@@ -35,7 +35,7 @@ function save(request, response)
 
                         let definition: IDefinition = Object.assign({} as IDefinition, result);
 
-                        let _response: IResponse = Object.assign({} as IResponse, fields);
+                        let _response: IResponse = Object.assign({} as IResponse, { fields });
                         _response.definition_id = <string> definition._id;
                         _response.tenant_id = definition.tenant_id;
                         _response.tenants_ids = definition.tenants_ids;
@@ -43,51 +43,53 @@ function save(request, response)
                         // TODO: move ip and analytics data to audits collection
                         _response.ip = ip;
 
-                        db.collection(RESPONSE_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(_response)));
+                        return db.collection(RESPONSE_COLLECTION_NAME)
+                            .insertOne(JSON.parse(JSON.stringify(_response)))
+                            .then(insertedResponse => {
+                                client.close();
 
-                        client.close();
+                                let query = "INSERT INTO `results` (`id`, `definition_id`, `key`, `type`, `version`, `data_type`, `name`, `value`, `snapshot`, `updated_at`, `created_at`) VALUES ?";
+                                let key = uuidv4();
 
-                        let query = "INSERT INTO `results` (`id`, `definition_id`, `key`, `type`, `version`, `data_type`, `name`, `value`, `snapshot`, `updated_at`, `created_at`) VALUES ?";
-                        let key = uuidv4();
+                                let rows = Object.values(fields).map((field) => {
+                                    let data = JSON.parse(JSON.stringify(field));
+                                    let type = data.type.replace("tripetto-block-", "");
 
-                        let rows = Object.values(fields).map((field) => {
-                            let data = JSON.parse(JSON.stringify(field));
-                            let type = data.type.replace("tripetto-block-", "");
-
-                            return [
-                                uuidv4(), 
-                                id,
-                                key,
-                                type,
-                                data.version,
-                                data.datatype,
-                                data.name,
-                                data.value,
-                                JSON.stringify(data),
-                                null,
-                                new Date(),
-                            ];
-                        });
-
-                        return request.getConnection((conErr, connection) => {
-                            if (conErr) {
-                                return response.status(500).send({
-                                    success: false,
-                                    message: conErr.message  || "failed to save result.",
+                                    return [
+                                        uuidv4(), 
+                                        id,
+                                        key,
+                                        type,
+                                        data.version,
+                                        data.datatype,
+                                        data.name,
+                                        data.value,
+                                        JSON.stringify(data),
+                                        null,
+                                        new Date(),
+                                    ];
                                 });
-                            }
 
-                            connection.query(query, [rows], (err) => {
-                                if (err) {
-                                    return response.status(500).send({
-                                        success: false,
-                                        message: err.message  || "failed to save result.",
+                                return request.getConnection((conErr, connection) => {
+                                    if (conErr) {
+                                        return response.status(500).send({
+                                            success: false,
+                                            message: conErr.message  || "failed to save result.",
+                                        });
+                                    }
+
+                                    connection.query(query, [rows], (err) => {
+                                        if (err) {
+                                            return response.status(500).send({
+                                                success: false,
+                                                message: err.message  || "failed to save result.",
+                                            });
+                                        }
+
+                                        return response.send({ success: true});
                                     });
-                                }
-
-                                return response.send({ success: true});
+                                });
                             });
-                        });
                     })
                     .catch(error => {
                         client.close();
