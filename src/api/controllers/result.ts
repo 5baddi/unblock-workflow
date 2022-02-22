@@ -19,7 +19,6 @@ function save(request, response)
     return connect()
         .then(client => {
                 let db = client.db();
-                let ip = request.headers['x-forwarded-for'] || null;
                 
                 db.collection(DEFINITION_COLLECTION_NAME)
                     .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
@@ -32,6 +31,14 @@ function save(request, response)
                                 message: "Definition not found!",
                             });
                         }
+
+                        fields = Object.values(fields).map((field) => {
+                            let data = JSON.parse(JSON.stringify(field));
+
+                            data.type = data.type.replace("tripetto-block-", "");
+
+                            return data;
+                        });
 
                         let definition: IDefinition = Object.assign({} as IDefinition, result);
 
@@ -50,13 +57,12 @@ function save(request, response)
 
                                 let rows = Object.values(fields).map((field) => {
                                     let data = JSON.parse(JSON.stringify(field));
-                                    let type = data.type.replace("tripetto-block-", "");
 
                                     return [
                                         uuidv4(), 
                                         id,
                                         key,
-                                        type,
+                                        data.type,
                                         data.version,
                                         data.datatype,
                                         data.name,
