@@ -100,8 +100,6 @@ function save(request, response)
                         _response.created_at = new Date();
 
                         if (RESULT_WEBHOOK) {
-                            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
                             return axios.post(RESULT_WEBHOOK, _response)
                                 .then(webhookResponse => {
                                     return storeResult(db, client, _response, id, fields, request, response);
