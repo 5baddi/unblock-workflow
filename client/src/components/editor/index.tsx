@@ -246,7 +246,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let user = this.state.glueContext?.user;
         this.setState({ isLoading: true, user });
-console.log(user);
+
         let definition = await loadDefinitionById(this.props.definitionId);
 
         if (definition && this.state.glueWorkspace && this.state.glueContext) {

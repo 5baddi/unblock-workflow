@@ -30,6 +30,10 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
     if (user && typeof user.tenantId === "string") {
         definition.tenant_id = user.tenantId;
     }
+    
+    if (user && typeof Array.isArray(user.tenantIds)) {
+        definition.tenants_ids = user.tenantIds;
+    }
 
     return definition;
 }
