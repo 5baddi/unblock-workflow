@@ -33,7 +33,8 @@ export interface IResponse
     definition_id: string;
     tenant_id?: string;
     tenants_ids?: Array<string>;
-    fields: IResponseField[]
+    fields: IResponseField[];
+    created_at?: Date;
 }
 
 export interface IResponseField 
