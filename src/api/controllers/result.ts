@@ -102,11 +102,13 @@ function save(request, response)
 
                         if (RESULT_WEBHOOK) {
                             let httpsAgent = new https.Agent({ rejectUnauthorized: false });
+                            console.log(RESULT_WEBHOOK);
 
                             return axios.post(RESULT_WEBHOOK, { httpsAgent: httpsAgent, data: _response })
                                 .then(webhookResponse => {
                                     return storeResult(db, client, _response, id, fields, request, response);
-                                });
+                                })
+                                .catch(error => console.log(error));
                         }
 
                         return storeResult(db, client, _response, id, fields, request, response);
