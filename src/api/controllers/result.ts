@@ -46,6 +46,7 @@ function save(request, response)
                         _response.definition_id = <string> definition._id;
                         _response.tenant_id = definition.tenant_id;
                         _response.tenants_ids = definition.tenants_ids;
+                        _response.created_at = new Date();
 
                         return db.collection(RESPONSE_COLLECTION_NAME)
                             .insertOne(JSON.parse(JSON.stringify(_response)))
