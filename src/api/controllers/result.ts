@@ -40,9 +40,6 @@ function save(request, response)
                         _response.tenant_id = definition.tenant_id;
                         _response.tenants_ids = definition.tenants_ids;
 
-                        // TODO: move ip and analytics data to audits collection
-                        _response.ip = ip;
-
                         return db.collection(RESPONSE_COLLECTION_NAME)
                             .insertOne(JSON.parse(JSON.stringify(_response)))
                             .then(insertedResponse => {

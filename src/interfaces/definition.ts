@@ -34,9 +34,6 @@ export interface IResponse
     tenant_id?: string;
     tenants_ids?: Array<string>;
     fields: IResponseField[]
-
-    // TODO: move it to audit
-    ip?: string;
 }
 
 export interface IResponseField 
