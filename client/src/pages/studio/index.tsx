@@ -10,6 +10,10 @@ export default function Studio ()
     const { id } = useParams();
     const glue = React.useContext(GlueContext);
 
+    if (! glue) {
+        return (<h1>Not found</h1>);
+    }
+
     return (
         <Grid container>
             <Editor element={ EDITOR_CONTAINER_ID } 
