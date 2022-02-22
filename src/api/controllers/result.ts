@@ -4,6 +4,7 @@ import { connect } from "../../services/mongodb";
 import { v4 as uuidv4 } from 'uuid';
 import { IResponse, IDefinition } from '../../interfaces/definition';
 import axios from "axios";
+import https from "https";
 
 function storeResult(db, client, _response, id, fields, request, response)
 {
@@ -100,9 +101,9 @@ function save(request, response)
                         _response.created_at = new Date();
 
                         if (RESULT_WEBHOOK) {
-                            process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+                            let httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
-                            return axios.post(RESULT_WEBHOOK, _response)
+                            return axios.post(RESULT_WEBHOOK, { httpsAgent: httpsAgent, data: _response })
                                 .then(webhookResponse => {
                                     return storeResult(db, client, _response, id, fields, request, response);
                                 });
