@@ -43,7 +43,7 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
         definition.tenants_ids = user.tenantIds;
     }
 
-    if (currentDefinition && Array.isArray(currentDefinition?.tenants_ids) && Array.isArray(definition.tenants_ids)) {
+    if (currentDefinition && Array.isArray(currentDefinition?.tenants_ids) && ! Array.isArray(definition.tenants_ids)) {
         definition.tenants_ids = currentDefinition.tenants_ids;
     } 
 
