@@ -3,6 +3,7 @@ import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUP
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
+import { loadSubDefinitions } from "../../services/definition";
 import { generateHash } from "../../helpers";
 
 function checkDefinitionVersion(definition: IDefinition): boolean
@@ -80,6 +81,51 @@ function find(request, response)
                     let definition = Object.assign({} as IDefinition, result);
 
                     return response.send({ success: true, definition });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return response.status(500).send({
+                        success: false,
+                        message: error.message || "failed to find definition",
+                    });
+                });
+        });
+}
+
+function findForRunner(request, response) 
+{
+    let id = request.params.id;
+    if (! id) {
+        response.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
+                .then(result => {
+                    if (! result === null) {
+                        client.close();
+
+                        return response.status(401).send({
+                            success: false,
+                            message: "failed to find definition",
+                        });
+                    }
+
+                    client.close();
+
+                    let definition = Object.assign({} as IDefinition, result);
+                    let _definition: IDefinition = loadSubDefinitions(definition);
+
+                    return response.send({ success: true, definition: _definition });
                 })
                 .catch(error => {
                     client.close();
@@ -418,5 +464,6 @@ export {
     hash,
     remove,
     bulkRemove,
-    bulkExport
+    bulkExport,
+    findForRunner
 }

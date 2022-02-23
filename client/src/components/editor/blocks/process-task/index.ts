@@ -1,6 +1,6 @@
 import { NodeBlock, tripetto } from "tripetto";
 
-export const BLOCK_NAME = "process-task";
+const BLOCK_NAME = "process-task";
 const BLOCK_VERSION = "0.0.1";
 
 @tripetto({
