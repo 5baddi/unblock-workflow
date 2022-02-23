@@ -2,20 +2,7 @@ import { IDefinition } from "../interfaces/definition";
 import { connect } from "./mongodb";
 import { DEFINITION_COLLECTION_NAME } from "../settings";
 import { ObjectId } from 'mongodb';
-import { ICluster, INode } from '@tripetto/map';
-
-async function loadClusterNodes(db, node: INode): Promise<ICluster[] | undefined>
-{
-    if (
-        ! node.block || typeof node.block.type !== "string" 
-        || node.block.type !== "process-task"
-        || typeof node.definitionId !== "string"
-    ) {
-        return undefined;
-    }
-
-    return undefined;
-}
+import { ICluster } from '@tripetto/map';
 
 async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinition>
 {
@@ -69,6 +56,7 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
             } as IDefinition);
         });
 }
+
 export {
     loadSubDefinitions
 }

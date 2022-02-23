@@ -247,9 +247,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.setState({ isLoading: true });
 
-        if (typeof user !== "undefined") {
-            window.sessionStorage.setItem(USER_ID_KEY, user.id);
-            window.sessionStorage.setItem(USER_TENANT_ID_KEY, user.tenantId);
+        if (typeof this.state.user !== "undefined") {
+            window.sessionStorage.setItem(USER_ID_KEY, this.state.user.id);
+            window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.state.user.tenantId);
         }
 
         let definition = await loadDefinitionById(this.props.definitionId);

@@ -105,30 +105,38 @@ async function findForRunner(request, response)
             });
     }
 
-    try {
-        let client = await connect();
-        let db = client.db();
+    return connect()
+        .then(client => {
+            let db = client.db();
 
-        let result =  await db.collection(DEFINITION_COLLECTION_NAME).findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } });
-        if (! result) {
-            return response.status(401).send({
-                success: false,
-                message: "failed to find definition",
-            });
-        }
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
+                .then(async(result) => {
+                    if (! result === null) {
+                        client.close();
 
-        let definition = Object.assign({} as IDefinition, result);
-        let _definition: IDefinition = await loadSubDefinitions(db, definition);
+                        return response.status(401).send({
+                            success: false,
+                            message: "failed to find definition",
+                        });
+                    }
 
-        client.close();
+                    client.close();
 
-        return response.send({ success: true, definition: _definition });
-    } catch (error) {
-        return response.status(500).send({
-            success: false,
-            message: error.message || "failed to find definition",
+                    let definition = Object.assign({} as IDefinition, result);
+                    let _definition: IDefinition = await loadSubDefinitions(db, definition);
+
+                    return response.send({ success: true, definition: _definition });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return response.status(500).send({
+                        success: false,
+                        message: error.message || "failed to find definition",
+                    });
+                });
         });
-    }
 }
 
 function save(request, response) 
