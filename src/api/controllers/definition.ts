@@ -20,9 +20,10 @@ function index(request, response)
         filter.tenant_id = tenantId;
     }
     
-    if (typeof userId === "string") {
-        filter.user_id = userId;
-    }
+    // TODO: filter by user if they don't have permission to see all
+    // if (typeof userId === "string") {
+    //     filter.user_id = userId;
+    // }
 
     return connect()
         .then(client => {
