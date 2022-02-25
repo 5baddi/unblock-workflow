@@ -119,32 +119,6 @@ async function findForRunner(request, response)
         let definition = Object.assign({} as IDefinition, result);
         let _definition: IDefinition = await loadSubDefinitions(db, definition);
 
-        // definition.clusters.map(async(cluster) => {
-        //     // clusters.push(cluster);
-
-        //     if (! cluster.nodes) {
-        //         return;
-        //     }
-
-        //     cluster.nodes.map(async(node) => {
-        //         if (
-        //             ! node.block || typeof node.block.type !== "string" 
-        //             || node.block.type !== "process-task"
-        //             || typeof node.definitionId !== "string"
-        //         ) {
-        //             return;
-        //         }
-
-        //         let result = await db.collection(DEFINITION_COLLECTION_NAME).findOne({ _id: new ObjectId(<string> node.definitionId) });
-        //         if (! result) {
-        //             return;
-        //         }
-
-        //         let subDefinition: IDefinition = Object.assign({} as IDefinition, result);
-        //         // clusters.push(...subDefinition.clusters);
-        //     });
-        // });
-
         client.close();
 
         return response.send({ success: true, definition: _definition });
