@@ -57,11 +57,17 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
                 clusters,
                 builder: definition.builder,
                 _id: definition._id,
-                name: definition.name
+                name: definition.name,
+                description: definition.description,
+                keywords: definition.keywords,
+                language: definition.language,
+                prologue: definition.prologue,
+                epilogue: definition.epilogue,
+                tenant_id: definition.tenant_id,
+                tenants_ids: definition.tenants_ids,
             } as IDefinition);
         });
 }
-
 export {
     loadSubDefinitions
 }
