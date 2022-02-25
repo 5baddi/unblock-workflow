@@ -29,7 +29,7 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
             definition.clusters.map(async(cluster) => {
                 clusters.push(cluster);
 
-                if (! cluster.nodes) {
+                if (! cluster.nodes || cluster.nodes.length === 0) {
                     return;
                 }
 
@@ -54,7 +54,7 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
         )
         .then(() => {
             return Promise.resolve({
-                clusters,
+                clusters: clusters,
                 builder: definition.builder,
                 _id: definition._id,
                 name: definition.name,
