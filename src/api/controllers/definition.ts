@@ -93,49 +93,67 @@ function find(request, response)
         });
 }
 
-function findForRunner(request, response) 
+async function findForRunner(request, response) 
 {
     let id = request.params.id;
     if (! id) {
-        response.status(401)
+        return response.status(401)
             .send({
                 success: false,
                 message: "Bad request!",
             });
     }
 
-    return connect()
-        .then(client => {
-            let db = client.db();
+    try {
+        let client = await connect();
+        let db = client.db();
 
-            db.collection(DEFINITION_COLLECTION_NAME)
-                .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
-                .then(result => {
-                    if (! result === null) {
-                        client.close();
+        let result =  await db.collection(DEFINITION_COLLECTION_NAME).findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } });
+        if (! result) {
+            return response.status(401).send({
+                success: false,
+                message: "failed to find definition",
+            });
+        }
 
-                        return response.status(401).send({
-                            success: false,
-                            message: "failed to find definition",
-                        });
-                    }
+        let definition = Object.assign({} as IDefinition, result);
+        let _definition: IDefinition = await loadSubDefinitions(db, definition);
 
-                    client.close();
+        // definition.clusters.map(async(cluster) => {
+        //     // clusters.push(cluster);
 
-                    let definition = Object.assign({} as IDefinition, result);
-                    let _definition: IDefinition = loadSubDefinitions(definition);
+        //     if (! cluster.nodes) {
+        //         return;
+        //     }
 
-                    return response.send({ success: true, definition: _definition });
-                })
-                .catch(error => {
-                    client.close();
+        //     cluster.nodes.map(async(node) => {
+        //         if (
+        //             ! node.block || typeof node.block.type !== "string" 
+        //             || node.block.type !== "process-task"
+        //             || typeof node.definitionId !== "string"
+        //         ) {
+        //             return;
+        //         }
 
-                    return response.status(500).send({
-                        success: false,
-                        message: error.message || "failed to find definition",
-                    });
-                });
+        //         let result = await db.collection(DEFINITION_COLLECTION_NAME).findOne({ _id: new ObjectId(<string> node.definitionId) });
+        //         if (! result) {
+        //             return;
+        //         }
+
+        //         let subDefinition: IDefinition = Object.assign({} as IDefinition, result);
+        //         // clusters.push(...subDefinition.clusters);
+        //     });
+        // });
+
+        client.close();
+
+        return response.send({ success: true, definition: _definition });
+    } catch (error) {
+        return response.status(500).send({
+            success: false,
+            message: error.message || "failed to find definition",
         });
+    }
 }
 
 function save(request, response) 
