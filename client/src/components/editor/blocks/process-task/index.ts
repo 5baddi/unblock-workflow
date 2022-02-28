@@ -1,4 +1,4 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { NodeBlock, tripetto, editor } from "tripetto";
 
 const BLOCK_NAME = "process-task";
 const BLOCK_VERSION = "0.0.1";
@@ -17,5 +17,9 @@ const BLOCK_VERSION = "0.0.1";
 })
 export class ProcessTask extends NodeBlock
 {
-
+    @editor
+    defineEditor() 
+    {
+        this.editor.name(false, false, "Name", false);
+    }
 }
