@@ -1,4 +1,4 @@
-import { NodeBlock, tripetto, editor } from "tripetto";
+import { NodeBlock, tripetto, editor, Forms } from "tripetto";
 
 const BLOCK_NAME = "process-task";
 const BLOCK_VERSION = "0.0.1";
@@ -21,5 +21,16 @@ export class ProcessTask extends NodeBlock
     defineEditor() 
     {
         this.editor.name(false, false, "Name", false);
+
+        this.editor.option({
+            name: "Within workflow",
+            locked: true,
+            form: {
+                title: "Select within workflow",
+                controls: [
+                    new Forms.Dropdown([], [])
+                ]
+            }
+        });
     }
 }
