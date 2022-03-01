@@ -28,9 +28,24 @@ const settings = {
 };
 
 const App = ({ classes }) => {
-    return window.location !== window.parent.location
-    ? (
-        <GlueProvider settings={settings}>
+    let defaultApp = (
+        <React.Fragment>
+            <CssBaseline/>
+            <main className={classes.main}>
+                <BrowserRouter basename={ BASE_NAME }>
+                    <Routes>
+                        <Route path="/run/:id" element={<ChatRunner />} />
+                        <Route path="/preview/:id" element={<ChatPreview />} />
+                        <Route path="/:id" element={<Studio />}/>
+                        <Route path="/" element={<Studio />}/>
+                    </Routes>
+                </BrowserRouter>
+            </main>
+        </React.Fragment>
+    );
+
+    return (
+        <GlueProvider settings={settings} fallback={defaultApp}>
             <React.Fragment>
                 <CssBaseline/>
                 <main className={classes.main}>
@@ -45,21 +60,6 @@ const App = ({ classes }) => {
                 </main>
             </React.Fragment>
         </GlueProvider>
-    )
-    : (
-        <React.Fragment>
-            <CssBaseline/>
-            <main className={classes.main}>
-                <BrowserRouter basename={ BASE_NAME }>
-                    <Routes>
-                        <Route path="/run/:id" element={<ChatRunner />} />
-                        <Route path="/preview/:id" element={<ChatPreview />} />
-                        <Route path="/:id" element={<Studio />}/>
-                        <Route path="/" element={<Studio />}/>
-                    </Routes>
-                </BrowserRouter>
-            </main>
-        </React.Fragment>
     );
 };
 
