@@ -38,6 +38,7 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
                         ! node.block || typeof node.block.type !== "string" 
                         || node.block.type !== "process-task"
                         || typeof node.definitionId !== "string"
+                        || node.definitionId === ""
                     ) {
                         return;
                     }
