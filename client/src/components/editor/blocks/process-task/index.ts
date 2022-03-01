@@ -20,17 +20,21 @@ export class ProcessTask extends NodeBlock
 {
     private definitions;
 
-    async loadDefinitions()
+    async loadDefinitions(): Promise<void>
     {
-        this.definitions = await API.get('/definitions');
-        console.log(this.definitions);
+        API.get('/definitions')
+            .then(definitions => {
+                if (! definitions) {
+                    this.definitions = [];
+                }
+
+                this.definitions = definitions;
+            });
     }
 
     @editor
     async defineEditor() 
-    {
-        await this.loadDefinitions();
-        
+    {        
         this.editor.name(false, false, "Name", false);
 
         this.editor.option({
