@@ -63,6 +63,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
     private applyStyle(): void
     {
         this.style = {
+            color: "#101828",
             display: "inline",
             autoFocus: true,
             noBranding: true,
