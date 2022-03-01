@@ -1,5 +1,9 @@
+import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
+import { definition } from "@tripetto/map/lib/decorators/definition";
 import { NodeBlock, tripetto, editor, Forms } from "tripetto";
 import API from '../../../../api';
+import { IDefinition } from '../../../../interfaces/index';
+import { IProcessTaskOptionInterface } from './interfaces';
 
 const BLOCK_NAME = "process-task";
 const BLOCK_VERSION = "0.0.1";
@@ -18,17 +22,33 @@ const BLOCK_VERSION = "0.0.1";
 })
 export class ProcessTask extends NodeBlock
 {
-    private definitions;
+    private options: Array<TOption<IProcessTaskOptionInterface>> = [];
 
     async loadDefinitions(): Promise<void>
     {
-        API.get('/definitions')
-            .then(definitions => {
-                if (! definitions) {
-                    this.definitions = [];
+        let endpoint = "/definitions";
+
+        API.get(endpoint)
+            .then(result => {
+                if (! result) {
+                    this.options = [];
                 }
 
-                this.definitions = definitions;
+                let definitions = Object.assign({} as Array<IDefinition>, result);
+                let _definitions = definitions.filter(definition => {
+                    if (! definition._id || ! definition.name) {
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                this.options = _definitions.map(definition => {
+                    return {
+                        value: <string> definition._id,
+                        label: <string> definition.name
+                    };
+                });
             });
     }
 
@@ -43,7 +63,7 @@ export class ProcessTask extends NodeBlock
             form: {
                 title: "Select within workflow",
                 controls: [
-                    new Forms.Dropdown([], [])
+                    new Forms.Dropdown(this.options, null)
                 ]
             }
         });
