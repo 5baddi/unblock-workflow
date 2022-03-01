@@ -1,5 +1,5 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
-import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
+import { NodeBlock, tripetto, editor, Forms, definition, slots } from "tripetto";
 import API from '../../../../api';
 import { IDefinition } from '../../../../interfaces/index';
 import { IProcessTaskOptionInterface } from './interfaces';
@@ -27,7 +27,8 @@ export class ProcessTask extends NodeBlock
     @definition("string")
     definitionId: string = "";
 
-    async loadDefinitions(): Promise<void>
+    @slots
+    defineSlots()
     {
         let endpoint = "/definitions";
 
@@ -43,13 +44,12 @@ export class ProcessTask extends NodeBlock
         }
 
         API.get(endpoint)
-            .then(result => {
-                if (! result) {
+            .then(response => {
+                if (! response.data || ! response.data.definitions || ! Array.isArray(response.data.definitions)) {
                     this.options = [];
                 }
 
-                let definitions = Object.assign({} as Array<IDefinition>, result);
-                let _definitions = definitions.filter(definition => {
+                let definitions = response.data.definitions.filter(definition => {
                     if (! definition._id || ! definition.name) {
                         return false;
                     }
@@ -57,7 +57,7 @@ export class ProcessTask extends NodeBlock
                     return true;
                 });
 
-                this.options = _definitions.map(definition => {
+                this.options = definitions.map(definition => {
                     return {
                         value: <string> definition._id,
                         label: <string> definition.name
@@ -67,8 +67,8 @@ export class ProcessTask extends NodeBlock
     }
 
     @editor
-    async defineEditor() 
-    {        
+    defineEditor() 
+    {
         this.editor.name(false, false, "Name", false);
 
         this.editor.option({
@@ -77,7 +77,7 @@ export class ProcessTask extends NodeBlock
             form: {
                 title: "Select within workflow",
                 controls: [
-                    new Forms.Dropdown(this.options, null)
+                    new Forms.Dropdown(this.options, Forms.Text.bind(this, "definitionId", ""))
                 ]
             }
         });

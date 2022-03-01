@@ -38,8 +38,11 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
                         ! node.block || typeof node.block.type !== "string" 
                         || node.block.type !== "process-task"
                         || typeof node.definitionId !== "string"
-                        || node.definitionId === ""
                     ) {
+                        if (typeof cluster !== "undefined" && Array.isArray(cluster.nodes) && cluster.nodes[index] && node.definitionId === "") {
+                            cluster.nodes.splice(index, 1);
+                        }
+
                         clusters.push(cluster);
 
                         return;
