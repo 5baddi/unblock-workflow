@@ -1,4 +1,5 @@
 import { NodeBlock, tripetto, editor, Forms } from "tripetto";
+import API from '../../../../api';
 
 const BLOCK_NAME = "process-task";
 const BLOCK_VERSION = "0.0.1";
@@ -17,9 +18,19 @@ const BLOCK_VERSION = "0.0.1";
 })
 export class ProcessTask extends NodeBlock
 {
-    @editor
-    defineEditor() 
+    private definitions;
+
+    async loadDefinitions()
     {
+        this.definitions = await API.get('/definitions');
+        console.log(this.definitions);
+    }
+
+    @editor
+    async defineEditor() 
+    {
+        await this.loadDefinitions();
+        
         this.editor.name(false, false, "Name", false);
 
         this.editor.option({
