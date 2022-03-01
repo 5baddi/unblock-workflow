@@ -1,9 +1,9 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
-import { definition } from "@tripetto/map/lib/decorators/definition";
 import { NodeBlock, tripetto, editor, Forms } from "tripetto";
 import API from '../../../../api';
 import { IDefinition } from '../../../../interfaces/index';
 import { IProcessTaskOptionInterface } from './interfaces';
+import { USER_ID_KEY, USER_TENANT_ID_KEY } from '../../../../global';
 
 const BLOCK_NAME = "process-task";
 const BLOCK_VERSION = "0.0.1";
@@ -27,6 +27,17 @@ export class ProcessTask extends NodeBlock
     async loadDefinitions(): Promise<void>
     {
         let endpoint = "/definitions";
+
+        let tenantId = window.sessionStorage.getItem(USER_TENANT_ID_KEY);
+        let userId = window.sessionStorage.getItem(USER_ID_KEY);
+
+        if (tenantId) {
+            endpoint = endpoint.concat(`/${tenantId}`);
+        }
+        
+        if (userId) {
+            endpoint = endpoint.concat(`/${userId}`);
+        }
 
         API.get(endpoint)
             .then(result => {

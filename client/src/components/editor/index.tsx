@@ -4,7 +4,7 @@ import { Builder, Debounce } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
-import { DEFINITION_KEY } from '../../global';
+import { DEFINITION_KEY, USER_ID_KEY, USER_TENANT_ID_KEY } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -246,6 +246,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let user = this.state.glueContext?.user;
         this.setState({ isLoading: true, user });
+
+        if (typeof user !== "undefined") {
+            window.sessionStorage.setItem(USER_ID_KEY, user.id);
+            window.sessionStorage.setItem(USER_TENANT_ID_KEY, user.tenantId);
+        }
 
         let definition = await loadDefinitionById(this.props.definitionId);
 
