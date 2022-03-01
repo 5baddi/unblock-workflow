@@ -1,5 +1,5 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
-import { NodeBlock, tripetto, editor, Forms } from "tripetto";
+import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
 import API from '../../../../api';
 import { IDefinition } from '../../../../interfaces/index';
 import { IProcessTaskOptionInterface } from './interfaces';
@@ -23,6 +23,9 @@ const BLOCK_VERSION = "0.0.1";
 export class ProcessTask extends NodeBlock
 {
     private options: Array<TOption<IProcessTaskOptionInterface>> = [];
+
+    @definition("string")
+    definitionId: string = "";
 
     async loadDefinitions(): Promise<void>
     {
