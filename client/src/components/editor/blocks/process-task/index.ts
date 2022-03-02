@@ -80,7 +80,7 @@ export class ProcessTask extends NodeBlock
             this.loadDefinitions();
         }
 
-        this.editor.name(false, false, "Name", false).visible(false);
+        this.editor.name(false, false, "Name", false);
 
         this.editor.option({
             name: "Within workflow",
