@@ -1,7 +1,6 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
 import { NodeBlock, tripetto, editor, Forms, definition, slots } from "tripetto";
 import API from '../../../../api';
-import { IDefinition } from '../../../../interfaces/index';
 import { IProcessTaskOptionInterface } from './interfaces';
 import { USER_ID_KEY, USER_TENANT_ID_KEY } from '../../../../global';
 
@@ -26,9 +25,11 @@ export class ProcessTask extends NodeBlock
 
     @definition("string")
     definitionId: string = "";
+    
+    @definition("boolean")
+    sendable: boolean = false;
 
-    @slots
-    defineSlots()
+    loadDefinitions(): void
     {
         let endpoint = "/definitions";
 
@@ -66,9 +67,19 @@ export class ProcessTask extends NodeBlock
             });
     }
 
+    @slots
+    defineSlots()
+    {
+        this.loadDefinitions();
+    }
+
     @editor
     defineEditor() 
     {
+        if (! this.options || this.options.length === 0) {
+            this.loadDefinitions();
+        }
+
         this.editor.name(false, false, "Name", false);
 
         this.editor.option({
@@ -77,7 +88,17 @@ export class ProcessTask extends NodeBlock
             form: {
                 title: "Select within workflow",
                 controls: [
-                    new Forms.Dropdown(this.options, Forms.Text.bind(this, "definitionId", ""))
+                    new Forms.Dropdown(this.options, Forms.Text.bind(this, "definitionId", "")).disabled(! this.options || this.options.length === 0)
+                ]
+            }
+        });
+        
+        this.editor.option({
+            name: "Request",
+            form: {
+                title: "Request",
+                controls: [
+                    new Forms.Checkbox("Send the workflow as request to an Unblocker", Forms.Checkbox.bind(this, "sendable", false))
                 ]
             }
         });
