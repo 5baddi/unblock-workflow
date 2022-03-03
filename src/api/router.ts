@@ -1,5 +1,6 @@
 import { index, find, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
 import { save as saveResult } from './controllers/result';
+import { send } from './controllers/webhooks';
 
 const express = require("express");
 const router = express.Router();
@@ -13,5 +14,6 @@ router.delete("/definitions", bulkRemove);
 router.delete("/definition/:id", remove);
 
 router.post("/result/:id", saveResult);
+router.post("/webhooks/:id", send);
 
 module.exports = router;
