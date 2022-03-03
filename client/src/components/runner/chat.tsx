@@ -24,6 +24,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         super(props);
 
         this.onSubmit = this.onSubmit.bind(this);
+        this.onChange = this.onChange.bind(this);
         this.onAction = this.onAction.bind(this);
         this.saveResult = this.saveResult.bind(this);
 
