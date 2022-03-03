@@ -183,6 +183,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
+        this.sendDataToWebhooks(exportables);
+
         this.setState({ isFailed: false, isLoading: true });
 
         return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
