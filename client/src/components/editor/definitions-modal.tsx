@@ -1,11 +1,13 @@
 import * as React from "react";
 import { Button, Modal } from "react-bootstrap";
 import { IEditorDefinitionsModalProps, IEditorDefinitionsModalState } from "../../interfaces";
-import { PUBLIC_URL } from "../../../../src/settings";
+import { PUBLIC_URL } from '../../../../src/settings';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderOpen, faTrash, faPlayCircle, faTrashAlt, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faFolderOpen, faTrash, faPlayCircle, faTrashAlt, faUpload, faClone } from '@fortawesome/free-solid-svg-icons';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import PulseLoader from "react-spinners/PulseLoader";
+import { IDefinition } from '../../interfaces/index';
+import API from '../../api';
 
 class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEditorDefinitionsModalState>
 {
@@ -118,8 +120,8 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                 field: "_id",
                 headerName: "Actions",
                 sortable: false,
-                flex: 1.5,
-                minWidth: 200,
+                flex: 1.6,
+                minWidth: 300,
                 cellClassName: "text-center",
                 renderCell: (cellValues) => {
                     return (
@@ -128,6 +130,10 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                                     variant="outline-primary" className="btn-sm mr-2"
                                     onClick={() => this.openWorkflow(cellValues.row._id)}>
                                 <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
+                            </Button>
+                            <Button variant="outline-primary" className="btn-sm mr- 2"
+                                    onClick={() => this.duplicateDefinition(cellValues.row)}>
+                                <FontAwesomeIcon icon={faClone}/>&nbsp;Duplicate
                             </Button>
                             <Button variant="outline-primary" className="btn-sm mr-2"
                                     onClick={() => this.runDefinition(cellValues.row._id)}>
@@ -176,6 +182,28 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         }
 
         window.open(`${PUBLIC_URL}/run/${definitionId}`, "_blank")?.focus();
+    }
+
+    private duplicateDefinition(definition: IDefinition): void
+    {
+        this.setState({ isLoading: true });
+
+        let _definition = Object.assign({} as IDefinition, definition);
+        delete _definition._id;
+
+        let duplicationIndex: number = this.state.definitions ? this.state.definitions.length + 1 : 1;
+        _definition.name = _definition.name ? _definition.name?.concat(` copy 0${duplicationIndex}`) : `Unamed copy 0${duplicationIndex}`;
+
+        API.post(`${PUBLIC_URL}/api/definitions`, { definition: _definition })
+            .then(response => {
+                if (! response.data.definition) {
+                    this.setState({ isLoading: false });
+
+                    return;
+                }
+
+                this.loadDefinitions();
+            });
     }
 
     private deleteWorkflow(definitionId: string)
