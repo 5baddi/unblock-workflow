@@ -10,7 +10,6 @@ import { PUBLIC_URL } from "../../../../src/settings";
 import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
 import Loader from "../loader";
 import { ENV } from "../../settings";
-import { Debounce } from "tripetto";
 
 import "./style.scss";
 
@@ -18,12 +17,14 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 {
     private style?: IChatStyles;
 
+    private exportables?: Export.IExportables; 
+
     constructor(props)
     {
         super(props);
 
         this.onSubmit = this.onSubmit.bind(this);
-        this.onData = this.onData.bind(this);
+        this.onAction = this.onAction.bind(this);
         this.saveResult = this.saveResult.bind(this);
 
         this.state = {
@@ -58,7 +59,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                     display: "inline",
                     definition: this.state.definition,
                     onSubmit: this.onSubmit,
-                    onData: this.onData,
+                    onChange: this.onChange,
+                    onAction: this.onAction,
                 });
             });
     }
@@ -131,26 +133,28 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         this.saveResult(exportables);
     }
 
-    mutateData = new Debounce((exportables?: Export.IExportables) => {
-        this.sendDataToWebhooks(exportables);
-    }, 1000);
+    private onChange(instance: Instance): void
+    {
+        this.exportables = Export.exportables(instance);
+    }
     
-    private onData(instance: Instance): void
+    private onAction(type, definition, block?): void
     {
         if (this.props.previewMode === true) {
             return;
         }
 
-        let exportables = Export.exportables(instance);
+        if (type !== "unstage") {
+            return;
+        }
 
         if (ENV === "development") {
-            console.log(exportables);
+            console.log(this.exportables);
 
             return;
         }
 
-        this.mutateData.cancel();
-        this.mutateData.invoke(exportables);
+        this.sendDataToWebhooks(this.exportables);
     }
 
     private async sendDataToWebhooks(exportables?: Export.IExportables): Promise<boolean>
