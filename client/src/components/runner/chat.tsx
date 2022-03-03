@@ -88,14 +88,14 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             questions: {
                 alignment: "left",
                 roundness: 8,
-                backgroundColor: "#F9FAFB",
-                textColor: "#101828",
+                backgroundColor: "#4B5565",
+                textColor: "white",
             },
             answers: {
                 alignment: "right",
                 roundness: 8,
-                backgroundColor: "#4B5565",
-                textColor: "white",
+                backgroundColor: "#F9FAFB",
+                textColor: "#101828",
             },
             inputs: {
                 backgroundColor: "white",
