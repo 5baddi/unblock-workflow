@@ -1,8 +1,8 @@
 import crypto from "crypto";
 
-function generateHash(): string
+function generateHash(length: number = 36): string
 {
-    return crypto.randomBytes(36).toString('hex');
+    return crypto.randomBytes(length).toString('hex');
 }
 
 export {
