@@ -10,6 +10,7 @@ import { PUBLIC_URL } from "../../../../src/settings";
 import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
 import Loader from "../loader";
 import { ENV } from "../../settings";
+import { Debounce } from "tripetto";
 
 import "./style.scss";
 
@@ -22,6 +23,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         super(props);
 
         this.onSubmit = this.onSubmit.bind(this);
+        this.onData = this.onData.bind(this);
         this.saveResult = this.saveResult.bind(this);
 
         this.state = {
@@ -56,6 +58,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                     display: "inline",
                     definition: this.state.definition,
                     onSubmit: this.onSubmit,
+                    onData: this.onData,
                 });
             });
     }
@@ -128,6 +131,42 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         this.saveResult(exportables);
     }
 
+    mutateData = new Debounce((exportables?: Export.IExportables) => {
+        this.sendDataToWebhooks(exportables);
+    }, 1000);
+    
+    private onData(instance: Instance): void
+    {
+        if (this.props.previewMode === true) {
+            return;
+        }
+
+        let exportables = Export.exportables(instance);
+
+        if (ENV === "development") {
+            console.log(exportables);
+
+            return;
+        }
+
+        this.mutateData.cancel();
+        this.mutateData.invoke(exportables);
+    }
+
+    private async sendDataToWebhooks(exportables?: Export.IExportables): Promise<boolean>
+    {
+        let definitionId = this.state.definition?._id;
+        if (! exportables || ! definitionId) {
+            return Promise.resolve(false);
+        }
+
+        if (! exportables.fields || exportables.fields.length === 0) {
+            return Promise.resolve(false);
+        }
+
+        return API.post(`${PUBLIC_URL}/api/webhooks/${definitionId}`, { fields: exportables.fields });
+    }
+    
     private async saveResult(exportables?: Export.IExportables): Promise<boolean>
     {
         let definitionId = this.state.definition?._id;
