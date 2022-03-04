@@ -233,7 +233,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
         let glueContext = await glueWorkspace?.getContext();
         let user = await this.props.glue.contexts.get("frontegg-user");
-
+console.log(user);
         this.setState({ glueWorkspace, glueContext, user });
     }
 
