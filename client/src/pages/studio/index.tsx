@@ -11,7 +11,7 @@ export default function Studio ()
     const { id } = useParams();
     const glue = React.useContext(GlueContext);
 
-    if (! glue && ENV !== "development") {
+    if (window.location === window.parent.location && ENV !== "development") {
         return (<h1>Not found</h1>);
     }
 
