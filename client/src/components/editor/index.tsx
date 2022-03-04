@@ -246,6 +246,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let user = this.state.glueContext?.user;
         this.setState({ isLoading: true, user });
+        console.log(user);
 
         if (typeof user !== "undefined") {
             window.sessionStorage.setItem(USER_ID_KEY, user.id);
