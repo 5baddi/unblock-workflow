@@ -1,6 +1,6 @@
 import { index, find, findForRunner, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
 import { save as saveResult } from './controllers/result';
-import { send } from './controllers/webhooks';
+import { send, save as builderWebhook } from './controllers/webhooks';
 
 const express = require("express");
 const router = express.Router();
@@ -14,7 +14,8 @@ router.delete("/definitions", bulkRemove);
 router.delete("/definition/:id", remove);
 
 router.post("/result/:id", saveResult);
-router.post("/webhooks/:id", send);
+router.post("/webhooks/runner/:id", send);
+router.get("/webhooks/builder/:id", builderWebhook);
 
 router.get("/runner/:id", findForRunner);
 
