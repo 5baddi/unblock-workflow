@@ -6,6 +6,7 @@ export const PUBLIC_URL = process.env.PUBLIC_URL || `http://${SERVER_HOST}:${SER
 export const MONGODB_URL = process.env.MONGODB_URL;
 export const RESULT_WEBHOOK = process.env.RESULT_WEBHOOK;
 export const RESPONSE_WEBHOOK = process.env.RESPONSE_WEBHOOK;
+export const BUILDER_ON_SAVE_WEBHOOK = process.env.BUILDER_ON_SAVE_WEBHOOK;
 export const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME || "admin";
 export const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD || "S57Yo4nzGEgdLX";
 
