@@ -1,11 +1,10 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, BUILDER_ON_SAVE_WEBHOOK } from '../../settings';
+import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION } from '../../settings';
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
 import { loadSubDefinitions } from "../../services/definition";
 import { generateHash } from "../../helpers";
-import * as Superagent from "superagent";
 
 function checkDefinitionVersion(definition: IDefinition): boolean
 {
@@ -258,15 +257,6 @@ function save(request, response)
 
                     let definition = Object.assign({} as IDefinition, result.value);
                     definition.is_saved = true;
-
-                    if (typeof BUILDER_ON_SAVE_WEBHOOK !== "undefined") {
-                        return Superagent
-                            .post(BUILDER_ON_SAVE_WEBHOOK)
-                            .send(definition)
-                            .then((webhookResult) => {
-                                return response.send({ success: true, definition });
-                            });
-                    }
 
                     return response.send({ success: true, definition });
                 })
