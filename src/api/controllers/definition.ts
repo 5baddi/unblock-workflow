@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, BUILDER_ON_SAVE_WEBHOOK } from '../../settings';
+import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, BUILDER_ON_SAVE_WEBHOOK, BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD } from '../../settings';
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
@@ -224,6 +224,7 @@ function save(request, response)
                     if (typeof BUILDER_ON_SAVE_WEBHOOK !== "undefined") {
                         return Superagent
                             .post(BUILDER_ON_SAVE_WEBHOOK)
+                            .auth(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD)
                             .send(definition)
                             .then((webhookResult) => {
                                 return response.send({ success: true, definition });
