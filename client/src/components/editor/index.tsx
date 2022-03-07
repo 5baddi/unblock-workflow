@@ -321,7 +321,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             console.log("definition has been changed", submittedDefinition);
         }
 
-        this.setState({ isSaving: true });
+        if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+            this.setState({ isSaving: true });
+        }
 
         let currentDefinition = this.getDefinition();
         let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
@@ -340,9 +342,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             }
         }
 
-        if (this.props.manualSaving === true) {
-            this.setState({ isSaving: true });
-
+        if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
             saveDefinition(definition)
                 .then(definition => this.onSuccessfulSaving(definition))
                 .catch(error => this.onFailedSaving(error, definition));
@@ -378,9 +378,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             definition.is_saved = false;
         }
 
-        this.setDefinition(definition);
-        this.setState({ isSaving: false });
         window.sessionStorage.setItem(DEFINITION_KEY, JSON.stringify(definition));
+
+        this.setDefinition(definition);
+        
+        if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+            this.setState({ isSaving: false });
+        }
 
         if (typeof error.response !== "undefined" && error.response.status === 409) {
             alert("The form you're currently editing is not the latest version. Please refresh your page to access it.");
@@ -394,7 +398,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        if (typeof this.timer === "undefined") {
+        if (typeof this.timer === "undefined" && typeof this.props.manualSaving === "boolean" && this.props.manualSaving === false) {
             this.startTimer();
         }
     }
