@@ -88,6 +88,16 @@ function saveDefinition(definition: IDefinition): Promise<IDefinition | undefine
 
             return Promise.resolve(definition);
         })
+        .then(definition => {
+            if (! definition) {
+                return Promise.resolve(undefined);
+            }
+
+            return API.get(`${PUBLIC_URL}/api/webhooks/builder/${definition._id}`)
+                .then(result => {
+                    return Promise.resolve(definition);
+                });
+        })
         .catch(error => {
             if (ENV === "development") {
                 console.log(error);

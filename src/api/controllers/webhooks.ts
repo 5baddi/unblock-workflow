@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, RESPONSE_WEBHOOK, BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD } from '../../settings';
+import { DEFINITION_COLLECTION_NAME, RESPONSE_WEBHOOK, BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD, BUILDER_ON_SAVE_WEBHOOK } from '../../settings';
 import { connect } from "../../services/mongodb";
 import { IResponse, IDefinition } from '../../interfaces/definition';
 import * as Superagent from "superagent";
@@ -9,11 +9,16 @@ function send(request, response)
     let id = request.params.id;
     let fields = request.body.fields;
     if (! id || ! fields) {
-        response.status(401)
+        return response.status(401)
             .send({
                 success: false,
                 message: "Definition id and fields are required!",
             });
+    }
+
+    if (typeof RESPONSE_WEBHOOK === "undefined") {
+        return response.status(200)
+            .send({ success: true });
     }
 
     return connect()
@@ -26,7 +31,7 @@ function send(request, response)
                         if (! result) {
                             client.close();
 
-                            return response.status(500).send({
+                            return response.status(404).send({
                                 success: false,
                                 message: "Definition not found!",
                             });
@@ -59,14 +64,64 @@ function send(request, response)
                     .catch(error => {
                         client.close();
 
-                        return response.status(500).send({
-                            success: false,
-                            message: error.message || "failed to fetch definition",
-                        });
+                        return response.status(200)
+                            .send({ success: true });
+                    });
+            });
+}
+
+function save(request, response)
+{
+    let id = request.params.id;
+    if (! id) {
+        return response.status(401)
+            .send({
+                success: false,
+                message: "Definition id is required!",
+            });
+    }
+
+    if (typeof BUILDER_ON_SAVE_WEBHOOK === "undefined") {
+        return response.status(200)
+            .send({ success: true });
+    }
+
+    return connect()
+        .then(client => {
+                let db = client.db();
+                
+                db.collection(DEFINITION_COLLECTION_NAME)
+                    .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
+                    .then(result => {
+                        if (! result) {
+                            client.close();
+
+                            return response.status(500).send({
+                                success: false,
+                                message: "Definition not found!",
+                            });
+                        }
+
+                        let definition: IDefinition = Object.assign({} as IDefinition, result);
+
+                        return Superagent
+                            .post(BUILDER_ON_SAVE_WEBHOOK)
+                            .auth(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD)
+                            .send(definition)
+                            .then((webhookResult) => {
+                                return response.send({ success: true});
+                            });
+                    })
+                    .catch(error => {
+                        client.close();
+
+                        return response.status(200)
+                            .send({ success: true });
                     });
             });
 }
 
 export {
-    send
+    send,
+    save
 }

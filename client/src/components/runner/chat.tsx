@@ -169,7 +169,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
-        return API.post(`${PUBLIC_URL}/api/webhooks/${definitionId}`, { fields: exportables.fields });
+        return API.post(`${PUBLIC_URL}/api/webhooks/runner/${definitionId}`, { fields: exportables.fields });
     }
     
     private async saveResult(exportables?: Export.IExportables): Promise<boolean>
