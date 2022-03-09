@@ -4,7 +4,7 @@ import { Builder, Debounce } from "tripetto";
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
-import { DEFINITION_KEY } from '../../global';
+import { DEFINITION_KEY, USER_ID_KEY, USER_TENANT_ID_KEY } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -125,6 +125,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentWillUnmount()
     {
+        this.mutateDefinition.cancel();
+        
         this.clearTimer();
         
         window.removeEventListener("resize", this.onResize);
@@ -247,6 +249,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.setState({ isLoading: true });
 
+        if (typeof this.state.user !== "undefined") {
+            window.sessionStorage.setItem(USER_ID_KEY, this.state.user.id);
+            window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.state.user.tenantId);
+        }
+
         let definition = await loadDefinitionById(this.props.definitionId);
 
         if (definition && this.state.glueWorkspace && this.state.glueContext) {
@@ -284,6 +291,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor.onReady = () => this.ready();
 
         window.sessionStorage.removeItem(DEFINITION_KEY);
+
+        if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+            this.setState({ isSaving: false });
+        }
 
         return this.editor;
     }
