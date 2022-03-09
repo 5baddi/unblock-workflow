@@ -290,6 +290,10 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         window.sessionStorage.removeItem(DEFINITION_KEY);
 
+        if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+            this.setState({ isSaving: false });
+        }
+
         return this.editor;
     }
 
