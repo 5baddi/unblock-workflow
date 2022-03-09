@@ -283,6 +283,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.editor.open(definition);
         this.editor.onReady = () => this.ready();
 
+        window.sessionStorage.removeItem(DEFINITION_KEY);
+
         return this.editor;
     }
 
