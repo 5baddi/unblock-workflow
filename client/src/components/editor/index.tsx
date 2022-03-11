@@ -576,14 +576,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private loadWorkflows(): Promise<IDefinition[] | undefined>
     {
-        let endpoint = `${PUBLIC_URL}/api/definitions`;
-        let user = this.state.user;
-
-        if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
-            endpoint = endpoint.concat(`/${user.tenantId}/${user.id}`);
-        }
-
-        return API.get(endpoint)
+        return this.save()
+            .then(() => {
+                let endpoint = `${PUBLIC_URL}/api/definitions`;
+                let user = this.state.user;
+        
+                if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
+                    endpoint = endpoint.concat(`/${user.tenantId}/${user.id}`);
+                }
+        
+                return API.get(endpoint);
+            })
             .then(response => {
                 if (! response.data.definitions) {
                     return undefined;
@@ -596,7 +599,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     console.log(error);
                 }
 
-                return [undefined];
+                return Promise.reject(undefined);
             });
     }
 }
