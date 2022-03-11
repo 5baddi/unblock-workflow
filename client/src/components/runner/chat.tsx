@@ -11,6 +11,8 @@ import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
 import Loader from "../loader";
 import { ENV } from "../../settings";
 
+import "../editor/blocks/process-task/runner";
+
 import "./style.scss";
 
 export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean }>
