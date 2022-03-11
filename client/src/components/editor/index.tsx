@@ -179,17 +179,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let definition: TripettoDefinition = Object.assign({} as TripettoDefinition, this.state.tripettoDefinition);
 
-        try {
-            await this.onChange(definition);
-        } catch (error) {
-            if (ENV === "development") {
-                console.log(error);
-            }
-            
-            if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
-                this.setState({ isSaving: false });
-            }
-        }
+        await this.onChange(definition);
     }
 
     toggleModal()
@@ -287,16 +277,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let definition = await loadDefinitionById(this.props.definitionId);
 
-        if (definition && this.state.glueWorkspace && this.state.glueContext) {
-            await this.state.glueWorkspace.updateContext({
-                ...this.state.glueContext,
-                workflow: {
-                    id: definition._id,
-                    action: "open"
-                } 
-            });
-        }
-
         return this.initBuilder(definition);
     }
 
@@ -365,41 +345,41 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private async onChange(submittedDefinition: TripettoDefinition): Promise<void>
     {
-        if (ENV === "development") {
-            console.log("definition has been changed", submittedDefinition);
-        }
-
-        if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
-            this.setState({ isSaving: true });
-        }
-
-        let currentDefinition = this.getDefinition();
-        let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
-
-        this.setDefinition(definition);
-
-        if (definition && typeof definition?._id === "string") {
-            if (this.state.glueWorkspace && this.state.glueContext) {
-                await this.state.glueWorkspace.updateContext({
-                    ...this.state.glueContext,
-                    workflow: {
-                        id: definition._id,
-                        action: "change"
-                    } 
-                });
+        try {
+            if (ENV === "development") {
+                console.log("definition has been changed", submittedDefinition);
             }
-        }
+    
+            if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+                this.setState({ isSaving: true });
+            }
+    
+            let currentDefinition = this.getDefinition();
+            let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
 
-        if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
-            return saveDefinition(definition)
-                .then(definition => this.onSuccessfulSaving(definition))
-                .catch(error => this.onFailedSaving(error, definition));
-        }
-        
-        this.mutateDefinition.cancel();
-        this.mutateDefinition.invoke(definition);
+            this.setDefinition(definition);
+    
+            if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+                return saveDefinition(definition)
+                    .then(definition => this.onSuccessfulSaving(definition))
+                    .catch(error => this.onFailedSaving(error, definition));
+            }
+            
+            this.mutateDefinition.cancel();
+            this.mutateDefinition.invoke(definition);
+    
+            return Promise.resolve();
+        } catch (error) {
+            if (ENV === "development") {
+                console.log(error);
+            }
 
-        return Promise.resolve();
+            if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+                this.setState({ isSaving: false });
+            }
+
+            return Promise.reject(error);
+        }
     }
 
     mutateDefinition = new Debounce((definition: IDefinition) => {
