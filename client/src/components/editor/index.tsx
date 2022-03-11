@@ -173,7 +173,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     async save(): Promise<void>
     {
-        if (typeof this.state.tripettoDefinition === undefined) {
+        if (typeof this.state.tripettoDefinition === "undefined") {
             return Promise.resolve();
         }
 
