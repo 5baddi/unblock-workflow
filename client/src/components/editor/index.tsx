@@ -39,6 +39,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.isMounted = false;
 
         this.state = {
+            tripettoDefinition: undefined,
             definition: { name: DEFAULT_NAME } as IDefinition,
             isLoading: true,
             isSaving: false,
@@ -170,9 +171,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         })
     }
 
-    save(): void
+    async save(): Promise<void>
     {
-        this.editor?.save();
+        if (typeof this.state.tripettoDefinition === undefined) {
+            return;
+        }
+
+        let definition: TripettoDefinition = Object.assign({} as TripettoDefinition, this.state.tripettoDefinition);
+
+        await this.onChange(definition);
     }
 
     toggleModal()
@@ -319,11 +326,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        this.editor.onChange = (definition: TripettoDefinition) => (! this.props.manualSaving ? this.onChange(definition) : {});
-        this.editor.onSave = (definition: TripettoDefinition) => (this.props.manualSaving === true ? this.onChange(definition) : {});
+        this.editor.onChange = (definition: TripettoDefinition) => (! this.props.manualSaving ? this.onChange(definition) : this.onChangeSnapshot(definition));
         this.editor.onClose = () => this.onClose();
 
         this.setState({ isLoading: false });
+    }
+
+    private onChangeSnapshot(tripettoDefinition: TripettoDefinition): void
+    {
+        this.setState({ tripettoDefinition });
     }
 
     private onClose()
@@ -370,11 +381,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
-            saveDefinition(definition)
+            return saveDefinition(definition)
                 .then(definition => this.onSuccessfulSaving(definition))
                 .catch(error => this.onFailedSaving(error, definition));
-
-            return Promise.resolve();
         }
         
         this.mutateDefinition.cancel();
