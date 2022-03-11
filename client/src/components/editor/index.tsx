@@ -179,7 +179,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let definition: TripettoDefinition = Object.assign({} as TripettoDefinition, this.state.tripettoDefinition);
 
-        await this.onChange(definition);
+        try {
+            await this.onChange(definition);
+        } catch (error) {
+            if (ENV === "development") {
+                console.log(error);
+            }
+            
+            if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
+                this.setState({ isSaving: false });
+            }
+        }
     }
 
     toggleModal()
