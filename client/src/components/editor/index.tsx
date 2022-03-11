@@ -23,9 +23,20 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 {
     private editor?: Builder;
     private timer?;
+    private _isMounted: boolean = false;
+
+    public set isMounted(status: boolean) {
+        this._isMounted = status;
+    }
+
+    public get isMounted() {
+        return this._isMounted;
+    }
 
     constructor(props) {
         super(props);
+
+        this.isMounted = false;
 
         this.state = {
             definition: { name: DEFAULT_NAME } as IDefinition,
@@ -116,7 +127,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentDidMount()
     {
-        this.open();
+        this.isMounted = true;
+        this.isMounted && this.open();
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
@@ -125,6 +137,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentWillUnmount()
     {
+        this.isMounted = false;
+
         this.mutateDefinition.cancel();
         
         this.clearTimer();
