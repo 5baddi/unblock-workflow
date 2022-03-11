@@ -14,33 +14,29 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
 
     return Promise.all(
             definition.clusters.map(async(cluster) => {
-                if (! cluster.nodes || cluster.nodes.length === 0) {
-                    clusters.push(cluster);
-
-                    return;
+                if (typeof cluster.nodes !== "undefined" && cluster.nodes.length > 0) {
+                    await Promise.all(cluster.nodes.map(async(node, index) => {
+                        if (
+                            ! node.block || typeof node.block.type !== "string" 
+                            || node.block.type !== "process-task"
+                            || typeof node.block.definitionId !== "string" || node.block.definitionId === ""
+                        ) {
+                            return;
+                        }
+    
+                        let result = await db.collection(DEFINITION_COLLECTION_NAME).findOne({ _id: new ObjectId(<string> node.block.definitionId) });
+                        if (! result) {
+                            return;
+                        }
+    
+                        let subDefinition: IDefinition = Object.assign({} as IDefinition, result);
+                        subDefinition.clusters.map(function (subCluster) {
+                            let _index = index + 1;
+    
+                            cluster.nodes?.splice(_index, 0, ...subCluster.nodes ?? []);
+                        });
+                    }));
                 }
-
-                await Promise.all(cluster.nodes.map(async(node, index) => {
-                    if (
-                        ! node.block || typeof node.block.type !== "string" 
-                        || node.block.type !== "process-task"
-                        || typeof node.block.definitionId !== "string" || node.block.definitionId === ""
-                    ) {
-                        return;
-                    }
-
-                    let result = await db.collection(DEFINITION_COLLECTION_NAME).findOne({ _id: new ObjectId(<string> node.block.definitionId) });
-                    if (! result) {
-                        return;
-                    }
-
-                    let subDefinition: IDefinition = Object.assign({} as IDefinition, result);
-                    subDefinition.clusters.map(function (subCluster) {
-                        let _index = index + 1;
-
-                        cluster.nodes?.splice(_index, 0, ...subCluster.nodes ?? []);
-                    });
-                }));
 
                 clusters.push(cluster);
             })
