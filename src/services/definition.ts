@@ -14,18 +14,18 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
 
     return Promise.all(
             definition.clusters.map(async(cluster) => {
-                clusters.push(cluster);
-
                 if (! cluster.nodes || cluster.nodes.length === 0) {
+                    clusters.push(cluster);
+
                     return;
                 }
 
-                return await Promise.all(cluster.nodes.map(async(node, index) => {
+                await Promise.all(cluster.nodes.map(async(node, index) => {
                     if (
                         ! node.block || typeof node.block.type !== "string" 
                         || node.block.type !== "process-task"
                         || typeof node.block.definitionId !== "string" || node.block.definitionId === ""
-                    ) {                        
+                    ) {
                         return;
                     }
 
@@ -35,9 +35,14 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
                     }
 
                     let subDefinition: IDefinition = Object.assign({} as IDefinition, result);
+                    subDefinition.clusters.map(function (subCluster) {
+                        let _index = index + 1;
 
-                    clusters.push(...subDefinition.clusters);
+                        cluster.nodes?.splice(_index, 0, ...subCluster.nodes ?? []);
+                    });
                 }));
+
+                clusters.push(cluster);
             })
         )
         .then(() => {
