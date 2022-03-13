@@ -286,6 +286,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.clearTimer();
 
+        this.setState({ tripettoDefinition: undefined });
+
         this.setDefinition(definition);
 
         let properties = mergeProperties(this.props.element);
