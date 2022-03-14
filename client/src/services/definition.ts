@@ -16,11 +16,6 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
 
     definition.builder = BUILDER_VERSION;
     definition.name = submittedDefinition?.name || DEFAULT_NAME;
-    definition.prologue = submittedDefinition?.prologue || undefined;
-    definition.epilogue = submittedDefinition?.epilogue || undefined;
-    definition.language = submittedDefinition?.language || undefined;
-    definition.keywords = submittedDefinition?.keywords || undefined;
-    definition.description = submittedDefinition?.description || undefined;
 
     if (currentDefinition && typeof currentDefinition._id === "string") {
         definition._id = currentDefinition._id;
