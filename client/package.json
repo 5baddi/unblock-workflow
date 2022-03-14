@@ -74,7 +74,10 @@
     "tripetto-collector-standard-bootstrap": "^1.0.23",
     "tripetto-runner-chat": "^3.6.0",
     "tripetto-runner-foundation": "^6.2.5",
-    "web-vitals": "^2.1.0"
+    "web-vitals": "^2.1.0",
+     "@types/styled-components": "^5.1.22",
+    "tripetto-runner-fabric": "^2.6.2",
+    "tripetto-runner-react-hook": "^3.1.1"
   },
   "devDependencies": {
     "babel-loader": "^8.2.3",
@@ -89,7 +92,10 @@
     "terser-webpack-plugin": "^5.3.1",
     "ts-loader": "^9.2.6",
     "webpack": "^5.68.0",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^4.9.2",
+    "styled-components": "^5.3.3",
+    "url-search-params-polyfill": "^8.1.1",
+    "promise-polyfill": "^8.2.1"
   },
   "eslintConfig": {
     "extends": [

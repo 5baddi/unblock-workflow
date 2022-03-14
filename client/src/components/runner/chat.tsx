@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Navigate } from "react-router-dom";
 import { IRunnerProps } from "../../interfaces";
-import { run } from "tripetto-runner-chat";
+import { run } from "../../runners/chat";
 import { Export } from "tripetto-runner-foundation";
 import { IDefinition } from "../../interfaces";
 import { Instance } from "tripetto-collector";
 import API from "../../api";
 import { PUBLIC_URL } from "../../../../src/settings";
-import { IChatStyles } from "tripetto-runner-chat/interfaces/styles";
+import { IChatStyles } from "../../runners/chat/interfaces/styles";
 import Loader from "../loader";
 import { ENV } from "../../settings";
 
