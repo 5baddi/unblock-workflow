@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Grid } from "@mui/material";
-import { Builder, Debounce } from "tripetto";
+import { Builder, Debounce, definition } from 'tripetto';
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
-import { DEFINITION_KEY, USER_ID_KEY, USER_TENANT_ID_KEY } from '../../global';
+import { DEFINITION_KEY, USER_ID_KEY, USER_TENANT_ID_KEY, DEFAULT_NAME } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -16,8 +16,6 @@ import { mergeProperties } from "../../services/builder";
 import "./blocks";
 
 import "./style.scss";
-
-const DEFAULT_NAME = "Unnamed";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {

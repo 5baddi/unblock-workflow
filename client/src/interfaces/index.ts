@@ -1,18 +1,25 @@
 import { Builder, IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto";
 import { ModalProps } from "react-bootstrap/Modal";
-import { IBuilder, IDefinition as TripettoDefinition } from "@tripetto/map";
+import { IBuilder, ICluster, IDefinition as TripettoDefinition, IPrologue, IEpilogue } from "@tripetto/map";
 
 export interface IDefinition extends TripettoIDefinition
 {
     _id?: string;
+    clusters: ICluster [];
+    builder: IBuilder;
     name?: string;
+    description?: string;
+    keywords?: string[];
+    language?: string;
+    prologue?: IPrologue;
+    epilogue?: IEpilogue;
+    created_at?: Date;
+    hash?: string;
     user_id?: string;
     tenant_id?: string;
     tenants_ids?: Array<string>;
-    is_saved?: boolean;
-    builder: IBuilder;
     updated_at?: Date;
-    hash?: string;
+    is_saved?: boolean;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}

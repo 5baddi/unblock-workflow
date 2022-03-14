@@ -250,7 +250,7 @@ function save(request, response)
             }
 
             query.db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate(filters, { $set: definition }, { upsert: true, returnDocument: "after" })
+                .findOneAndReplace(filters, definition, { upsert: true, returnDocument: "after" })
                 .then(result => {
                     if (! result.ok || ! result.value) {
                         query.client.close();

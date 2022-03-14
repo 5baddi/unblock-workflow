@@ -3,6 +3,7 @@ import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { VERSION, PUBLIC_URL, ENV } from "../settings";
 import API  from "../api";
 import { omit } from "lodash";
+import { DEFAULT_NAME } from '../global';
 
 const BUILDER_VERSION = {
     "name": "unblock",
@@ -14,9 +15,19 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
     let definition: IDefinition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submittedDefinition)));
 
     definition.builder = BUILDER_VERSION;
+    definition.name = submittedDefinition?.name || DEFAULT_NAME;
+    definition.prologue = submittedDefinition?.prologue || undefined;
+    definition.epilogue = submittedDefinition?.epilogue || undefined;
+    definition.language = submittedDefinition?.language || undefined;
+    definition.keywords = submittedDefinition?.keywords || undefined;
+    definition.description = submittedDefinition?.description || undefined;
 
     if (currentDefinition && typeof currentDefinition._id === "string") {
         definition._id = currentDefinition._id;
+    }
+    
+    if (currentDefinition && typeof currentDefinition.created_at !== "undefined") {
+        definition.created_at = currentDefinition.created_at;
     }
 
     if (currentDefinition && typeof currentDefinition?.hash === "string") {
@@ -45,7 +56,7 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
 
     if (currentDefinition && Array.isArray(currentDefinition?.tenants_ids) && ! Array.isArray(definition.tenants_ids)) {
         definition.tenants_ids = currentDefinition.tenants_ids;
-    } 
+    }
 
     return definition;
 }

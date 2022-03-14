@@ -9,6 +9,8 @@ export const DEFINITION_ID_KEY = "definition-id";
 export const DEFINITION_NAME_KEY = "definition-name";
 export const EDITOR_CONTAINER_ID: string = "editor-container";
 
+export const DEFAULT_NAME = "Unnamed";
+
 export const DEFAULT_EDITOR_PROPERTIES: IEditorProperties = {
     element: null,
     fonts: `${PUBLIC_URL}/fonts/`,
