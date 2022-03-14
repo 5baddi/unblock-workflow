@@ -90,14 +90,14 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             questions: {
                 alignment: "left",
                 roundness: 8,
-                backgroundColor: "#4B5565",
-                textColor: "white",
+                backgroundColor: "#F9FAFB",
+                textColor: "#101828",
             },
             answers: {
                 alignment: "right",
                 roundness: 8,
-                backgroundColor: "#F9FAFB",
-                textColor: "#101828",
+                backgroundColor: "#4B5565",
+                textColor: "white",
             },
             inputs: {
                 backgroundColor: "white",
@@ -115,6 +115,18 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                 baseColor: "#4B5565",
                 mode: "fill",
                 roundness: 8,
+            },
+            radiobuttons: {
+                backgroundColor: "#F9FAFB",
+                textColor: "#101828",
+            },
+            checkboxes: {
+                backgroundColor: "#F9FAFB",
+                textColor: "#101828",
+            },
+            matrix: {
+                backgroundColor: "#F9FAFB",
+                textColor: "#101828",
             }
         } as IChatStyles;
     }
