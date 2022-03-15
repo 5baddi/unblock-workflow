@@ -131,7 +131,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                                     onClick={() => this.openWorkflow(cellValues.row._id)}>
                                 <FontAwesomeIcon icon={faFolderOpen}/>&nbsp;Open
                             </Button>
-                            <Button variant="outline-primary" className="btn-sm mr- 2"
+                            <Button variant="outline-primary" className="btn-sm mr-2"
                                     onClick={() => this.duplicateDefinition(cellValues.row)}>
                                 <FontAwesomeIcon icon={faClone}/>&nbsp;Duplicate
                             </Button>
@@ -150,12 +150,12 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         ];
 
         return (
-            <div style={{display: "table", tableLayout: "fixed", width: "100%", height: 300}}>
+            <div style={{display: "table", tableLayout: "fixed", width: "100%", height: 700}}>
                 <DataGrid
                     rows={this.state.definitions}
                     columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
+                    pageSize={50}
+                    rowsPerPageOptions={[50]}
                     getRowId={(row) => row._id }
                     disableSelectionOnClick
                     checkboxSelection

@@ -12,6 +12,14 @@
   margin-right: 2px;
 }
 
+.modal-lg, .modal-xl {
+  min-width: 960px !important;
+}
+
+.modal-dialog-centered {
+  min-height: calc(100% - 0.5rem);
+}
+
 .modal-dialog {
   .btn-primary {
     background-color: rgba(44,64,90,0.8) !important;
