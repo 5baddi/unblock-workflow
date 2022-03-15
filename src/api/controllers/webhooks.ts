@@ -55,7 +55,7 @@ function send(request, response)
 
                         return Superagent
                             .post(RESPONSE_WEBHOOK)
-                            .auth(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD)
+                            // .auth(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD)
                             .send(_response)
                             .then((webhookResult) => {
                                 return response.send({ success: true});
