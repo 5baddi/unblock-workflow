@@ -4,7 +4,7 @@ import { IEditorDefinitionsModalProps, IEditorDefinitionsModalState } from "../.
 import { PUBLIC_URL } from '../../../../src/settings';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen, faTrash, faPlayCircle, faTrashAlt, faUpload, faClone } from '@fortawesome/free-solid-svg-icons';
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridCellEditCommitParams, GridColDef } from "@mui/x-data-grid";
 import PulseLoader from "react-spinners/PulseLoader";
 import { IDefinition } from '../../interfaces/index';
 import API from '../../api';
@@ -111,6 +111,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                 field: "name",
                 headerName: "Name",
                 description: "Workflow name",
+                editable: true,
                 sortable: true,
                 flex: 3,
                 minWidth: 500,
@@ -163,9 +164,23 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                         this.setSelectionModel(newSelectionModel);
                     }}
                     selectionModel={this.state.selectionModel}
+                    onCellEditCommit={this.updateDefinition}
                 />
             </div>
         );
+    }
+
+    private updateDefinition(params: GridCellEditCommitParams)
+    {
+        let rowParams = Object.assign({}, JSON.parse(JSON.stringify(params)));
+        let definitionId = rowParams.row._id || undefined;
+        let name = rowParams.value || undefined;
+
+        if (typeof definitionId === "undefined" || typeof name === "undefined") {
+            return;
+        }
+
+        API.put(`${PUBLIC_URL}/api/definitions/${definitionId}`, { name });
     }
 
     private setSelectionModel(newSelectionModel) 

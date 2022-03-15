@@ -289,7 +289,7 @@ function hash(request, response)
 {
     let id = request.params.id;
     if (! id) {
-        response.status(401)
+        return response.status(401)
             .send({
                 success: false,
                 message: "Bad request!",
@@ -316,6 +316,50 @@ function hash(request, response)
                     client.close();
 
                     return response.send({ success: true, hash });
+                })
+                .catch(error => {
+                    client.close();
+
+                    return response.status(500).send({
+                        success: false,
+                        message: error.message || "failed to update definition hash",
+                    });
+                });
+        });
+}
+
+function updateName(request, response)
+{
+    let id = request.params.id;
+    let name = request.body.name;
+    if (! id || ! name) {
+        return response.status(401)
+            .send({
+                success: false,
+                message: "Bad request!",
+            });
+    }
+
+    return connect()
+        .then(client => {
+            let db = client.db();
+            let hash = generateHash();
+
+            db.collection(DEFINITION_COLLECTION_NAME)
+                .findOneAndUpdate({ _id: new ObjectId(id), deleted_at: { $exists: false } }, { $set: { name } })
+                .then(result => {
+                    if (! result.ok) {
+                        client.close();
+
+                        return response.status(401).send({
+                            success: false,
+                            message: "failed to find definition",
+                        });
+                    }
+
+                    client.close();
+
+                    return response.send({ success: true, name });
                 })
                 .catch(error => {
                     client.close();
@@ -460,6 +504,7 @@ function bulkExport(request, response)
 
 export {
     index,
+    updateName,
     find,
     save,
     hash,

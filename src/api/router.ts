@@ -1,4 +1,4 @@
-import { index, find, findForRunner, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
+import { index, updateName, find, findForRunner, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
 import { save as saveResult } from './controllers/result';
 import { send, save as builderWebhook } from './controllers/webhooks';
 
@@ -8,6 +8,7 @@ const router = express.Router();
 router.get("/definition/:id", find);
 router.put("/definition/:id/hash", hash);
 router.get("/definitions/:tenantId?/:userId?", index);
+router.put("/definitions/:id", updateName);
 router.post("/definitions", save);
 router.post("/definitions/export", bulkExport);
 router.delete("/definitions", bulkRemove);
