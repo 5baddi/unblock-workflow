@@ -106,13 +106,14 @@ function save(request, response)
 
                         return Superagent
                             .post(BUILDER_ON_SAVE_WEBHOOK)
-                            .auth(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD)
+                            // .auth(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD)
                             .send(definition)
                             .then((webhookResult) => {
                                 return response.send({ success: true});
                             });
                     })
                     .catch(error => {
+                        console.log(error);
                         client.close();
 
                         return response.status(200)
