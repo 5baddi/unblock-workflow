@@ -275,19 +275,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let definition = await loadDefinitionById(this.props.definitionId);
 
-        if (this.props.glue) {
-            await this.props.glue.contexts.set(
-                'workflow', 
-                {
-                    id: definition?._id || undefined,
-                    name: definition?.name || undefined,
-                    action: "open"
-                } 
-            );
-
-            console.log(await this.props.glue.contexts.get('workflow'));
-        }
-
         return this.initBuilder(definition);
     }
 
@@ -300,6 +287,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.setState({ tripettoDefinition: undefined });
 
         this.setDefinition(definition);
+
+        if (this.props.glue) {
+            await this.props.glue.contexts.set(
+                'workflow', 
+                {
+                    id: definition?._id || undefined,
+                    name: definition?.name || undefined,
+                    action: "open"
+                } 
+            );
+        }
 
         let properties = mergeProperties(this.props.element);
 
@@ -381,8 +379,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         action: "change"
                     } 
                 );
-
-                console.log(await this.props.glue.contexts.get('workflow'));
             }
     
             if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
