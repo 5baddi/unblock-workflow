@@ -275,6 +275,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let definition = await loadDefinitionById(this.props.definitionId);
 
+        if (this.props.glue) {
+            this.props.glue.contexts.set(
+                'workflow', 
+                {
+                    id: definition?._id || undefined,
+                    name: definition?.name || undefined,
+                    action: "open"
+                } 
+            );
+        }
+
         return this.initBuilder(definition);
     }
 
@@ -358,6 +369,19 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
 
             this.setDefinition(definition);
+
+            if (this.props.glue) {
+                this.props.glue.contexts.set(
+                    'workflow', 
+                    {
+                        id: definition?._id || undefined,
+                        name: definition?.name || undefined,
+                        action: "change"
+                    } 
+                );
+
+                console.log(this.props.glue.contexts.get('workflow'));
+            }
     
             if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
                 return saveDefinition(definition)
