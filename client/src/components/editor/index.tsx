@@ -276,7 +276,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let definition = await loadDefinitionById(this.props.definitionId);
 
         if (this.props.glue) {
-            this.props.glue.contexts.set(
+            await this.props.glue.contexts.set(
                 'workflow', 
                 {
                     id: definition?._id || undefined,
@@ -373,7 +373,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             this.setDefinition(definition);
 
             if (this.props.glue) {
-                this.props.glue.contexts.set(
+                await this.props.glue.contexts.set(
                     'workflow', 
                     {
                         id: definition?._id || undefined,
