@@ -175,10 +175,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve();
         }
 
-        if (this.state.definition?.is_saved === true) {
-            return Promise.resolve();
-        }
-
         let definition: TripettoDefinition = Object.assign({} as TripettoDefinition, this.state.tripettoDefinition);
 
         await this.onChange(definition);
