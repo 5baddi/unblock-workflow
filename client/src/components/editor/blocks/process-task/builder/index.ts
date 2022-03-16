@@ -27,6 +27,8 @@ export class ProcessTask extends NodeBlock
     @definition("boolean")
     sendable: boolean = false;
 
+    dropdown?;
+
     loadDefinitions(): void
     {
         let endpoint = "/definitions";
@@ -45,7 +47,7 @@ export class ProcessTask extends NodeBlock
         API.get(endpoint)
             .then(response => {
                 if (! response.data || ! response.data.definitions || ! Array.isArray(response.data.definitions)) {
-                    this.options = [];
+                    this.dropdown.options = [];
                 }
 
                 let definitions = response.data.definitions.filter(definition => {
@@ -62,21 +64,29 @@ export class ProcessTask extends NodeBlock
                         label: <string> definition.name
                     };
                 });
-            });
-    }
 
-    @slots
-    defineSlots()
-    {
-        this.loadDefinitions();
+                this.dropdown.options(this.options);
+
+                if (Array.isArray(this.options) && this.options.length > 0) {
+                    this.dropdown.isAwaiting = false;
+                }
+            });
     }
 
     @editor
     defineEditor() 
     {
-        if (! this.options || this.options.length === 0) {
-            this.loadDefinitions();
-        }
+        let defaultOptions = [
+            {
+                label: 'Loading workflows...',
+                value: '-1',
+            }
+        ];
+
+        this.dropdown = (new Forms.Dropdown(defaultOptions, Forms.Text.bind(this, "definitionId", "")))
+            .await();
+
+        this.loadDefinitions();
 
         this.editor.name(false, false, "Name", false).focus();
         this.node.nameVisible = false;
@@ -87,7 +97,7 @@ export class ProcessTask extends NodeBlock
             form: {
                 title: "Select within workflow",
                 controls: [
-                    new Forms.Dropdown(this.options, Forms.Text.bind(this, "definitionId", "")).disabled(! this.options || this.options.length === 0)
+                    this.dropdown
                 ]
             }
         });
