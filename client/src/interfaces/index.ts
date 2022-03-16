@@ -18,7 +18,7 @@ export interface IDefinition extends TripettoIDefinition
     user_id?: string;
     tenant_id?: string;
     tenants_ids?: Array<string>;
-    updated_at?: Date;
+    updated_at?: Date | string | number;
     is_saved?: boolean;
 }
 

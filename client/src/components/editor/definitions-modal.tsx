@@ -150,13 +150,21 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             },
         ];
 
-        let definitions = Object.values(this.state.definitions).sort(function (a, b) {
-            if (typeof b.created_at === "undefined" || typeof a.created_at === "undefined") {
-                return 0;
-            }
+        let definitions = Object.values(this.state.definitions)
+            .sort(function (a, b) {
+                if (typeof b.created_at === "undefined" || typeof a.created_at === "undefined") {
+                    return 0;
+                }
 
-            return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime();
-        });
+                return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime();
+            })
+            .sort(function (a, b) {
+                if (typeof b.updated_at === "undefined" || typeof a.updated_at === "undefined") {
+                    return 0;
+                }
+    
+                return (new Date(b.updated_at)).getTime() - (new Date(a.updated_at)).getTime();
+            });
 
         return (
             <div style={{display: "table", tableLayout: "fixed", width: "100%", height: 700}}>
@@ -173,11 +181,6 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     }}
                     selectionModel={this.state.selectionModel}
                     onCellEditCommit={this.updateDefinition}
-                    initialState={{
-                        sorting: {
-                          sortModel: [{ field: 'created_at', sort: 'desc' }],
-                        },
-                    }}
                 />
             </div>
         );
