@@ -13,7 +13,7 @@ export interface IDefinition extends TripettoIDefinition
     language?: string;
     prologue?: IPrologue;
     epilogue?: IEpilogue;
-    created_at?: Date;
+    created_at?: Date | string | number;
     hash?: string;
     user_id?: string;
     tenant_id?: string;

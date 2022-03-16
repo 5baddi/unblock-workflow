@@ -150,10 +150,18 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             },
         ];
 
+        let definitions = Object.values(this.state.definitions).sort(function (a, b) {
+            if (typeof b.created_at === "undefined" || typeof a.created_at === "undefined") {
+                return 0;
+            }
+
+            return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime();
+        });
+
         return (
             <div style={{display: "table", tableLayout: "fixed", width: "100%", height: 700}}>
                 <DataGrid
-                    rows={this.state.definitions}
+                    rows={definitions}
                     columns={columns}
                     pageSize={50}
                     rowsPerPageOptions={[50]}
@@ -165,6 +173,11 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                     }}
                     selectionModel={this.state.selectionModel}
                     onCellEditCommit={this.updateDefinition}
+                    initialState={{
+                        sorting: {
+                          sortModel: [{ field: 'created_at', sort: 'desc' }],
+                        },
+                    }}
                 />
             </div>
         );
