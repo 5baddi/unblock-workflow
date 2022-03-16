@@ -284,6 +284,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     action: "open"
                 } 
             );
+
+            console.log(await this.props.glue.contexts.get('workflow'));
         }
 
         return this.initBuilder(definition);
@@ -380,7 +382,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     } 
                 );
 
-                console.log(this.props.glue.contexts.get('workflow'));
+                console.log(await this.props.glue.contexts.get('workflow'));
             }
     
             if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
