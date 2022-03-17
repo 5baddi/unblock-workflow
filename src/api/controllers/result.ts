@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, RESPONSE_COLLECTION_NAME, RESULT_WEBHOOK } from '../../settings';
+import { DEFINITION_COLLECTION_NAME, RESPONSE_COLLECTION_NAME, RESULT_WEBHOOK, NORMALIZED_RESPONSE_COLLECTION_NAME } from '../../settings';
 import { connect } from "../../services/mongodb";
 import { v4 as uuidv4 } from 'uuid';
 import { IResponse, IDefinition } from '../../interfaces/definition';
@@ -10,7 +10,7 @@ function save(request, response)
     let id = request.params.id;
     let fields = request.body.fields;
     if (! id || ! fields) {
-        response.status(401)
+        return response.status(401)
             .send({
                 success: false,
                 message: "Definition id and fields are required!",
@@ -52,8 +52,6 @@ function save(request, response)
                         return db.collection(RESPONSE_COLLECTION_NAME)
                             .insertOne(JSON.parse(JSON.stringify(_response)))
                             .then(insertedResponse => {
-                                client.close();
-
                                 let query = "INSERT INTO `results` (`id`, `definition_id`, `key`, `type`, `version`, `data_type`, `name`, `value`, `snapshot`, `updated_at`, `created_at`) VALUES ?";
                                 let key = uuidv4();
 
@@ -75,40 +73,71 @@ function save(request, response)
                                     ];
                                 });
 
-                                return request.getConnection((conErr, connection) => {
+                                let error: any = undefined;
+
+                                request.getConnection((conErr, connection) => {
                                     if (conErr) {
-                                        return response.status(500).send({
-                                            success: false,
-                                            message: conErr.message  || "failed to save result.",
-                                        });
+                                        error = conErr;
+
+                                        return;
                                     }
 
                                     connection.query(query, [rows], (err) => {
                                         if (err) {
-                                            return response.status(500).send({
-                                                success: false,
-                                                message: err.message  || "failed to save result.",
-                                            });
-                                        }
+                                            error = err;
 
-                                        return response.send({ success: true});
+                                            return;
+                                        }
                                     });
                                 });
-                            })
-                            .then(savingResponse => {
-                                if (RESULT_WEBHOOK) {
-                                    return Superagent
-                                        .post(RESULT_WEBHOOK)
-                                        .send(_response)
-                                        .then((webhookResult) => {
-                                            return savingResponse;
-                                        });
+
+                                if (typeof error === "undefined") {
+                                    return true;
                                 }
 
-                                return savingResponse;
+                                return error;
+                            })
+                            .then(savingResponse => {
+                                if (savingResponse !== true) {
+                                    return response.status(500).send({
+                                        success: false,
+                                        message: savingResponse?.message  || "failed to save result.",
+                                    });
+                                }
+
+                                let normalizedResponses = {
+                                    definition_id: _response.definition_id,
+                                    tenant_id: _response.tenant_id,
+                                    tenants_ids: _response.tenants_ids,
+                                    created_at: new Date()
+                                };
+                                 
+                                Object.values(fields).map((field) => {
+                                    let data = JSON.parse(JSON.stringify(field));
+
+                                    normalizedResponses[data.name] = data.value;
+                                });
+
+                                return db.collection(NORMALIZED_RESPONSE_COLLECTION_NAME)
+                                    .insertOne(normalizedResponses)
+                                    .then(normalizedResult => {
+                                        client.close();
+
+                                        if (RESULT_WEBHOOK) {
+                                            return Superagent
+                                                .post(RESULT_WEBHOOK)
+                                                .send(_response)
+                                                .then((webhookResult) => {
+                                                    return response.send({ success: true });;
+                                                });
+                                        }
+        
+                                        return response.send({ success: true });;
+                                    });
                             });
                     })
                     .catch(error => {
+                        console.log(error);
                         client.close();
 
                         return response.status(500).send({
