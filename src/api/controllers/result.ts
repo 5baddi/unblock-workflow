@@ -115,7 +115,18 @@ function save(request, response)
                                 Object.values(fields).map((field) => {
                                     let data = JSON.parse(JSON.stringify(field));
 
-                                    normalizedResponses[data.name] = data.value;
+                                    let name = data.name;
+                                    if (typeof name !== "string") {
+                                        return false;
+                                    }
+
+                                    let _name: string = name;
+                                    _name = name.split('.').join('');
+                                    _name = name.split('$').join('');
+
+                                    normalizedResponses[_name] = data.value;
+
+                                    return field;
                                 });
 
                                 return db.collection(NORMALIZED_RESPONSE_COLLECTION_NAME)
