@@ -121,8 +121,8 @@ function save(request, response)
                                     }
 
                                     let _name: string = name;
-                                    _name = name.split('.').join('');
-                                    _name = name.split('$').join('');
+                                    _name = name.split('.').join(' ');
+                                    _name = name.split('$').join(' ');
 
                                     normalizedResponses[_name] = data.string || data.value;
 
