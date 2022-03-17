@@ -369,6 +369,17 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
 
             this.setDefinition(definition);
+
+            if (this.props.glue) {
+                await this.props.glue.contexts.set(
+                    'workflow', 
+                    {
+                        id: definition?._id || undefined,
+                        name: definition?.name || undefined,
+                        action: "change"
+                    } 
+                );
+            }
     
             if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
                 return saveDefinition(definition)
