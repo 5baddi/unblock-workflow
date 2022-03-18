@@ -300,30 +300,32 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             );
 
             if (this.state.definition) {
-                await this.props.glue.appManager.inMemory.import([
+                let importResult = await this.props.glue.appManager.inMemory.import([
                     {
                         name: RUNNER_PREVIEW_APP,
                         type: "window",
                         title: "Unblock - Workflow preview",
                         details: {
                             url: `${PUBLIC_URL}/preview/${this.state.definition._id}`,
-                        },
-                        customProperties: {
-                            includeInWorkspaces: false,
-                        },
+                        }
                     }, {
                         name: RUNNER_RUN_APP,
                         type: "window",
                         title: "Unblock - Workflow runner",
                         details: {
                             url: `${PUBLIC_URL}/run/${this.state.definition._id}`,
-                        },
-                        customProperties: {
-                            includeInWorkspaces: false,
-                        },
+                        }
                     }], 
                     "merge"
                 );
+
+                let importedApps = importResult.imported;
+                let errors = importResult.errors;
+
+                if (ENV === "development") {
+                    importedApps.forEach(console.log);
+                    errors.forEach(e => console.log(`App: ${e.app}, Error: ${e.error}`));
+                }
             }
         }
 

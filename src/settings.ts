@@ -28,7 +28,7 @@ export const DEFINITION_KEY = "definition";
 export const DEFINITION_COLLECTION_NAME = "definitions";
 export const SNAPSHOT_COLLECTION_NAME = "snapshots";
 export const RESPONSE_COLLECTION_NAME = "responses";
-export const NORMALIZED_RESPONSE_COLLECTION_NAME = "normalized_responses";
+export const NORMALIZED_RESPONSE_COLLECTION_NAME = "results-";
 export const TASK_COLLECTION_NAME = "tasks";
 export const USER_COLLECTION_NAME = "users";
 

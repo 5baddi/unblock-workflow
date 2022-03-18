@@ -5,6 +5,7 @@ import { IBuilder, ICluster, IDefinition as TripettoDefinition, IPrologue, IEpil
 export interface IDefinition extends TripettoIDefinition
 {
     _id?: string;
+    slug?: string;
     clusters: ICluster [];
     builder: IBuilder;
     name?: string;

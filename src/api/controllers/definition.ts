@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION } from '../../settings';
+import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, NORMALIZED_RESPONSE_COLLECTION_NAME } from '../../settings';
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
@@ -204,6 +204,14 @@ function save(request, response)
                     };
                 });
         })
+        .then(async(query) => {
+            if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug) {
+                await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug}`)
+                    .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug}`);
+            }
+
+            return query;
+        })
         .then(query => {
             let now: Date = new Date();
             let ip = request.headers['x-forwarded-for'] || null;
@@ -260,6 +268,7 @@ function save(request, response)
 
             if (typeof definition._id === "undefined") {
                 filters._id = definition._id = new ObjectId();
+                definition.slug = definition._id.toJSON();
             }
 
             if (typeof definition._id === "string") {

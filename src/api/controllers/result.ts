@@ -130,12 +130,12 @@ function save(request, response)
                                     _name = name.split('.').join(' ');
                                     _name = name.split('$').join(' ');
 
-                                    normalizedResponses[_name] = data.string || data.value;
+                                    normalizedResponses[_name] = data.datatype !== "date" ? data.value : (data.string || data.value);
 
                                     return field;
                                 });
 
-                                return db.collection(NORMALIZED_RESPONSE_COLLECTION_NAME)
+                                return db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${definition.slug || definition._id}`)
                                     .insertOne(normalizedResponses)
                                     .then(normalizedResult => {
                                         client.close();

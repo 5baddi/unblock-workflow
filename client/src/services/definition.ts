@@ -20,6 +20,13 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
     if (currentDefinition && typeof currentDefinition._id === "string") {
         definition._id = currentDefinition._id;
     }
+
+    let slug = definition.name.replace(/[^\w]/g, '-');
+    if (definition.name !== DEFAULT_NAME && (typeof definition.slug === "undefined" && definition.slug !== slug)) {
+        definition.slug = slug;
+    } else {
+        definition.slug = definition._id || undefined;
+    }
     
     if (currentDefinition && typeof currentDefinition.created_at !== "undefined") {
         definition.created_at = currentDefinition.created_at;
