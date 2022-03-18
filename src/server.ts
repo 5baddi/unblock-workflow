@@ -41,7 +41,7 @@ app.locals = {
 
 app.use(async (req, res, next) => {
     try {
-        res.header("Access-Control-Allow-Origin", SERVER_HOST);
+        res.header("Access-Control-Allow-Origin", ENV === "development" ? "*" : SERVER_HOST);
         res.header(
             "Access-Control-Allow-Headers",
             "Origin, X-Requested-With, Content-Type, Accept, Authorization"
