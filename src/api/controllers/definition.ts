@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION } from '../../settings';
+import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION } from '../../settings';
 import { IDefinition, ISnapshot } from "../../interfaces/definition";
 import { IMongoDBFilter } from '../../interfaces';
 import { connect } from "../../services/mongodb";
@@ -13,6 +13,7 @@ function checkDefinitionVersion(definition: IDefinition): boolean
 
 function index(request, response) 
 {
+    let tenant = request.query.tenant;
     let tenantId = request.params.tenantId;
     let userId = request.params.userId;
     let filter = JSON.parse(JSON.stringify({ deleted_at: { $exists: false } }));
@@ -26,9 +27,16 @@ function index(request, response)
     //     filter.user_id = userId;
     // }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+ 
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
 
             db.collection(DEFINITION_COLLECTION_NAME)
                 .find(filter)
@@ -52,6 +60,7 @@ function index(request, response)
 
 function find(request, response) 
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     if (! id) {
         response.status(401)
@@ -61,9 +70,16 @@ function find(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
 
             db.collection(DEFINITION_COLLECTION_NAME)
                 .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
@@ -96,6 +112,7 @@ function find(request, response)
 
 async function findForRunner(request, response) 
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     if (! id) {
         return response.status(401)
@@ -105,9 +122,16 @@ async function findForRunner(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
 
             db.collection(DEFINITION_COLLECTION_NAME)
                 .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
@@ -141,6 +165,7 @@ async function findForRunner(request, response)
 
 function save(request, response) 
 {
+    let tenant = request.query.tenant;
     let body = request.body;
     if (! body.definition) {
         response.status(401)
@@ -150,11 +175,18 @@ function save(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     let definition: IDefinition = Object.assign({} as IDefinition, body.definition);
 
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
             let existDefinition: IDefinition | null = null;
 
             if (typeof definition._id === "undefined") {
@@ -287,6 +319,7 @@ function save(request, response)
 
 function hash(request, response)
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     if (! id) {
         return response.status(401)
@@ -296,9 +329,16 @@ function hash(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
             let hash = generateHash();
 
             db.collection(DEFINITION_COLLECTION_NAME)
@@ -330,6 +370,7 @@ function hash(request, response)
 
 function updateName(request, response)
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     let name = request.body.name;
     if (! id || ! name) {
@@ -340,9 +381,16 @@ function updateName(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
             let hash = generateHash();
 
             db.collection(DEFINITION_COLLECTION_NAME)
@@ -374,6 +422,7 @@ function updateName(request, response)
 
 function remove(request, response) 
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     if (! id) {
         response.status(401)
@@ -383,9 +432,16 @@ function remove(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
 
             db.collection(DEFINITION_COLLECTION_NAME)
                 .findOneAndUpdate({ _id: new ObjectId(id), deleted_at: { $exists: false } }, { $set: { deleted_at: new Date() }})
@@ -416,6 +472,7 @@ function remove(request, response)
 
 function bulkRemove(request, response) 
 {
+    let tenant = request.query.tenant;
     let body = request.body;
     let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
     if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
@@ -426,13 +483,20 @@ function bulkRemove(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     let ids = Object.values(definitionsIds).map((id) => {
         return new ObjectId(id);
     });
 
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
             let bulk = db.collection(DEFINITION_COLLECTION_NAME).initializeUnorderedBulkOp();
 
             bulk.find({ _id: { $in: ids }, deleted_at: { $exists: false } }).update({ $set: { deleted_at: new Date() } });
@@ -464,6 +528,7 @@ function bulkRemove(request, response)
 
 function bulkExport(request, response) 
 {
+    let tenant = request.query.tenant;
     let body = request.body;
     let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
     if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
@@ -474,13 +539,20 @@ function bulkExport(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     let ids = Object.values(definitionsIds).map((id) => {
         return new ObjectId(id);
     });
 
     return connect()
         .then(client => {
-            let db = client.db();
+            let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
 
             db.collection(DEFINITION_COLLECTION_NAME)
                 .find({ _id: { $in: ids }, deleted_at: { $exists: false } })

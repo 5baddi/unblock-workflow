@@ -87,6 +87,15 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             .catch(error => this.setState({ isLoading: false  }));
     }
 
+    private getTenantId(): string
+    {
+        if (! this.props.user || ! this.props.user.tenantId) {
+            return '';
+        }
+
+        return this.props.user.tenantId;
+    }
+
     private renderDefinitionsTable()
     {
         if (! this.props.show) {
@@ -196,7 +205,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             return;
         }
 
-        API.put(`${PUBLIC_URL}/api/definitions/${definitionId}`, { name });
+        API.put(`${PUBLIC_URL}/api/definitions/${definitionId}?tenant=${this.getTenantId()}`, { name });
     }
 
     private setSelectionModel(newSelectionModel) 
@@ -225,7 +234,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         let duplicationIndex: number = this.state.definitions ? this.state.definitions.length + 1 : 1;
         _definition.name = _definition.name ? _definition.name?.concat(` copy 0${duplicationIndex}`) : `Unamed copy 0${duplicationIndex}`;
 
-        API.post(`${PUBLIC_URL}/api/definitions`, { definition: _definition })
+        API.post(`${PUBLIC_URL}/api/definitions?tenant=${this.getTenantId()}`, { definition: _definition })
             .then(response => {
                 if (! response.data.definition) {
                     this.setState({ isLoading: false });

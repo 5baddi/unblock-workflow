@@ -77,13 +77,15 @@ function metaFieldsHasChanged(submittedDefinition?: TripettoDefinition, stateDef
     return false;
 }
 
-function saveDefinition(definition: IDefinition): Promise<IDefinition | undefined>
+function saveDefinition(definition: IDefinition, tenantId?: string): Promise<IDefinition | undefined>
 {
     if (typeof definition.name === "undefined" && typeof definition.clusters === "undefined") {
         return Promise.resolve(definition);
     }
 
-    return API.post(`${PUBLIC_URL}/api/definitions`, { definition })
+    let tenant = typeof tenantId !== "undefined" ? tenantId : '';
+
+    return API.post(`${PUBLIC_URL}/api/definitions?tenant=${tenant}`, { definition })
         .then(response => {
             if (! response.data.definition) {
                 return Promise.resolve(undefined);
@@ -113,13 +115,15 @@ function saveDefinition(definition: IDefinition): Promise<IDefinition | undefine
         });
 }
 
-function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefined>
+function loadDefinitionById(definitionId?: string, tenantId?: string): Promise<IDefinition | undefined>
 {
     if (! definitionId) {
         return Promise.resolve(undefined);
     }
 
-    return API.get(`${PUBLIC_URL}/api/definition/${definitionId}`)
+    let tenant = typeof tenantId !== "undefined" ? tenantId : '';
+
+    return API.get(`${PUBLIC_URL}/api/definition/${definitionId}?tenant=${tenant}`)
         .then(response => {
             if (! response.data.definition) {
                 return undefined;
@@ -134,7 +138,7 @@ function loadDefinitionById(definitionId?: string): Promise<IDefinition | undefi
                 return definition;
             }
 
-            return API.put(`${PUBLIC_URL}/api/definition/${definition._id}/hash`)
+            return API.put(`${PUBLIC_URL}/api/definition/${definition._id}/hash?tenant=${tenant}`)
                 .then(response => {
                     if (! response.data.hash) {
                         return undefined;

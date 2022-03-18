@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Grid } from "@mui/material";
-import { Builder, Debounce, definition } from 'tripetto';
+import { Builder, Debounce } from 'tripetto';
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
@@ -118,6 +118,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         bulkDeleteWorkflows={this.bulkDeleteWorkflows}
                         allowExport={this.props.allowExport}
                         bulkExportWorkflows={this.bulkExportWorkflows}
+                        user={this.state.user}
                         loadWorkflows={() => this.loadWorkflows()}/>
                 </Grid>
             </Grid>
@@ -239,7 +240,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 console.log("re-send unsaved definition", definition);
             }
 
-            saveDefinition(definition)
+            saveDefinition(definition, this.getTenantId())
                 .then(definition => this.onSuccessfulSaving(definition))
                 .catch(error => this.onFailedSaving(error, definition));
         }, 15000);
@@ -273,7 +274,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.state.user.tenantId);
         }
 
-        let definition = await loadDefinitionById(this.props.definitionId);
+        let definition = await loadDefinitionById(this.props.definitionId, this.getTenantId());
 
         return this.initBuilder(definition);
     }
@@ -382,7 +383,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             }
     
             if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
-                return saveDefinition(definition)
+                return saveDefinition(definition, this.getTenantId())
                     .then(definition => this.onSuccessfulSaving(definition))
                     .catch(error => this.onFailedSaving(error, definition));
             }
@@ -405,7 +406,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     }
 
     mutateDefinition = new Debounce((definition: IDefinition) => {
-        saveDefinition(definition)
+        saveDefinition(definition, this.getTenantId())
             .then(definition => this.onSuccessfulSaving(definition))
             .catch(error => this.onFailedSaving(error, definition));
     }, 500);
@@ -470,7 +471,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve(false);
         }
 
-        return API.delete(`${PUBLIC_URL}/api/definitions`, { data: { definitionsIds } })
+        return API.delete(`${PUBLIC_URL}/api/definitions?tenant=${this.getTenantId()}`, { data: { definitionsIds } })
             .then(response => {
                 if (! response.data.success) {
                     return false;
@@ -492,13 +493,22 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             });
     }
 
+    private getTenantId(): string
+    {
+        if (! this.state.user || ! this.state.user.tenantId) {
+            return '';
+        }
+
+        return this.state.user.tenantId;
+    }
+
     private bulkExportWorkflows(definitionsIds?: string[]): Promise<boolean>
     {
         if (! this.props.allowExport || typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
             return Promise.resolve(false);
         }
 
-        return API.post(`${PUBLIC_URL}/api/definitions/export`, { definitionsIds })
+        return API.post(`${PUBLIC_URL}/api/definitions/export?tenant=${this.getTenantId()}`, { definitionsIds })
             .then(response => {
                 if (! response.data.success || ! response.data.definitions) {
                     return false;
@@ -552,7 +562,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.setState({ isLoading: true });
 
-        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}`)
+        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}?tenant=${this.getTenantId()}`)
             .then(response => {
                 if (! response.data.success) {
                     return false;
@@ -590,7 +600,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.setState({ isLoading: true, showModal: false });
 
-        loadDefinitionById(definitionId)
+        loadDefinitionById(definitionId, this.getTenantId())
             .then(definition => {
                 this.initBuilder(definition);
             });
@@ -600,11 +610,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         return this.save()
             .then(() => {
-                let endpoint = `${PUBLIC_URL}/api/definitions`;
+                let endpoint = `${PUBLIC_URL}/api/definitions?tenant=${this.getTenantId()}`;
                 let user = this.state.user;
         
                 if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
-                    endpoint = endpoint.concat(`/${user.tenantId}/${user.id}`);
+                    endpoint = endpoint.concat(`/${user.tenantId}/${user.id}?tenant=${user.tenantId}`);
                 }
         
                 return API.get(endpoint);

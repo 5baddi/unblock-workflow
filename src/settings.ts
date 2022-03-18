@@ -4,13 +4,14 @@ export const SERVER_HOST = process.env.SERVER_HOST || "localhost";
 export const SERVER_PORT = process.env.SERVER_PORT || "3000";
 export const PUBLIC_URL = process.env.PUBLIC_URL || `http://${SERVER_HOST}:${SERVER_PORT}`;
 export const MONGODB_URL = process.env.MONGODB_URL;
+export const DEFAULT_MONGODB_DATABASE = process.env.DEFAULT_MONGODB_DATABASE;
 export const RESULT_WEBHOOK = process.env.RESULT_WEBHOOK;
 export const RESPONSE_WEBHOOK = process.env.RESPONSE_WEBHOOK;
 export const BUILDER_ON_SAVE_WEBHOOK = process.env.BUILDER_ON_SAVE_WEBHOOK;
 export const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME || "admin";
 export const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD || "S57Yo4nzGEgdLX";
 
-if (! MONGODB_URL) {
+if (! MONGODB_URL || ! DEFAULT_MONGODB_DATABASE) {
     throw new Error("Unblock Studio: The environment variable 'MONGODB_URL' is not defined.");
 }
 
