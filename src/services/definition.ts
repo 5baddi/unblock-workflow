@@ -103,7 +103,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
                 });
         })
         .then(async(query) => {
-            if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug && query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
+            if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
                 await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug}`)
                     .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug}`);
             }
