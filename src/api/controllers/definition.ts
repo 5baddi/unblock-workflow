@@ -30,12 +30,12 @@ function index(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
- 
+ console.log(tenantDB);
     return connect()
         .then(client => {
             let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
@@ -75,10 +75,10 @@ function find(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     return connect()
@@ -129,10 +129,10 @@ async function findForRunner(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     return connect()
@@ -184,10 +184,10 @@ function save(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     let definition: IDefinition = Object.assign({} as IDefinition, body.definition);
@@ -340,10 +340,10 @@ function hash(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     return connect()
@@ -394,10 +394,10 @@ function updateName(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     return connect()
@@ -447,10 +447,10 @@ function remove(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     return connect()
@@ -500,10 +500,10 @@ function bulkRemove(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     let ids = Object.values(definitionsIds).map((id) => {
@@ -558,10 +558,10 @@ function bulkExport(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     let ids = Object.values(definitionsIds).map((id) => {

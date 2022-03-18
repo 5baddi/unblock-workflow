@@ -20,10 +20,10 @@ function send(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     if (typeof RESPONSE_WEBHOOK === "undefined") {
@@ -95,10 +95,10 @@ function save(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
-        tenantDB = tenant.split('/').join('');
-        tenantDB = tenant.split('\\').join('');
-        tenantDB = tenant.split('$').join('');
-        tenantDB = tenant.split('.').join('');
+        tenantDB = tenantDB?.split('/').join('');
+        tenantDB = tenantDB?.split('\\').join('');
+        tenantDB = tenantDB?.split('$').join('');
+        tenantDB = tenantDB?.split('.').join('');
     }
 
     if (typeof BUILDER_ON_SAVE_WEBHOOK === "undefined") {
