@@ -20,6 +20,8 @@ function send(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -93,6 +95,8 @@ function save(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }

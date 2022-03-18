@@ -30,6 +30,8 @@ function index(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -73,6 +75,8 @@ function find(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -125,6 +129,8 @@ async function findForRunner(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -178,6 +184,8 @@ function save(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -332,6 +340,8 @@ function hash(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -384,6 +394,8 @@ function updateName(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -435,6 +447,8 @@ function remove(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -486,6 +500,8 @@ function bulkRemove(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
@@ -542,6 +558,8 @@ function bulkExport(request, response)
     let tenantDB: string | undefined = undefined;
     if (tenant) {
         tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('/').join('');
+        tenantDB = tenant.split('\\').join('');
         tenantDB = tenant.split('$').join('');
         tenantDB = tenant.split('.').join('');
     }
