@@ -68,6 +68,15 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             });
     }
 
+    private getTenantId(): string
+    {
+        if (! this.state.definition || ! this.state.definition.tenant_id) {
+            return '';
+        }
+
+        return this.state.definition.tenant_id;
+    }
+
     private applyStyle(): void
     {
         this.style = {
@@ -183,7 +192,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve(false);
         }
 
-        return API.post(`${PUBLIC_URL}/api/webhooks/runner/${definitionId}`, { fields: exportables.fields });
+        return API.post(`${PUBLIC_URL}/api/webhooks/runner/${definitionId}?tenant=${this.getTenantId()}`, { fields: exportables.fields });
     }
     
     private async saveResult(exportables?: Export.IExportables): Promise<boolean>
@@ -201,7 +210,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         this.setState({ isFailed: false, isLoading: true });
 
-        return API.post(`${PUBLIC_URL}/api/result/${definitionId}`, { fields: exportables.fields })
+        return API.post(`${PUBLIC_URL}/api/result/${definitionId}?tenant=${this.getTenantId()}`, { fields: exportables.fields })
             .then(response => {
                 if (! response.data.success) {
                     this.setState({ isFailed: true, isLoading: false });
@@ -228,7 +237,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return Promise.resolve();
         }
 
-        return API.get(`${PUBLIC_URL}/api/runner/${definitionId}`)
+        return API.get(`${PUBLIC_URL}/api/runner/${definitionId}?tenant=${this.getTenantId()}`)
             .then(response => {
                 if (! response.data.definition) {
                     this.setState({ isLoading: false, isFailed: true });

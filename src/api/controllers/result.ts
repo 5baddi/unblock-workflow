@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, RESPONSE_COLLECTION_NAME, RESULT_WEBHOOK, NORMALIZED_RESPONSE_COLLECTION_NAME } from '../../settings';
+import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, RESPONSE_COLLECTION_NAME, RESULT_WEBHOOK, NORMALIZED_RESPONSE_COLLECTION_NAME } from '../../settings';
 import { connect } from "../../services/mongodb";
 import { v4 as uuidv4 } from 'uuid';
 import { IResponse, IDefinition } from '../../interfaces/definition';
@@ -7,6 +7,7 @@ import * as Superagent from "superagent";
 
 function save(request, response)
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     let fields = request.body.fields;
     if (! id || ! fields) {
@@ -17,9 +18,16 @@ function save(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     return connect()
         .then(client => {
-                let db = client.db();
+                let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
                 
                 db.collection(DEFINITION_COLLECTION_NAME)
                     .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })

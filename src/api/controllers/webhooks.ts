@@ -1,11 +1,12 @@
 import { ObjectId } from "mongodb";
-import { DEFINITION_COLLECTION_NAME, RESPONSE_WEBHOOK, BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD, BUILDER_ON_SAVE_WEBHOOK } from '../../settings';
+import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, RESPONSE_WEBHOOK, BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD, BUILDER_ON_SAVE_WEBHOOK } from '../../settings';
 import { connect } from "../../services/mongodb";
 import { IResponse, IDefinition } from '../../interfaces/definition';
 import * as Superagent from "superagent";
 
 function send(request, response)
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     let fields = request.body.fields;
     if (! id || ! fields) {
@@ -16,6 +17,13 @@ function send(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     if (typeof RESPONSE_WEBHOOK === "undefined") {
         return response.status(200)
             .send({ success: true });
@@ -23,7 +31,7 @@ function send(request, response)
 
     return connect()
         .then(client => {
-                let db = client.db();
+                let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
                 
                 db.collection(DEFINITION_COLLECTION_NAME)
                     .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
@@ -72,6 +80,7 @@ function send(request, response)
 
 function save(request, response)
 {
+    let tenant = request.query.tenant;
     let id = request.params.id;
     if (! id) {
         return response.status(401)
@@ -81,6 +90,13 @@ function save(request, response)
             });
     }
 
+    let tenantDB: string | undefined = undefined;
+    if (tenant) {
+        tenantDB = tenant.split(' ').join('');
+        tenantDB = tenant.split('$').join('');
+        tenantDB = tenant.split('.').join('');
+    }
+
     if (typeof BUILDER_ON_SAVE_WEBHOOK === "undefined") {
         return response.status(200)
             .send({ success: true });
@@ -88,7 +104,7 @@ function save(request, response)
 
     return connect()
         .then(client => {
-                let db = client.db();
+                let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
                 
                 db.collection(DEFINITION_COLLECTION_NAME)
                     .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
