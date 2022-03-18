@@ -4,7 +4,7 @@ import { Builder, Debounce } from 'tripetto';
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
-import { DEFINITION_KEY, USER_ID_KEY, USER_TENANT_ID_KEY, DEFAULT_NAME } from '../../global';
+import { DEFINITION_KEY, USER_ID_KEY, USER_TENANT_ID_KEY, DEFAULT_NAME, RUNNER_PREVIEW_APP, RUNNER_RUN_APP } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -298,6 +298,33 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     action: "open"
                 } 
             );
+
+            if (this.state.definition) {
+                await this.props.glue.appManager.inMemory.import([
+                    {
+                        name: RUNNER_PREVIEW_APP,
+                        type: "window",
+                        title: "Unblock - Workflow preview",
+                        details: {
+                            url: `${PUBLIC_URL}/preview/${this.state.definition._id}`,
+                        },
+                        customProperties: {
+                            includeInWorkspaces: false,
+                        },
+                    }, {
+                        name: RUNNER_RUN_APP,
+                        type: "window",
+                        title: "Unblock - Workflow runner",
+                        details: {
+                            url: `${PUBLIC_URL}/run/${this.state.definition._id}`,
+                        },
+                        customProperties: {
+                            includeInWorkspaces: false,
+                        },
+                    }], 
+                    "merge"
+                );
+            }
         }
 
         let properties = mergeProperties(this.props.element);
@@ -533,7 +560,14 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        window.open(`${PUBLIC_URL}/preview/${this.state.definition._id}`, "_blank")?.focus();
+        if (! this.state.glueWorkspace || ! this.state.glueWorkspace.getAllGroups()[0]) {
+            window.open(`${PUBLIC_URL}/preview/${this.state.definition._id}`)?.focus();
+
+            return;
+        }
+
+        this.state.glueWorkspace 
+            .addGroup({type: "group", children: [{type: "window", appName: RUNNER_PREVIEW_APP}]});
     }
     
     private run()
@@ -542,7 +576,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        window.open(`${PUBLIC_URL}/run/${this.state.definition._id}`, "_blank")?.focus();
+        if (! this.state.glueWorkspace || ! this.state.glueWorkspace.getAllGroups()[0]) {
+            window.open(`${PUBLIC_URL}/run/${this.state.definition._id}`)?.focus();
+
+            return;
+        }
+
+        this.state.glueWorkspace 
+            .addGroup({type: "group", children: [{type: "window", appName: RUNNER_RUN_APP}]});
+
+        
     }
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>

@@ -60,6 +60,7 @@ export interface IRunnerProps
 {
     definitionId?: string;
     previewMode?: boolean;
+    glue?: any;
 }
 
 export interface IEditorMenuProps

@@ -221,7 +221,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             return;
         }
 
-        window.open(`${PUBLIC_URL}/run/${definitionId}`, "_blank")?.focus();
+        window.open(`${PUBLIC_URL}/run/${definitionId}`)?.focus();
     }
 
     private duplicateDefinition(definition: IDefinition): void

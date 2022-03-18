@@ -15,11 +15,21 @@ import "../editor/blocks/process-task/runner";
 
 import "./style.scss";
 
-export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean }>
+export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean, glueWorkspace?: any, glueContext?: any, user?: any }>
 {
     private style?: IChatStyles;
 
     private exportables?: Export.IExportables; 
+
+    private _isMounted: boolean = false;
+
+    public set isMounted(status: boolean) {
+        this._isMounted = status;
+    }
+
+    public get isMounted() {
+        return this._isMounted;
+    }
 
     constructor(props)
     {
@@ -34,6 +44,9 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             definition: undefined,
             isLoading: true,
             isFailed: false,
+            glueWorkspace: undefined,
+            glueContext: undefined,
+            user: undefined,
         };
     }
 
@@ -51,30 +64,54 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
         );
     }
 
-    componentDidMount()
+    async componentDidMount()
     {
+        this.isMounted = true;
+        this.isMounted && this.open();
+    }
+
+    componentWillUnmount()
+    {
+        this.isMounted = false;
+    }
+
+    async open()
+    {
+        await this.getGlueWorkspace();
+        await this.loadDefinitionById(this.props.definitionId);
+
         this.applyStyle();
-        this.loadDefinitionById(this.props.definitionId)
-            .then(() => {
-                run({
-                    element: document.getElementById("chat-runner"),
-                    styles: this.style,
-                    display: "inline",
-                    definition: this.state.definition,
-                    onSubmit: this.onSubmit,
-                    onChange: this.onChange,
-                    onAction: this.onAction,
-                });
-            });
+        run({
+            element: document.getElementById("chat-runner"),
+            styles: this.style,
+            display: "inline",
+            definition: this.state.definition,
+            onSubmit: this.onSubmit,
+            onChange: this.onChange,
+            onAction: this.onAction,
+        });
+    }
+
+    async getGlueWorkspace()
+    {
+        if (! this.props.glue) {
+            return;
+        }
+
+        let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
+        let glueContext = await glueWorkspace?.getContext();
+        let user = await this.props.glue.contexts.get("frontegg-user");
+
+        this.setState({ glueWorkspace, glueContext, user });
     }
 
     private getTenantId(): string
     {
-        if (! this.state.definition || ! this.state.definition.tenant_id) {
+        if (! this.state.user || ! this.state.user.tenantId) {
             return '';
         }
 
-        return this.state.definition.tenant_id.replace(/[^\w]/g, '');
+        return this.state.user.tenantId.replace(/[^\w]/g, '');
     }
 
     private applyStyle(): void
@@ -222,6 +259,26 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
                 return Promise.resolve(response.data.success);
             })
+            .then(success => {
+                if (success && this.props.glue) {
+                    return Promise.resolve([
+                        success,
+                        this.props.glue.contexts.set(
+                            "workflow", 
+                            {
+                                workflowId: this.state.definition?._id || undefined,
+                                tenantId: this.state.definition?.tenant_id || undefined,
+                                action: "results"
+                            } 
+                        )
+                    ]);
+                }
+
+                return Promise.resolve(success);
+            })
+            .then(([success, glueSetVoid]) => {
+                return Promise.resolve(success);
+            })
             .catch(error => {
                 if (ENV === "development") {
                     console.log(error);
@@ -233,7 +290,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
     private loadDefinitionById(definitionId?: string): Promise<void>
     {
-        if (! definitionId) {
+        if (! definitionId || ! this.state.user) {
             return Promise.resolve();
         }
 

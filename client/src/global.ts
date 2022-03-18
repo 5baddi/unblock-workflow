@@ -10,6 +10,8 @@ export const DEFINITION_NAME_KEY = "definition-name";
 export const EDITOR_CONTAINER_ID: string = "editor-container";
 
 export const DEFAULT_NAME = "Unnamed";
+export const RUNNER_PREVIEW_APP = "workflow-runner-preview-app";
+export const RUNNER_RUN_APP = "workflow-runner-run-app";
 
 export const DEFAULT_EDITOR_PROPERTIES: IEditorProperties = {
     element: null,
