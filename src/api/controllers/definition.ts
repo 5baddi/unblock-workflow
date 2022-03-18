@@ -28,11 +28,7 @@ function index(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     return connect()
@@ -73,11 +69,7 @@ function find(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     return connect()
@@ -127,11 +119,7 @@ async function findForRunner(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     return connect()
@@ -182,11 +170,7 @@ function save(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     let definition: IDefinition = Object.assign({} as IDefinition, body.definition);
@@ -338,11 +322,7 @@ function hash(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     return connect()
@@ -392,11 +372,7 @@ function updateName(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     return connect()
@@ -445,11 +421,7 @@ function remove(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     return connect()
@@ -498,11 +470,7 @@ function bulkRemove(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     let ids = Object.values(definitionsIds).map((id) => {
@@ -556,11 +524,7 @@ function bulkExport(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     let ids = Object.values(definitionsIds).map((id) => {

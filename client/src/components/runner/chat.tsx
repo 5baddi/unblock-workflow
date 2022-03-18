@@ -74,7 +74,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return '';
         }
 
-        return this.state.definition.tenant_id;
+        return this.state.definition.tenant_id.replace(/[^\w]/g, '');
     }
 
     private applyStyle(): void

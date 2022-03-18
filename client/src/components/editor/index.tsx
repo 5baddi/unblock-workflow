@@ -255,7 +255,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
         let glueContext = await glueWorkspace?.getContext();
         let user = await this.props.glue.contexts.get("frontegg-user");
-console.log(user);
+
         this.setState({ glueWorkspace, glueContext, user });
     }
 
@@ -271,7 +271,7 @@ console.log(user);
 
         if (typeof this.state.user !== "undefined") {
             window.sessionStorage.setItem(USER_ID_KEY, this.state.user.id);
-            window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.state.user.tenantId);
+            window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.state.user.tenantId.replace(/[^\w]/g, ''));
         }
 
         let definition = await loadDefinitionById(this.props.definitionId, this.getTenantId());
@@ -499,7 +499,7 @@ console.log(user);
             return '';
         }
 
-        return this.state.user.tenantId;
+        return this.state.user.tenantId.replace(/[^\w]/g, '');
     }
 
     private bulkExportWorkflows(definitionsIds?: string[]): Promise<boolean>
@@ -610,11 +610,11 @@ console.log(user);
     {
         return this.save()
             .then(() => {
-                let endpoint = `${PUBLIC_URL}/api/definitions/${this.getTenantId()}`;
+                let endpoint = `${PUBLIC_URL}/api/definitions`;
                 let user = this.state.user;
         
                 if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
-                    endpoint = endpoint.concat(`/${user.tenantId}/${user.id}`);
+                    endpoint = endpoint.concat(`/${user.tenantId.replace(/[^\w]/g, '')}/${user.id}`);
                 }
         
                 return API.get(endpoint);

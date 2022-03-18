@@ -20,11 +20,7 @@ function save(request, response)
 
     let tenantDB: string | undefined = undefined;
     if (typeof tenantId === "string") {
-        tenantDB = tenantId.split(' ').join('');
-        tenantDB = tenantDB?.split('/').join('');
-        tenantDB = tenantDB?.split('\\').join('');
-        tenantDB = tenantDB?.split('$').join('');
-        tenantDB = tenantDB?.split('.').join('');
+        tenantDB = tenantId.replace(/[^\w]/g, '');
     }
 
     return connect()

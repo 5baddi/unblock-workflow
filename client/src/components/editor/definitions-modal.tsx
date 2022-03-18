@@ -93,7 +93,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             return '';
         }
 
-        return this.props.user.tenantId;
+        return this.props.user.tenantId.replace(/[^\w]/g, '');
     }
 
     private renderDefinitionsTable()

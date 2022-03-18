@@ -38,7 +38,7 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
     } 
     
     if (user && typeof user.tenantId === "string") {
-        definition.tenant_id = user.tenantId;
+        definition.tenant_id = user.tenantId.replace(/[^\w]/g, '');
     }
 
     if (currentDefinition && typeof currentDefinition?.tenant_id === "string" && typeof definition.tenant_id !== "string") {
