@@ -85,7 +85,7 @@ function saveDefinition(definition: IDefinition, tenantId?: string): Promise<IDe
 
     let tenant = typeof tenantId !== "undefined" ? tenantId : '';
 
-    return API.post(`${PUBLIC_URL}/api/definitions?tenant=${tenant}`, { definition })
+    return API.post(`${PUBLIC_URL}/api/definitions/${tenant}`, { definition })
         .then(response => {
             if (! response.data.definition) {
                 return Promise.resolve(undefined);
@@ -101,7 +101,7 @@ function saveDefinition(definition: IDefinition, tenantId?: string): Promise<IDe
                 return Promise.resolve(undefined);
             }
 
-            return API.get(`${PUBLIC_URL}/api/webhooks/builder/${definition._id}`)
+            return API.get(`${PUBLIC_URL}/api/webhooks/builder/${definition._id}/${tenant}`)
                 .then(result => {
                     return Promise.resolve(definition);
                 });
@@ -123,7 +123,7 @@ function loadDefinitionById(definitionId?: string, tenantId?: string): Promise<I
 
     let tenant = typeof tenantId !== "undefined" ? tenantId : '';
 
-    return API.get(`${PUBLIC_URL}/api/definition/${definitionId}?tenant=${tenant}`)
+    return API.get(`${PUBLIC_URL}/api/definition/${definitionId}/${tenant}`)
         .then(response => {
             if (! response.data.definition) {
                 return undefined;
@@ -138,7 +138,7 @@ function loadDefinitionById(definitionId?: string, tenantId?: string): Promise<I
                 return definition;
             }
 
-            return API.put(`${PUBLIC_URL}/api/definition/${definition._id}/hash?tenant=${tenant}`)
+            return API.put(`${PUBLIC_URL}/api/definition/${definition._id}/hash/${tenant}`)
                 .then(response => {
                     if (! response.data.hash) {
                         return undefined;

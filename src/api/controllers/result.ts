@@ -7,8 +7,8 @@ import * as Superagent from "superagent";
 
 function save(request, response)
 {
-    let tenant = request.query.tenant;
     let id = request.params.id;
+    let tenantId = request.params.tenantId;
     let fields = request.body.fields;
     if (! id || ! fields) {
         return response.status(401)
@@ -19,8 +19,8 @@ function save(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -158,7 +158,6 @@ function save(request, response)
                             });
                     })
                     .catch(error => {
-                        console.log(error);
                         client.close();
 
                         return response.status(500).send({

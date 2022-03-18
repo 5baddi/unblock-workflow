@@ -471,7 +471,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve(false);
         }
 
-        return API.delete(`${PUBLIC_URL}/api/definitions?tenant=${this.getTenantId()}`, { data: { definitionsIds } })
+        return API.delete(`${PUBLIC_URL}/api/definitions/${this.getTenantId()}`, { data: { definitionsIds } })
             .then(response => {
                 if (! response.data.success) {
                     return false;
@@ -508,7 +508,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return Promise.resolve(false);
         }
 
-        return API.post(`${PUBLIC_URL}/api/definitions/export?tenant=${this.getTenantId()}`, { definitionsIds })
+        return API.post(`${PUBLIC_URL}/api/definitions/export/${this.getTenantId()}`, { definitionsIds })
             .then(response => {
                 if (! response.data.success || ! response.data.definitions) {
                     return false;
@@ -562,7 +562,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         this.setState({ isLoading: true });
 
-        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}?tenant=${this.getTenantId()}`)
+        return API.delete(`${PUBLIC_URL}/api/definition/${definitionId || oldDefinitionId}/${this.getTenantId()}`)
             .then(response => {
                 if (! response.data.success) {
                     return false;
@@ -610,11 +610,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
     {
         return this.save()
             .then(() => {
-                let endpoint = `${PUBLIC_URL}/api/definitions?tenant=${this.getTenantId()}`;
+                let endpoint = `${PUBLIC_URL}/api/definitions/${this.getTenantId()}`;
                 let user = this.state.user;
         
                 if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
-                    endpoint = endpoint.concat(`/${user.tenantId}/${user.id}?tenant=${user.tenantId}`);
+                    endpoint = endpoint.concat(`/${user.tenantId}/${user.id}`);
                 }
         
                 return API.get(endpoint);

@@ -13,7 +13,6 @@ function checkDefinitionVersion(definition: IDefinition): boolean
 
 function index(request, response) 
 {
-    let tenant = request.query.tenant;
     let tenantId = request.params.tenantId;
     let userId = request.params.userId;
     let filter = JSON.parse(JSON.stringify({ deleted_at: { $exists: false } }));
@@ -28,14 +27,14 @@ function index(request, response)
     // }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
         tenantDB = tenantDB?.split('.').join('');
     }
- console.log(tenantDB);
+
     return connect()
         .then(client => {
             let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
@@ -62,8 +61,8 @@ function index(request, response)
 
 function find(request, response) 
 {
-    let tenant = request.query.tenant;
     let id = request.params.id;
+    let tenantId = request.params.tenantId;
     if (! id) {
         response.status(401)
             .send({
@@ -73,8 +72,8 @@ function find(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -116,8 +115,8 @@ function find(request, response)
 
 async function findForRunner(request, response) 
 {
-    let tenant = request.query.tenant;
     let id = request.params.id;
+    let tenantId = request.params.tenantId;
     if (! id) {
         return response.status(401)
             .send({
@@ -127,8 +126,8 @@ async function findForRunner(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -171,7 +170,7 @@ async function findForRunner(request, response)
 
 function save(request, response) 
 {
-    let tenant = request.query.tenant;
+    let tenantId = request.params.tenantId;
     let body = request.body;
     if (! body.definition) {
         response.status(401)
@@ -182,8 +181,8 @@ function save(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -327,8 +326,8 @@ function save(request, response)
 
 function hash(request, response)
 {
-    let tenant = request.query.tenant;
     let id = request.params.id;
+    let tenantId = request.params.tenantId;
     if (! id) {
         return response.status(401)
             .send({
@@ -338,8 +337,8 @@ function hash(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -380,8 +379,8 @@ function hash(request, response)
 
 function updateName(request, response)
 {
-    let tenant = request.query.tenant;
     let id = request.params.id;
+    let tenantId = request.params.tenantId;
     let name = request.body.name;
     if (! id || ! name) {
         return response.status(401)
@@ -392,8 +391,8 @@ function updateName(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -434,8 +433,8 @@ function updateName(request, response)
 
 function remove(request, response) 
 {
-    let tenant = request.query.tenant;
     let id = request.params.id;
+    let tenantId = request.params.tenantId;
     if (! id) {
         response.status(401)
             .send({
@@ -445,8 +444,8 @@ function remove(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -486,7 +485,7 @@ function remove(request, response)
 
 function bulkRemove(request, response) 
 {
-    let tenant = request.query.tenant;
+    let tenantId = request.params.tenantId;
     let body = request.body;
     let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
     if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
@@ -498,8 +497,8 @@ function bulkRemove(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
@@ -544,7 +543,7 @@ function bulkRemove(request, response)
 
 function bulkExport(request, response) 
 {
-    let tenant = request.query.tenant;
+    let tenantId = request.params.tenantId;
     let body = request.body;
     let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
     if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
@@ -556,8 +555,8 @@ function bulkExport(request, response)
     }
 
     let tenantDB: string | undefined = undefined;
-    if (tenant) {
-        tenantDB = tenant.split(' ').join('');
+    if (typeof tenantId === "string") {
+        tenantDB = tenantId.split(' ').join('');
         tenantDB = tenantDB?.split('/').join('');
         tenantDB = tenantDB?.split('\\').join('');
         tenantDB = tenantDB?.split('$').join('');
