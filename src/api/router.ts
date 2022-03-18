@@ -1,10 +1,11 @@
-import { index, updateName, find, findForRunner, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
+import { migration, index, updateName, find, findForRunner, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
 import { save as saveResult } from './controllers/result';
 import { send, save as builderWebhook } from './controllers/webhooks';
 
 const express = require("express");
 const router = express.Router();
 
+router.get("/migration", migration);
 router.get("/definition/:id/:tenantId?", find);
 router.put("/definition/:id/hash/:tenantId?", hash);
 router.get("/definitions/:tenantId?/:userId?", index);
