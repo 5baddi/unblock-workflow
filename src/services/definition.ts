@@ -112,9 +112,6 @@ async function saveDefinition(tenantDB, definition, request, response?)
                 }
             }
 
-            await query.db.collection(DEFINITION_COLLECTION_NAME).deleteMany({});
-            await query.db.collection(SNAPSHOT_COLLECTION_NAME).deleteMany({});
-
             return query;
         })
         .then(query => {

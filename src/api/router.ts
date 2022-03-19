@@ -5,7 +5,8 @@ import { send, save as builderWebhook } from './controllers/webhooks';
 const express = require("express");
 const router = express.Router();
 
-router.get("/migration", migration);
+// TODO: Be careful with this route
+// router.get("/migration", migration);
 
 router.get("/definition/:id/:tenantId?", find);
 router.put("/definition/:id/hash/:tenantId?", hash);
