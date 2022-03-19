@@ -104,8 +104,12 @@ async function saveDefinition(tenantDB, definition, request, response?)
         })
         .then(async(query) => {
             if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
-                await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`)
-                    .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
+                try {
+                    await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`)
+                        .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
+                } catch (e) {
+                    await query.db.createCollection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
+                }
             }
 
             return query;
