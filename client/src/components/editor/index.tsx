@@ -464,6 +464,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             this.setState({ isSaving: false });
         }
 
+        if (typeof error.response !== "undefined" && error.response.status === 409 && typeof error.response.data.key !== "undefined" && error.response.data.key === "duplicate-name") {
+            alert("Workflow name already exists in your tenant! Please make sure to choose another name.");
+
+            return;
+        }
+
         if (typeof error.response !== "undefined" && error.response.status === 409) {
             alert("The form you're currently editing is not the latest version. Please refresh your page to access it.");
 
@@ -563,8 +569,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (! this.state.glueWorkspace || ! this.state.glueWorkspace.getAllGroups()[0]) {
-            window.open(`${PUBLIC_URL}/preview/${this.state.definition._id}`)?.focus();
-
             return;
         }
 
@@ -579,8 +583,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (! this.state.glueWorkspace || ! this.state.glueWorkspace.getAllGroups()[0]) {
-            window.open(`${PUBLIC_URL}/run/${this.state.definition._id}`)?.focus();
-
             return;
         }
 

@@ -114,7 +114,6 @@ function save(request, response)
                                 let normalizedResponses = {
                                     definition_id: _response.definition_id,
                                     tenant_id: _response.tenant_id,
-                                    tenants_ids: _response.tenants_ids,
                                     created_at: new Date()
                                 };
                                  
