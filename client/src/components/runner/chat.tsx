@@ -268,6 +268,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                             {
                                 id: this.state.definition?._id || undefined,
                                 name: this.state.definition?.name || undefined,
+                                table: `results-${this.state.definition?.slug || this.state.definition?._id || undefined}`,
                                 action: "results"
                             } 
                         )
