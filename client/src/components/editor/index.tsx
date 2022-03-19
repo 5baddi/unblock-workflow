@@ -612,6 +612,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         navigator.clipboard.writeText(`${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`);
+        alert("Runner link copied.");
     }
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>
