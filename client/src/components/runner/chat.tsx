@@ -296,7 +296,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
     private loadDefinitionById(definitionId?: string): Promise<void>
     {
-        if (! definitionId || ! this.state.user) {
+        if (! definitionId) {
             return Promise.resolve();
         }
 
