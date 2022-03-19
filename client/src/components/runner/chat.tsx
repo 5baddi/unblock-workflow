@@ -266,8 +266,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
                         this.props.glue.contexts.set(
                             "workflow", 
                             {
-                                workflowId: this.state.definition?._id || undefined,
-                                tenantId: this.state.definition?.tenant_id || undefined,
+                                id: this.state.definition?._id || undefined,
+                                name: this.state.definition?.name || undefined,
                                 action: "results"
                             } 
                         )
