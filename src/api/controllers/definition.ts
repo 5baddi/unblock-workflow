@@ -451,6 +451,8 @@ async function migration(request, response)
             }));
 
             client.close();
+
+            return response.send({ success: true, definitions }); 
         });
 }
 
