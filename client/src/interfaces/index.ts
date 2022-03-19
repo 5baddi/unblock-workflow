@@ -60,6 +60,7 @@ export interface IHeaderState
 export interface IRunnerProps
 {
     definitionId?: string;
+    tenantId?: string;
     previewMode?: boolean;
     glue?: any;
 }

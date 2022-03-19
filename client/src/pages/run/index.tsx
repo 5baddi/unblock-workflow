@@ -7,17 +7,13 @@ import { ENV } from '../../../../src/settings';
 
 export default function ChatRunner ()
 {
-    let { id } = useParams();
+    let { id, tenantId } = useParams();
 
     const glue = React.useContext(GlueContext);
 
-    if (window.location === window.parent.location && ENV !== "development") {
-        return (<h1>Not found</h1>);
-    }
-
     return (
         <Grid container>
-            <UnblockChatRunner definitionId={id} glue={glue}/>
+            <UnblockChatRunner definitionId={id} tenantId={tenantId} glue={glue}/>
         </Grid>
     );
 };

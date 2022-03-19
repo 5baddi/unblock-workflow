@@ -569,6 +569,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (! this.state.glueWorkspace || ! this.state.glueWorkspace.getAllGroups()[0]) {
+            window.open(`${PUBLIC_URL}/preview/${this.state.definition._id}/${this.state.definition.tenant_id}`)?.focus();
+
             return;
         }
 
@@ -583,6 +585,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (! this.state.glueWorkspace || ! this.state.glueWorkspace.getAllGroups()[0]) {
+            window.open(`${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`)?.focus();
+
             return;
         }
 

@@ -107,6 +107,10 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
     private getTenantId(): string
     {
+        if (typeof this.props.tenantId === "string") {
+            return this.props.tenantId;
+        }
+
         if (! this.state.user || ! this.state.user.tenantId) {
             return '';
         }
