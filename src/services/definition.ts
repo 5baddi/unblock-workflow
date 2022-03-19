@@ -152,20 +152,26 @@ async function saveDefinition(tenantDB, definition, request, response?)
             }
 
             if (typeof definition.name !== "undefined" && definition.name.toLocaleLowerCase() !== "unnamed") {
-                let existsCollectionByName = await query.db.collection(DEFINITION_COLLECTION_NAME)
-                .findOne({ name: definition.name });
+                try {
+                    let existsWorkflowByName = await query.db.collection(DEFINITION_COLLECTION_NAME)
+                        .findOne({ name: definition.name });
 
-                if (typeof existsCollectionByName !== "undefined" && existsCollectionByName?._id !== definition._id && existsCollectionByName?.name === definition.name) {
-                    if (typeof response === "undefined") {
-                        process.exit();
+                    if (typeof existsWorkflowByName !== "undefined" && existsWorkflowByName?._id !== definition._id && existsWorkflowByName?.name === definition.name) {
+                        if (typeof response === "undefined") {
+                            process.exit();
+                        }
+
+                        return response.status(409)
+                            .send({
+                                success: false,
+                                key: "duplicate-name",
+                                message: "Workflow name already exists!",
+                            });
                     }
-
-                    return response.status(409)
-                        .send({
-                            success: false,
-                            key: "duplicate-name",
-                            message: "Workflow name already exists!",
-                        });
+                } catch (error) {
+                    if (ENV === "development") {
+                        console.log(error);
+                    }
                 }
             }
 
