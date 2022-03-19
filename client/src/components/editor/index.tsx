@@ -271,7 +271,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         if (typeof this.state.user !== "undefined") {
             window.sessionStorage.setItem(USER_ID_KEY, this.state.user.id);
-            window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.state.user.tenantId.replace(/[^\w]/g, ''));
+            window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.getTenantId());
         }
 
         let definition = await loadDefinitionById(this.props.definitionId, this.getTenantId());
@@ -659,7 +659,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 let user = this.state.user;
         
                 if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
-                    endpoint = endpoint.concat(`/${user.tenantId.replace(/[^\w]/g, '')}/${user.id}`);
+                    endpoint = endpoint.concat(`/${this.getTenantId()}/${user.id}`);
                 }
         
                 return API.get(endpoint);

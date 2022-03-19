@@ -1,6 +1,6 @@
 import { IDefinition, ISnapshot } from '../interfaces/definition';
 import { connect } from "./mongodb";
-import { DEFINITION_COLLECTION_NAME, DEFAULT_MONGODB_DATABASE, NORMALIZED_RESPONSE_COLLECTION_NAME, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, ROOT_USER_ID } from "../settings";
+import { DEFINITION_COLLECTION_NAME, DEFAULT_MONGODB_DATABASE, NORMALIZED_RESPONSE_COLLECTION_NAME, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, ROOT_USER_ID, ENV } from '../settings';
 import { ObjectId } from 'mongodb';
 import { ICluster } from '@tripetto/map';
 import { IMongoDBFilter } from '../interfaces/index';
@@ -105,10 +105,21 @@ async function saveDefinition(tenantDB, definition, request, response?)
         .then(async(query) => {
             if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
                 try {
+                    let existsCollection = await query.db.listCollections({name: `${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`}).toArray();
+                    if (! Array.isArray(existsCollection) || existsCollection.length === 0) {
+                        await query.db.createCollection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
+
+                        return query;
+                    }
+                    
                     await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`)
                         .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
-                } catch (e) {
-                    await query.db.createCollection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
+
+                    return query;
+                } catch (error) {
+                    if (ENV === "development") {
+                        console.log(error);
+                    }
                 }
             }
 
