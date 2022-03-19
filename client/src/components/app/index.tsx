@@ -34,8 +34,8 @@ const App = ({ classes }) => {
             <main className={classes.main}>
                 <BrowserRouter basename={ BASE_NAME }>
                     <Routes>
-                        <Route path="/run/:id" element={<ChatRunner />} />
-                        <Route path="/preview/:id" element={<ChatPreview />} />
+                        <Route path="/run/:id/:tenantId" element={<ChatRunner />} />
+                        <Route path="/preview/:id/:tenantId" element={<ChatPreview />} />
                         <Route path="/:id" element={<Studio />}/>
                         <Route path="/" element={<Studio />}/>
                     </Routes>
