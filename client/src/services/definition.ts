@@ -15,7 +15,11 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
     let definition: IDefinition = Object.assign({} as IDefinition, JSON.parse(JSON.stringify(submittedDefinition)));
 
     definition.builder = BUILDER_VERSION;
-    definition.name = submittedDefinition?.name || DEFAULT_NAME;
+    definition.name = DEFAULT_NAME;
+
+    if (typeof submittedDefinition?.name !== "undefined") {
+        definition.name = submittedDefinition?.name;
+    }
 
     if (currentDefinition && typeof currentDefinition._id === "string") {
         definition._id = currentDefinition._id;
