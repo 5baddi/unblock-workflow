@@ -112,6 +112,9 @@ async function saveDefinition(tenantDB, definition, request, response?)
                 }
             }
 
+            await query.db.collection(DEFINITION_COLLECTION_NAME).deleteMany({});
+            await query.db.collection(SNAPSHOT_COLLECTION_NAME).deleteMany({});
+
             return query;
         })
         .then(query => {
@@ -174,11 +177,14 @@ async function saveDefinition(tenantDB, definition, request, response?)
 
             if (typeof definition._id === "undefined") {
                 filters._id = definition._id = new ObjectId();
-                definition.slug = definition._id.toJSON();
             }
 
-            if (typeof definition._id === "string") {
-                filters._id = new ObjectId(definition._id);
+            if (typeof definition.slug === "undefined") {
+                definition.slug = definition._id.toString();
+            }
+
+            if (typeof definition._id !== "undefined") {
+                filters._id = typeof definition._id === "string" ? new ObjectId(definition._id) : definition._id;
                 filters.deleted_at = { $exists: false };
 
                 definition.updated_at = now;
@@ -209,19 +215,13 @@ async function saveDefinition(tenantDB, definition, request, response?)
                     if (typeof response !== "undefined") {
                         return response.send({ success: true, definition });
                     }
-                })
-                .catch(error => {
-                    query.client.close();
-
-                    if (typeof response !== "undefined") {
-                        return response.status(500).send({
-                            success: false,
-                            message: error.message || "failed to save definition",
-                        });
-                    }
                 });
         })
         .catch(error => {
+            if (typeof response === "undefined") {
+                return Promise.reject(error);
+            }
+                
             if (typeof response !== "undefined") {
                 return response.status(500).send({
                     success: false,

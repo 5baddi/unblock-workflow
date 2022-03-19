@@ -423,43 +423,34 @@ function bulkExport(request, response)
 async function migration(request, response) 
 {
     return connect()
-        .then(client => {
+        .then(async(client) => {
             let db = client.db(DEFAULT_MONGODB_DATABASE);
 
-            db.collection(DEFINITION_COLLECTION_NAME)
+            let definitions = await db.collection(DEFINITION_COLLECTION_NAME)
                 .find({ tenant_id: { $exists: true }})
                 .sort("created_at", "desc")
-                .toArray()
-                .then(async(items) => {
-                    await Promise.all(Object.values(items).map(async(value) => {
-                        let definition: IDefinition = Object.assign({} as IDefinition, value);
+                .toArray();
 
-                        let tenantDB: string | undefined = undefined;
-                        if (typeof definition.tenant_id === "string") {
-                            tenantDB = definition.tenant_id.replace(/[^\w]/g, '');
-                        }
+            await Promise.all(Object.values(definitions || []).map(async(value) => {
+                let definition: IDefinition = Object.assign({} as IDefinition, value);
 
-                        if (typeof tenantDB === "undefined") {
-                            return false;
-                        }
+                let tenantDB: string | undefined = undefined;
+                if (typeof definition.tenant_id === "string") {
+                    tenantDB = definition.tenant_id.replace(/[^\w]/g, '');
+                }
 
+                if (typeof tenantDB === "string" && tenantDB !== "") {
+                    try {
                         await saveDefinition(tenantDB, definition, request);
+                    } catch (e) {
+                        console.log(e);
 
-                        return value;
-                    }));
+                        process.exit();
+                    }
+                }
+            }));
 
-                    client.close();
-
-                    return response.send({ success: true });
-                })
-                .catch(error => {
-                    client.close();
-
-                    return response.status(500).send({
-                        success: false,
-                        message: error.message || "failed to fetch definitions",
-                    });
-                });
+            client.close();
         });
 }
 

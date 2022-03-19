@@ -23,7 +23,7 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
 
     let slug = definition.name.replace(/[^\w]/g, '-');
     if (definition.name !== DEFAULT_NAME && (typeof definition.slug === "undefined" && definition.slug !== slug)) {
-        definition.slug = slug;
+        definition.slug = slug.toLocaleLowerCase();
     } else {
         definition.slug = definition._id || undefined;
     }
