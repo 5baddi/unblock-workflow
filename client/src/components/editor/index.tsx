@@ -611,10 +611,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        let link = `${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`;
-        
-        navigator.clipboard.writeText(link);
-        alert("Runner link copied.");
+        window.open(`${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`, "_blank")?.focus();
+
+        return;
     }
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>

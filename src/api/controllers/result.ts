@@ -10,6 +10,8 @@ function save(request, response)
     let id = request.params.id;
     let tenantId = request.params.tenantId;
     let fields = request.body.fields;
+    let unblockerId = request.body.unblocker_id || undefined;
+    let unblockerTenantId = request.body.unblocker_tenant_id || undefined;
     if (! id || ! fields) {
         return response.status(401)
             .send({
@@ -112,8 +114,8 @@ function save(request, response)
                                 }
 
                                 let normalizedResponses = {
-                                    definition_id: _response.definition_id,
-                                    tenant_id: _response.tenant_id,
+                                    unblocker_id: unblockerId,
+                                    unblocker_tenant_id: unblockerTenantId,
                                     created_at: new Date()
                                 };
                                  
