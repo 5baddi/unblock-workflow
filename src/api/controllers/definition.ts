@@ -431,7 +431,7 @@ function migration(request, response)
                 .sort("created_at", "desc")
                 .toArray()
                 .then(async(items) => {
-                    Object.values(items).map(async(value) => {
+                    await Promise.all(Object.values(items).map(async(value) => {
                         let definition: IDefinition = Object.assign({} as IDefinition, value);
 
                         let tenantDB: string | undefined = undefined;
@@ -446,7 +446,7 @@ function migration(request, response)
                         await saveDefinition(tenantDB, definition, request);
 
                         return value;
-                    });
+                    }));
 
                     client.close();
 
