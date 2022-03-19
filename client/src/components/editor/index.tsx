@@ -611,7 +611,9 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        navigator.clipboard.writeText(`${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`);
+        let link = `${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`;
+        
+        navigator.clipboard.writeText(link);
         alert("Runner link copied.");
     }
 
