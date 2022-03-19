@@ -134,33 +134,30 @@ function loadDefinitionById(definitionId?: string, tenantId?: string): Promise<I
 
     let tenant = typeof tenantId !== "undefined" ? tenantId : '';
 
-    return API.get(`${PUBLIC_URL}/api/migration`)
-        .then(() => {
-            return API.get(`${PUBLIC_URL}/api/definition/${definitionId}/${tenant}`)
+    return API.get(`${PUBLIC_URL}/api/definition/${definitionId}/${tenant}`)
+        .then(response => {
+            if (! response.data.definition) {
+                return undefined;
+            }
+
+            let definition: IDefinition = parseDefinition(response.data.definition);
+
+            return definition;
+        })
+        .then(definition => {
+            if (! definition || typeof definition._id === "undefined") {
+                return definition;
+            }
+
+            return API.put(`${PUBLIC_URL}/api/definition/${definition._id}/hash/${tenant}`)
                 .then(response => {
-                    if (! response.data.definition) {
+                    if (! response.data.hash) {
                         return undefined;
                     }
         
-                    let definition: IDefinition = parseDefinition(response.data.definition);
+                    definition.hash = response.data.hash;
         
                     return definition;
-                })
-                .then(definition => {
-                    if (! definition || typeof definition._id === "undefined") {
-                        return definition;
-                    }
-        
-                    return API.put(`${PUBLIC_URL}/api/definition/${definition._id}/hash/${tenant}`)
-                        .then(response => {
-                            if (! response.data.hash) {
-                                return undefined;
-                            }
-                
-                            definition.hash = response.data.hash;
-                
-                            return definition;
-                        });
                 });
         })
         .catch(error => {
