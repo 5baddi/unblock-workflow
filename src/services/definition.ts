@@ -211,6 +211,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
 
                     let definition = Object.assign({} as IDefinition, result.value);
                     definition.is_saved = true;
+                    console.log(definition.tenant_id, definition._id);
 
                     if (typeof response !== "undefined") {
                         return response.send({ success: true, definition });
