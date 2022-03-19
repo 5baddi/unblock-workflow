@@ -420,14 +420,14 @@ function bulkExport(request, response)
         });
 }
 
-function migration(request, response) 
+async function migration(request, response) 
 {
     return connect()
         .then(client => {
             let db = client.db(DEFAULT_MONGODB_DATABASE);
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .find({})
+                .find({ tenant_id: { $exists: true }})
                 .sort("created_at", "desc")
                 .toArray()
                 .then(async(items) => {
