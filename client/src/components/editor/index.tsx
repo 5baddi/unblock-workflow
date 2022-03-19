@@ -7,7 +7,7 @@ import { ENV, PUBLIC_URL } from "../../settings";
 import { DEFINITION_KEY, USER_ID_KEY, USER_TENANT_ID_KEY, DEFAULT_NAME, RUNNER_PREVIEW_APP, RUNNER_RUN_APP } from '../../global';
 import API  from "../../api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faQuestion, faTrash, faPlay, faSave, faSpinner, faEye, faShareAlt } from "@fortawesome/free-solid-svg-icons";
 import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
@@ -98,6 +98,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                             ? (
                                 <button onClick={() => this.run()} title="Run workflow">
                                     <FontAwesomeIcon icon={faPlay}/>
+                                </button>
+                            )
+                            : undefined
+                        }
+                        {
+                            this.state.definition && this.state.definition._id
+                            ? (
+                                <button onClick={() => this.share()} title="Share workflow runner">
+                                    <FontAwesomeIcon icon={faShareAlt}/>
                                 </button>
                             )
                             : undefined
@@ -594,6 +603,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             .addGroup({type: "group", children: [{type: "window", appName: RUNNER_RUN_APP}]});
 
         
+    }
+
+    private share(): void
+    {
+        if (typeof this.state.definition === "undefined" || typeof this.state.definition._id === "undefined" || typeof this.state.definition.tenant_id === "undefined") {
+            return;
+        }
+
+        navigator.clipboard.writeText(`${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`);
     }
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>
