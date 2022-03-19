@@ -103,29 +103,6 @@ async function saveDefinition(tenantDB, definition, request, response?)
                 });
         })
         .then(async(query) => {
-            if (definition.name.toLocaleLowerCase() === "unnamed") {
-                return query;
-            }
-
-            let existsCollectionByName = await query.db.collection(DEFINITION_COLLECTION_NAME)
-                .findOne({ name: definition.name });
-
-            if (typeof existsCollectionByName !== "undefined" && existsCollectionByName?._id !== definition._id && existsCollectionByName?.name === definition.name) {
-                if (typeof response === "undefined") {
-                    process.exit();
-                }
-
-                return response.status(409)
-                    .send({
-                        success: false,
-                        key: "duplicate-name",
-                        message: "Workflow name already exists!",
-                    });
-            }
-
-            return query;
-        })
-        .then(async(query) => {
             if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
                 try {
                     let existsCollection = await query.db.listCollections({name: `${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`}).toArray();
@@ -148,7 +125,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
 
             return query;
         })
-        .then(query => {
+        .then(async(query) => {
             let now: Date = new Date();
             let ip = request.headers['x-forwarded-for'] || null;
             let definition: IDefinition = query.definition;
@@ -171,6 +148,24 @@ async function saveDefinition(tenantDB, definition, request, response?)
                                 message: error.message || "failed to take snapshot of definition",
                             });
                     }
+                }
+            }
+
+            if (typeof definition.name !== "undefined" && definition.name.toLocaleLowerCase() !== "unnamed") {
+                let existsCollectionByName = await query.db.collection(DEFINITION_COLLECTION_NAME)
+                .findOne({ name: definition.name });
+
+                if (typeof existsCollectionByName !== "undefined" && existsCollectionByName?._id !== definition._id && existsCollectionByName?.name === definition.name) {
+                    if (typeof response === "undefined") {
+                        process.exit();
+                    }
+
+                    return response.status(409)
+                        .send({
+                            success: false,
+                            key: "duplicate-name",
+                            message: "Workflow name already exists!",
+                        });
                 }
             }
 
