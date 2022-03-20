@@ -10,8 +10,9 @@ function save(request, response)
     let id = request.params.id;
     let tenantId = request.params.tenantId;
     let fields = request.body.fields;
-    let unblockerId = request.body.unblocker_id || undefined;
-    let unblockerTenantId = request.body.unblocker_tenant_id || undefined;
+    let unblockerId = request.body.unblockerId || undefined;
+    let unblockerTenantId = request.body.unblockerTenantId || undefined;
+
     if (! id || ! fields) {
         return response.status(401)
             .send({
