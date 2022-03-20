@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { Grid }  from "@mui/material";
 import { ChatRunner as UnblockChatRunner } from "../../components/runner/chat";
 import { GlueContext } from "@glue42/react-hooks";
+import { useAuthUser } from "@frontegg/react";
+const user = useAuthUser();
 
 export default function ChatRunner ()
 {
@@ -12,7 +14,7 @@ export default function ChatRunner ()
 
     return (
         <Grid container>
-            <UnblockChatRunner definitionId={id} tenantId={tenantId} glue={glue}/>
+            <UnblockChatRunner definitionId={id} tenantId={tenantId} glue={glue} user={user}/>
         </Grid>
     );
 };

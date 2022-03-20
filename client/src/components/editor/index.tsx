@@ -45,7 +45,6 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             showModal: false,
             glueWorkspace: undefined,
             glueContext: undefined,
-            user: undefined,
         };
 
         this.onResize = this.onResize.bind(this);
@@ -128,7 +127,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         bulkDeleteWorkflows={this.bulkDeleteWorkflows}
                         allowExport={this.props.allowExport}
                         bulkExportWorkflows={this.bulkExportWorkflows}
-                        user={this.state.user}
+                        user={this.props.user}
                         loadWorkflows={() => this.loadWorkflows()}/>
                 </Grid>
             </Grid>
@@ -264,19 +263,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
         let glueContext = await glueWorkspace?.getContext();
-        //let user = await this.props.glue.contexts.get("frontegg-user");
 
         this.setState({ glueWorkspace, glueContext });
-    }
-
-    async getFrontegg()
-    {
-        if (! this.props.user) {
-            return;
-        }
-
-        let user = this.props.user;
-        this.setState({ user });
     }
 
     async open(): Promise<Builder | void>
@@ -286,12 +274,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         await this.getGlueWorkspace();
-        await this.getFrontegg();
 
         this.setState({ isLoading: true });
 
-        if (typeof this.state.user !== "undefined") {
-            window.sessionStorage.setItem(USER_ID_KEY, this.state.user.id);
+        if (typeof this.props.user !== "undefined") {
+            window.sessionStorage.setItem(USER_ID_KEY, this.props.user.id);
             window.sessionStorage.setItem(USER_TENANT_ID_KEY, this.getTenantId());
         }
 
@@ -417,7 +404,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             }
     
             let currentDefinition = this.getDefinition();
-            let definition = parseDefinition(submittedDefinition, currentDefinition, this.state.user);
+            let definition = parseDefinition(submittedDefinition, currentDefinition, this.props.user);
 
             this.setDefinition(definition);
 
@@ -553,11 +540,11 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     private getTenantId(): string
     {
-        if (! this.state.user || ! this.state.user.tenantId) {
+        if (! this.props.user || ! this.props.user.tenantId) {
             return '';
         }
 
-        return this.state.user.tenantId.replace(/[^\w]/g, '');
+        return this.props.user.tenantId.replace(/[^\w]/g, '');
     }
 
     private bulkExportWorkflows(definitionsIds?: string[]): Promise<boolean>
@@ -699,7 +686,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         return this.save()
             .then(() => {
                 let endpoint = `${PUBLIC_URL}/api/definitions`;
-                let user = this.state.user;
+                let user = this.props.user;
         
                 if (user && typeof user.tenantId === "string" && typeof user.id === "string") {
                     endpoint = endpoint.concat(`/${this.getTenantId()}/${user.id}`);

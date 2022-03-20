@@ -8,8 +8,7 @@ import { BASE_NAME } from "../../settings";
 import GlueWeb from "@glue42/web";
 import GlueWorkspaces from "@glue42/workspaces-api";
 import { GlueProvider } from "@glue42/react-hooks";
-import { useAuth } from "@frontegg/react";
-import { useAuthUser } from "@frontegg/react";
+import { useAuth, useAuthUser } from "@frontegg/react";
 import API from "../../api";
 
 import "./style.scss";
@@ -33,6 +32,7 @@ const settings = {
 const App = ({ classes }) => {
     const { isAuthenticated }: { isAuthenticated: boolean } = useAuth();
     const user = useAuthUser();
+
     if (isAuthenticated) {
         API.interceptors.request.use(function (config) {
             const token = user.accessToken;

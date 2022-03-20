@@ -3,9 +3,8 @@ import ReactDOM from "react-dom";
 import registerServiceWorker from "./registerServiceWorker";
 import App from "./components/app";
 import { BASE_NAME } from "./settings";
-
-import { FronteggProvider } from '@frontegg/react';
-import { BrowserRouter } from 'react-router-dom';
+import { FronteggProvider } from "@frontegg/react";
+import { BrowserRouter } from "react-router-dom";
 
 const contextOptions = {
     baseUrl: 'https://auth.unblock.io',

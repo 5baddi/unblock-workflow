@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Navigate } from "react-router-dom";
-import { IRunnerProps } from "../../interfaces";
+import { IChatRunnerProps, IChatRunnerState } from "../../interfaces";
 import { run } from "../../runners/chat";
 import { Export } from "tripetto-runner-foundation";
 import { IDefinition } from "../../interfaces";
@@ -14,9 +14,8 @@ import { ENV } from "../../settings";
 import "../editor/blocks/process-task/runner";
 
 import "./style.scss";
-import {useAuthUser} from "@frontegg/react";
 
-export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean, glueWorkspace?: any, glueContext?: any, user?: any }>
+export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerState>
 {
     private style?: IChatStyles;
 
@@ -46,8 +45,7 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             isLoading: true,
             isFailed: false,
             glueWorkspace: undefined,
-            glueContext: undefined,
-            user: undefined,
+            glueContext: undefined
         };
     }
 
@@ -101,10 +99,8 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
         let glueContext = await glueWorkspace?.getContext();
-        //let user = await this.props.glue.contexts.get("frontegg-user");
-        const user = useAuthUser();
 
-        this.setState({ glueWorkspace, glueContext, user });
+        this.setState({ glueWorkspace, glueContext });
 
     }
 
@@ -114,11 +110,11 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
             return this.props.tenantId;
         }
 
-        if (! this.state.user || ! this.state.user.tenantId) {
+        if (! this.props.user || ! this.props.user.tenantId) {
             return '';
         }
 
-        return this.state.user.tenantId.replace(/[^\w]/g, '');
+        return this.props.user.tenantId.replace(/[^\w]/g, '');
     }
 
     private applyStyle(): void
@@ -254,7 +250,9 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         this.setState({ isFailed: false, isLoading: true });
 
-        return API.post(`${PUBLIC_URL}/api/result/${definitionId}/${this.getTenantId()}`, { fields: exportables.fields })
+        let data = { fields: exportables.fields, unblockerId: this.props.user?.id, unblockerTenantId: this.props.user?.tenantId };
+
+        return API.post(`${PUBLIC_URL}/api/result/${definitionId}/${this.getTenantId()}`, data)
             .then(response => {
                 if (! response.data.success) {
                     this.setState({ isFailed: true, isLoading: false });
