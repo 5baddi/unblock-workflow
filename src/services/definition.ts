@@ -156,7 +156,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
                     let existsWorkflowByName = await query.db.collection(DEFINITION_COLLECTION_NAME)
                         .findOne({ name: definition.name });
 
-                    if (typeof existsWorkflowByName !== "undefined" && existsWorkflowByName?._id !== definition._id && existsWorkflowByName?.name === definition.name) {
+                    if (typeof existsWorkflowByName !== "undefined" && existsWorkflowByName?._id.toString() !== definition._id && existsWorkflowByName?.name === definition.name) {
                         if (typeof response === "undefined") {
                             process.exit();
                         }

@@ -4,6 +4,7 @@ import { IEntity } from "./entity";
 
 export interface IDefinition extends TripettoIDefinition, IEntity
 {
+    name?: string;
     slug?: string;
     user_id?: string;
     is_saved?: boolean;
