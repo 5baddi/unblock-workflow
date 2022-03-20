@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Grid } from "@mui/material";
-import { Builder, Debounce } from 'tripetto';
+import { Builder, Debounce, Forms } from 'tripetto';
 import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { IDefinition, IEditorProps, IEditorState } from "../../interfaces";
 import { ENV, PUBLIC_URL } from "../../settings";
@@ -12,6 +12,7 @@ import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
+import { popup, error as errorPopup, apiError } from "./dialog";
 
 import "./blocks";
 
@@ -474,22 +475,24 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         if (typeof error.response !== "undefined" && error.response.status === 409 && typeof error.response.data.key !== "undefined" && error.response.data.key === "duplicate-name") {
-            alert("Workflow name already exists in your tenant! Please make sure to choose another name.");
+            errorPopup("Workflow name already exists in your tenant! Please make sure to choose another name.");
 
             return;
         }
 
         if (typeof error.response !== "undefined" && error.response.status === 409) {
-            alert("The form you're currently editing is not the latest version. Please refresh your page to access it.");
+            errorPopup("The form you're currently editing is not the latest version. Please refresh your page to access it.");
 
             return;
         }
         
         if (typeof error.response !== "undefined" && error.response.status === 505) {
-            alert("A new update has been released. Please refresh your page to continue editing your form.");
+            errorPopup("A new update has been released. Please refresh your page to continue editing your form.");
 
             return;
         }
+
+        apiError();
 
         if (typeof this.timer === "undefined" && typeof this.props.manualSaving === "boolean" && this.props.manualSaving === false) {
             this.startTimer();
@@ -611,9 +614,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        window.open(`${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`, "_blank")?.focus();
+        let link = `${PUBLIC_URL}/run/${this.state.definition._id}/${this.state.definition.tenant_id}`;
 
-        return;
+        let urlText = new Forms.Text("singleline", link).readonly();
+        urlText.copyToClipboard();
+
+        popup("Copied!");
     }
 
     private deleteWorkflow(definitionId?: string): Promise<boolean>

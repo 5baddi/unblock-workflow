@@ -1,5 +1,9 @@
 @import "~bootstrap/scss/bootstrap";
 
+.swal2-container {
+  z-index: 405000000 !important;
+}
+
 .modal-backdrop {
   z-index: 105000000;
 }
@@ -22,7 +26,7 @@
 
 .modal-dialog {
   .btn-primary {
-    background-color: rgba(44,64,90,0.8) !important;
+    background-color: rgba(44, 64, 90, 0.8) !important;
     border-color: rgba(44,64,90,0.8) !important;
   }
 
