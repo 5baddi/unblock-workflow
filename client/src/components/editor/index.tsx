@@ -346,7 +346,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 } 
             );
 
-            await this.props.glue.appManager.inMemory.clear();
+            await this.props.glue.appManager.inMemory.remove(RUNNER_PREVIEW_APP);
+            await this.props.glue.appManager.inMemory.remove(RUNNER_RUN_APP);
 
             if (definition) {
                 let importResult = await this.props.glue.appManager.inMemory.import(
