@@ -39,3 +39,5 @@ export const LOG_FOLDER = "./logs";
 export const LOG_LEVEL = "error";
 
 export const SUPPORTED_VERSION = "0.0.7";
+
+export const PUBLIC_KEY_PATH = process.env.PUBLIC_KEY_PATH || '';

@@ -264,9 +264,19 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
         let glueContext = await glueWorkspace?.getContext();
-        let user = await this.props.glue.contexts.get("frontegg-user");
+        //let user = await this.props.glue.contexts.get("frontegg-user");
 
-        this.setState({ glueWorkspace, glueContext, user });
+        this.setState({ glueWorkspace, glueContext });
+    }
+
+    async getFrontegg()
+    {
+        if (! this.props.user) {
+            return;
+        }
+
+        let user = this.props.user;
+        this.setState({ user });
     }
 
     async open(): Promise<Builder | void>
@@ -276,6 +286,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         await this.getGlueWorkspace();
+        await this.getFrontegg();
 
         this.setState({ isLoading: true });
 

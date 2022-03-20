@@ -1,6 +1,7 @@
 import { Builder, IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto";
 import { ModalProps } from "react-bootstrap/Modal";
 import { IBuilder, ICluster, IDefinition as TripettoDefinition, IPrologue, IEpilogue } from "@tripetto/map";
+import {User} from "@frontegg/redux-store";
 
 export interface IDefinition extends TripettoIDefinition
 {
@@ -32,6 +33,7 @@ export interface IEditorProps
     manualSaving?: boolean;
     allowExport?: boolean;
     glue?: any;
+    user?: User;
 }
 
 export interface IEditorState

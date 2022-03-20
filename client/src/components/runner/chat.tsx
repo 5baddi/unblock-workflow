@@ -14,6 +14,7 @@ import { ENV } from "../../settings";
 import "../editor/blocks/process-task/runner";
 
 import "./style.scss";
+import {useAuthUser} from "@frontegg/react";
 
 export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDefinition, isLoading: boolean, isFailed: boolean, glueWorkspace?: any, glueContext?: any, user?: any }>
 {
@@ -100,9 +101,11 @@ export class ChatRunner extends React.Component<IRunnerProps, { definition?: IDe
 
         let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
         let glueContext = await glueWorkspace?.getContext();
-        let user = await this.props.glue.contexts.get("frontegg-user");
+        //let user = await this.props.glue.contexts.get("frontegg-user");
+        const user = useAuthUser();
 
         this.setState({ glueWorkspace, glueContext, user });
+
     }
 
     private getTenantId(): string
