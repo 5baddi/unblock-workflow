@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
-import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, ROOT_USER_ID, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, NORMALIZED_RESPONSE_COLLECTION_NAME } from '../../settings';
-import { IDefinition, ISnapshot } from "../../interfaces/definition";
-import { IMongoDBFilter } from '../../interfaces';
+import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME } from '../../settings';
+import { IDefinition } from "../../interfaces/definition";
 import { connect } from "../../services/mongodb";
 import { loadSubDefinitions, saveDefinition } from "../../services/definition";
 import { generateHash } from "../../helpers";

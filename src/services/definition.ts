@@ -154,7 +154,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
             if (typeof definition.name !== "undefined" && definition.name.toLocaleLowerCase() !== "unnamed") {
                 try {
                     let existsWorkflowByName = await query.db.collection(DEFINITION_COLLECTION_NAME)
-                        .findOne({ name: definition.name });
+                        .findOne({ name: definition.name, deleted_at: { $exists: false } });
 
                     if (typeof existsWorkflowByName !== "undefined" && existsWorkflowByName?._id.toString() !== definition._id && existsWorkflowByName?.name === definition.name) {
                         if (typeof response === "undefined") {
