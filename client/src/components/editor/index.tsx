@@ -188,6 +188,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         let definition: TripettoDefinition = Object.assign({} as TripettoDefinition, this.state.tripettoDefinition);
 
         await this.onChange(definition);
+
+        await this.initWorkflowApps(this.getDefinition());
     }
 
     toggleModal()
@@ -307,39 +309,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                 } 
             );
 
-            await this.props.glue.appManager.inMemory.clear();
-
-            if (this.state.definition) {
-                let importResult = await this.props.glue.appManager.inMemory.import(
-                    [
-                        {
-                            name: RUNNER_PREVIEW_APP,
-                            type: "window",
-                            title: "Unblock - Workflow preview",
-                            details: {
-                                url: `${PUBLIC_URL}/preview/${this.state.definition._id}`,
-                            }
-                        }, 
-                        {
-                            name: RUNNER_RUN_APP,
-                            type: "window",
-                            title: "Unblock - Workflow runner",
-                            details: {
-                                url: `${PUBLIC_URL}/run/${this.state.definition._id}`,
-                            }
-                        }
-                    ], 
-                    "merge"
-                );
-
-                let importedApps = importResult.imported;
-                let errors = importResult.errors;
-
-                if (ENV === "development") {
-                    importedApps.forEach(console.log);
-                    errors.forEach(e => console.log(`App: ${e.app}, Error: ${e.error}`));
-                }
-            }
+            await this.initWorkflowApps(definition);
         }
 
         let properties = mergeProperties(this.props.element);
@@ -362,6 +332,54 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         }
 
         return this.editor;
+    }
+
+    private async initWorkflowApps(definition?: IDefinition): Promise<void>
+    {
+        if (this.props.glue) {
+            await this.props.glue.contexts.set(
+                'workflow', 
+                {
+                    id: definition?._id || undefined,
+                    name: definition?.name || undefined,
+                    action: "open"
+                } 
+            );
+
+            await this.props.glue.appManager.inMemory.clear();
+
+            if (definition) {
+                let importResult = await this.props.glue.appManager.inMemory.import(
+                    [
+                        {
+                            name: RUNNER_PREVIEW_APP,
+                            type: "window",
+                            title: "Unblock - Workflow preview",
+                            details: {
+                                url: `${PUBLIC_URL}/preview/${definition._id}`,
+                            }
+                        }, 
+                        {
+                            name: RUNNER_RUN_APP,
+                            type: "window",
+                            title: "Unblock - Workflow runner",
+                            details: {
+                                url: `${PUBLIC_URL}/run/${definition._id}`,
+                            }
+                        }
+                    ], 
+                    "merge"
+                );
+
+                let importedApps = importResult.imported;
+                let errors = importResult.errors;
+
+                if (ENV === "development") {
+                    importedApps.forEach(console.log);
+                    errors.forEach(e => console.log(`App: ${e.app}, Error: ${e.error}`));
+                }
+            }
+        }
     }
 
     ready()
