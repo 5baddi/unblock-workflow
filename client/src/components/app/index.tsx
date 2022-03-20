@@ -64,14 +64,12 @@ const App = ({ classes }) => {
                 <CssBaseline/>
                 <main className={classes.main}>
                     {isAuthenticated && (
-                        <BrowserRouter basename={ BASE_NAME }>
-                            <Routes>
-                                <Route path="/run/:id" element={<ChatRunner />} />
-                                <Route path="/preview/:id" element={<ChatPreview />} />
-                                <Route path="/:id" element={<Studio />}/>
-                                <Route path="/" element={<Studio />}/>
-                            </Routes>
-                        </BrowserRouter>
+                        <Routes>
+                            <Route path="/run/:id" element={<ChatRunner />} />
+                            <Route path="/preview/:id" element={<ChatPreview />} />
+                            <Route path="/:id" element={<Studio />}/>
+                            <Route path="/" element={<Studio />}/>
+                        </Routes>
                     )}
                 </main>
             </React.Fragment>
