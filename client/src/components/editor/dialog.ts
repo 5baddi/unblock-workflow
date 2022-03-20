@@ -22,6 +22,25 @@ function error(text: string): void
     });
 }
 
+function confirm(title: string): Promise<boolean>
+{
+    return Swal.fire({
+        title,
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: 'Yes',
+        confirmButtonColor: PRIMARY_BUTTON_BG_COLOR,
+        denyButtonText: 'Cancel'
+    })
+    .then((result) => {
+        if (result.isConfirmed) {
+            return true;
+        }
+
+        return false;
+    });     
+}
+
 function apiError(): void
 {
     Swal.fire({
@@ -35,5 +54,6 @@ function apiError(): void
 export {
     popup,
     error,
-    apiError
+    apiError,
+    confirm
 }

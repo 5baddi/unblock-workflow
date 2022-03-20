@@ -12,7 +12,7 @@ import DefinitionsModal from "./definitions-modal";
 import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
-import { popup, error as errorPopup, apiError } from "./dialog";
+import { popup, error as errorPopup, apiError, confirm as confirmPopup} from "./dialog";
 
 import "./blocks";
 
@@ -111,7 +111,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                             )
                             : undefined
                         }
-                        <button onClick={() => this.deleteWorkflow()} title="Delete workflow">
+                        <button onClick={async() => this.deleteWorkflow()} title="Delete workflow">
                             <FontAwesomeIcon icon={faTrash}/>
                         </button>
                         <button onClick={() => this.openTutorial()} title="Open tutorial">
@@ -124,7 +124,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                         createNewWorkflow={() => this.createNewWorkflow()}
                         deleteWorkflow={this.deleteWorkflow}
                         openWorkflow={this.openWorkflow}
-                        bulkDeleteWorkflows={this.bulkDeleteWorkflows}
+                        bulkDeleteWorkflows={async(definitionIds) => this.bulkDeleteWorkflows(definitionIds)}
                         allowExport={this.props.allowExport}
                         bulkExportWorkflows={this.bulkExportWorkflows}
                         user={this.props.user}
@@ -511,19 +511,25 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         this.initBuilder();
     }
 
-    private bulkDeleteWorkflows(definitionsIds?: string[]): Promise<boolean>
+    private async bulkDeleteWorkflows(definitionsIds?: string[]): Promise<boolean>
     {
         if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
             return Promise.resolve(false);
         }
 
-        if (! confirm("Are you sure you want to delete this workflow?")) {
+        this.toggleModal();
+        this.setState({ isLoading: true });
+
+        if (! await confirmPopup("Are you sure you want to delete this workflow?")) {
             return Promise.resolve(false);
         }
 
         return API.delete(`${PUBLIC_URL}/api/definitions/${this.getTenantId()}`, { data: { definitionsIds } })
             .then(response => {
                 if (! response.data.success) {
+                    this.setState({ isLoading: false });
+                    this.toggleModal();
+
                     return false;
                 }
 
@@ -532,12 +538,18 @@ class Editor extends React.Component<IEditorProps, IEditorState>
                     this.initBuilder();
                 }
 
+                this.setState({ isLoading: false });
+                this.toggleModal();
+
                 return true;
             })
             .catch(error => {
                 if (ENV === "development") {
                     console.log(error);
                 }
+
+                this.setState({ isLoading: false });
+                this.toggleModal();
 
                 return false;
             });
@@ -625,12 +637,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         popup("Copied!");
     }
 
-    private deleteWorkflow(definitionId?: string): Promise<boolean>
+    private async deleteWorkflow(definitionId?: string): Promise<boolean>
     {
         let oldDefinition = this.getDefinition();
         let oldDefinitionId = oldDefinition ? oldDefinition._id : undefined;
 
-        if (! confirm("Are you sure you want to delete this workflow?")) {
+        if (! await confirmPopup("Are you sure you want to delete this workflow?")) {
             return Promise.resolve(false);
         }
 
