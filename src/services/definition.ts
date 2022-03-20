@@ -73,14 +73,6 @@ async function loadSubDefinitions(db, definition: IDefinition): Promise<IDefinit
 
 async function saveDefinition(tenantDB, definition, request, response?) 
 {
-    if (typeof definition._id === "undefined") {
-        definition._id = new ObjectId();
-    }
-
-    if (typeof definition.slug === "undefined") {
-        definition.slug = definition._id.toString();
-    }
-
     return connect()
         .then(client => {
             let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
@@ -113,7 +105,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
         .then(async(query) => {
             if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
                 try {
-                    let existsCollection = await query.db.listCollections({name: `${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`}).toArray();
+                    let existsCollection = await query.db.listCollections({name: `${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`}).toArray();
                     if (! Array.isArray(existsCollection) || existsCollection.length === 0) {
                         await query.db.createCollection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
 
@@ -216,7 +208,11 @@ async function saveDefinition(tenantDB, definition, request, response?)
             let filters = Object.assign({} as IMongoDBFilter, {});
 
             if (typeof definition._id === "undefined") {
-                filters._id = definition._id;
+                filters._id = definition._id = new ObjectId();
+            }
+
+            if (typeof definition.slug === "undefined") {
+                definition.slug = definition._id.toString();
             }
 
             if (typeof definition._id !== "undefined") {
