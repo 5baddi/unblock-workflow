@@ -10,7 +10,6 @@ const contextOptions = {
     baseUrl: 'https://unblock.frontegg.com',
 };
 
-
 ReactDOM.render(
     <BrowserRouter basename={ BASE_NAME }>
         <FronteggProvider contextOptions={contextOptions}>
