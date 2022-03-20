@@ -4,13 +4,12 @@ import { Grid }  from "@mui/material";
 import { ChatRunner as UnblockChatRunner } from "../../components/runner/chat";
 import { GlueContext } from "@glue42/react-hooks";
 import { useAuthUser } from "@frontegg/react";
-const user = useAuthUser();
 
 export default function ChatRunner ()
 {
     const { id, tenantId } = useParams();
-
     const glue = React.useContext(GlueContext);
+    const user = useAuthUser();
 
     return (
         <Grid container>

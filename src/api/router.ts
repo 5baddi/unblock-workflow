@@ -2,12 +2,8 @@ import { migration, index, updateName, find, findForRunner, hash, save, remove, 
 import { save as saveResult } from "./controllers/result";
 import { send, save as builderWebhook } from "./controllers/webhooks";
 import express from "express";
-import { authenticateToken } from "../middleware/authenticateToken";
 
 const router = express.Router();
-
-// Middlewares
-router.use(authenticateToken);
 
 // TODO: Be careful with this route
 // router.get("/migration", migration);
