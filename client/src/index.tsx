@@ -7,7 +7,7 @@ import { FronteggProvider } from "@frontegg/react";
 import { BrowserRouter } from "react-router-dom";
 
 const contextOptions = {
-    baseUrl: 'https://auth.unblock.io',
+    baseUrl: 'https://unblock.frontegg.com',
 };
 
 
