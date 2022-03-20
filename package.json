@@ -13,9 +13,11 @@
     "clean": "shx rm -rf ./build/* ./public/*",
     "compile": "tsc",
     "prod": "cd client && yarn run start",
+    "dev": "cd client && yarn run start:dev",
     "build": "run-s clean compile prod",
+    "build:dev": "run-s clean compile dev",
     "start": "node -r dotenv/config ./build/server.js",
-    "watch": "nodemon -r node_modules/dotenv/config ./build/server.js -e ts,tsx --exec \"yarn run build && yarn run start\""
+    "watch": "nodemon -r node_modules/dotenv/config ./build/server.js -e ts,tsx --exec \"yarn run build:dev && yarn run start\""
   },
   "dependencies": {
     "body-parser": "^1.19.1",
@@ -27,6 +29,7 @@
     "express-myconnection": "^1.0.4",
     "inversify": "^6.0.1",
     "inversify-express-utils": "^6.4.3",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.3.1",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
@@ -40,7 +43,9 @@
     "winston-daily-rotate-file": "^4.6.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.15",
+    "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/node": "^17.0.21",
     "dotenv": "^16.0.0",
     "npx": "^10.2.2",
     "shx": "^0.3.4",

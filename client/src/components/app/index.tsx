@@ -8,6 +8,8 @@ import { BASE_NAME } from "../../settings";
 import GlueWeb from "@glue42/web";
 import GlueWorkspaces from "@glue42/workspaces-api";
 import { GlueProvider } from "@glue42/react-hooks";
+import { useAuth, useAuthUser } from "@frontegg/react";
+import API from "../../api";
 
 import "./style.scss";
 
@@ -28,18 +30,30 @@ const settings = {
 };
 
 const App = ({ classes }) => {
+    const { isAuthenticated }: { isAuthenticated: boolean } = useAuth();
+    const user = useAuthUser();
+
+    if (isAuthenticated) {
+        API.interceptors.request.use(function (config) {
+            const token = user.accessToken;
+            config.headers =  {'Authorization': `Bearer ${token}`};
+
+            return config;
+        });
+    }
+
     let defaultApp = (
         <React.Fragment>
             <CssBaseline/>
             <main className={classes.main}>
-                <BrowserRouter basename={ BASE_NAME }>
-                    <Routes>
-                        <Route path="/run/:id/:tenantId" element={<ChatRunner />} />
-                        <Route path="/preview/:id/:tenantId" element={<ChatPreview />} />
-                        <Route path="/:id" element={<Studio />}/>
-                        <Route path="/" element={<Studio />}/>
-                    </Routes>
-                </BrowserRouter>
+                {isAuthenticated && (
+                        <Routes>
+                            <Route path="/run/:id/:tenantId" element={<ChatRunner />} />
+                            <Route path="/preview/:id/:tenantId" element={<ChatPreview />} />
+                            <Route path="/:id" element={<Studio />}/>
+                            <Route path="/" element={<Studio />}/>
+                        </Routes>
+                )}
             </main>
         </React.Fragment>
     );
@@ -49,14 +63,16 @@ const App = ({ classes }) => {
             <React.Fragment>
                 <CssBaseline/>
                 <main className={classes.main}>
-                    <BrowserRouter basename={ BASE_NAME }>
-                        <Routes>
-                            <Route path="/run/:id" element={<ChatRunner />} />
-                            <Route path="/preview/:id" element={<ChatPreview />} />
-                            <Route path="/:id" element={<Studio />}/>
-                            <Route path="/" element={<Studio />}/>
-                        </Routes>
-                    </BrowserRouter>
+                    {isAuthenticated && (
+                        <BrowserRouter basename={ BASE_NAME }>
+                            <Routes>
+                                <Route path="/run/:id" element={<ChatRunner />} />
+                                <Route path="/preview/:id" element={<ChatPreview />} />
+                                <Route path="/:id" element={<Studio />}/>
+                                <Route path="/" element={<Studio />}/>
+                            </Routes>
+                        </BrowserRouter>
+                    )}
                 </main>
             </React.Fragment>
         </GlueProvider>

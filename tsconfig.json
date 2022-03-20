@@ -28,7 +28,10 @@
     "emitDecoratorMetadata": true,
     "useUnknownInCatchVariables": false,
     "baseUrl": "./src",
-    "outDir": "./build"
+    "outDir": "./build",
+    "paths": {
+      "tslib": ["./node_modules/tslib/tslib.d.ts"]
+    }
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts", "./build", "./public", "./client"],

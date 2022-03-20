@@ -1,6 +1,7 @@
 import { Builder, IBuilderProperties, IDefinition as TripettoIDefinition } from "tripetto";
 import { ModalProps } from "react-bootstrap/Modal";
 import { IBuilder, ICluster, IDefinition as TripettoDefinition, IPrologue, IEpilogue } from "@tripetto/map";
+import { User } from "@frontegg/redux-store";
 
 export interface IDefinition extends TripettoIDefinition
 {
@@ -32,6 +33,7 @@ export interface IEditorProps
     manualSaving?: boolean;
     allowExport?: boolean;
     glue?: any;
+    user?: User;
 }
 
 export interface IEditorState
@@ -43,7 +45,6 @@ export interface IEditorState
     showModal: boolean;
     glueWorkspace?: any;
     glueContext?: any;
-    user?: any;
 }
 
 export interface IHeaderProps
@@ -57,12 +58,22 @@ export interface IHeaderState
     name?: string;
 }
 
-export interface IRunnerProps
+export interface IChatRunnerProps
 {
     definitionId?: string;
     tenantId?: string;
     previewMode?: boolean;
     glue?: any;
+    user?: User;
+}
+
+export interface IChatRunnerState
+{ 
+    definition?: IDefinition, 
+    isLoading: boolean, 
+    isFailed: boolean, 
+    glueWorkspace?: any, 
+    glueContext?: any 
 }
 
 export interface IEditorMenuProps

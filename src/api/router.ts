@@ -1,8 +1,8 @@
-import { migration, index, updateName, find, findForRunner, hash, save, remove, bulkRemove, bulkExport } from './controllers/definition';
-import { save as saveResult } from './controllers/result';
-import { send, save as builderWebhook } from './controllers/webhooks';
+import { migration, index, updateName, find, findForRunner, hash, save, remove, bulkRemove, bulkExport } from "./controllers/definition";
+import { save as saveResult } from "./controllers/result";
+import { send, save as builderWebhook } from "./controllers/webhooks";
+import express from "express";
 
-const express = require("express");
 const router = express.Router();
 
 // TODO: Be careful with this route

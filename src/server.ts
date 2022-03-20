@@ -1,5 +1,7 @@
 import path from "path";
-import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB } from './settings';
+import { ENV, SERVER_PORT, SERVER_HOST, APP_NAME, PUBLIC_URL, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB } from "./settings";
+import { authenticateToken } from "./middleware/authenticateToken";
+import { Request, Response, NextFunction } from 'express';
 
 const express = require("express");
 const cors = require("cors");
@@ -39,7 +41,7 @@ app.locals = {
     url: PUBLIC_URL
 };
 
-app.use(async (req, res, next) => {
+app.use(async (req: Request, res: Response, next: NextFunction) => {
     try {
         res.header("Access-Control-Allow-Origin", ENV === "development" ? "*" : SERVER_HOST);
         res.header(
@@ -51,11 +53,11 @@ app.use(async (req, res, next) => {
             return res.status(200).json({});
         }
 
-        next();
+        return next();
     } catch (error) {
         console.log(error);
 
-        next(error.message);
+        return next(error.message);
     }
 });
 
@@ -64,6 +66,8 @@ app.get('/404', (req, res) => {
 });
 
 app.use(express.json());
+
+apiRouter.use(authenticateToken);
 app.use("/api", apiRouter);
 
 app.get('/*', (req, res) => {
