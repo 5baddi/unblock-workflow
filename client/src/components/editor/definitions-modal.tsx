@@ -1,13 +1,16 @@
 import * as React from "react";
 import { Button, Modal } from "react-bootstrap";
 import { IEditorDefinitionsModalProps, IEditorDefinitionsModalState } from "../../interfaces";
-import { PUBLIC_URL } from '../../../../src/settings';
+import { PUBLIC_URL } from "../../../../src/settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderOpen, faTrash, faPlayCircle, faTrashAlt, faUpload, faClone } from '@fortawesome/free-solid-svg-icons';
+import { faFolderOpen, faTrash, faPlayCircle, faTrashAlt, faUpload, faClone } from "@fortawesome/free-solid-svg-icons";
 import { DataGrid, GridCellEditCommitParams, GridColDef } from "@mui/x-data-grid";
 import PulseLoader from "react-spinners/PulseLoader";
-import { IDefinition } from '../../interfaces/index';
-import API from '../../api';
+import { IDefinition } from "../../interfaces/index";
+import API from "../../api";
+import { error as errorPopup, apiError} from "./dialog";
+import { getTenantId } from "../../services/definition";
+import { User } from "@frontegg/redux-store";
 
 class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEditorDefinitionsModalState>
 {
@@ -85,15 +88,6 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                 this.setState({ definitions, isLoading: false });
             })
             .catch(error => this.setState({ isLoading: false  }));
-    }
-
-    private getTenantId(): string
-    {
-        if (! this.props.user || ! this.props.user.tenantId) {
-            return '';
-        }
-
-        return this.props.user.tenantId.replace(/[^\w]/g, '');
     }
 
     private renderDefinitionsTable()
@@ -189,13 +183,13 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                         this.setSelectionModel(newSelectionModel);
                     }}
                     selectionModel={this.state.selectionModel}
-                    onCellEditCommit={this.updateDefinition}
+                    onCellEditCommit={(params: GridCellEditCommitParams) => {this.updateDefinition(params, this.props.user)}}
                 />
             </div>
         );
     }
 
-    private updateDefinition(params: GridCellEditCommitParams)
+    private updateDefinition(params: GridCellEditCommitParams, user?: User)
     {
         let rowParams = Object.assign({}, JSON.parse(JSON.stringify(params)));
         let definitionId = rowParams.row._id || undefined;
@@ -205,7 +199,28 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             return;
         }
 
-        API.put(`${PUBLIC_URL}/api/definitions/${definitionId}/${this.getTenantId()}`, { name });
+        API.put(`${PUBLIC_URL}/api/definitions/${definitionId}/${getTenantId(user)}`, { name })
+            .catch(error => {
+                if (typeof error.response !== "undefined" && error.response.status === 409 && typeof error.response.data.key !== "undefined" && error.response.data.key === "duplicate-name") {
+                    errorPopup("Workflow name already exists in your tenant! Please make sure to choose another name.");
+        
+                    return;
+                }
+        
+                if (typeof error.response !== "undefined" && error.response.status === 409) {
+                    errorPopup("The form you're currently editing is not the latest version. Please refresh your page to access it.");
+        
+                    return;
+                }
+                
+                if (typeof error.response !== "undefined" && error.response.status === 505) {
+                    errorPopup("A new update has been released. Please refresh your page to continue editing your form.");
+        
+                    return;
+                }
+        
+                apiError();
+            });
     }
 
     private setSelectionModel(newSelectionModel) 
@@ -234,7 +249,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         let duplicationIndex: number = this.state.definitions ? this.state.definitions.length + 1 : 1;
         _definition.name = _definition.name ? _definition.name?.concat(` copy 0${duplicationIndex}`) : `Unamed copy 0${duplicationIndex}`;
 
-        API.post(`${PUBLIC_URL}/api/definitions/${this.getTenantId()}`, { definition: _definition })
+        API.post(`${PUBLIC_URL}/api/definitions/${getTenantId(this.props.user)}`, { definition: _definition })
             .then(response => {
                 if (! response.data.definition) {
                     this.setState({ isLoading: false });

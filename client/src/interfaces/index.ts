@@ -87,7 +87,7 @@ export interface IEditorDefinitionsModalProps extends ModalProps
 {
     currentOpenedDefinition: string | undefined;
     allowExport?: boolean;
-    user?: any;
+    user?: User;
 
     createNewWorkflow: () => void;
     openWorkflow: (definitionId: string) => void;

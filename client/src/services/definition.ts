@@ -3,7 +3,8 @@ import { IDefinition as TripettoDefinition } from "@tripetto/map";
 import { VERSION, PUBLIC_URL, ENV } from "../settings";
 import API  from "../api";
 import { omit } from "lodash";
-import { DEFAULT_NAME } from '../global';
+import { DEFAULT_NAME } from "../global";
+import { User } from "@frontegg/redux-store";
 
 const BUILDER_VERSION = {
     "name": "unblock",
@@ -202,11 +203,21 @@ function exportDefinitionAsJsonFile(data?: IDefinition | IDefinition[]): void
     linkElement.click();
 }
 
+function getTenantId(user?: User): string
+{
+    if (! user || ! user.tenantId) {
+        return "";
+    }
+
+    return user.tenantId.replace(/[^\w]/g, "");
+}
+
 export {
     parseDefinition,
     saveDefinition,
     loadDefinitionById,
     metaFieldsHasChanged,
     exportDefinitionAsJsonFile,
-    omitUniqueFields
+    omitUniqueFields,
+    getTenantId
 }

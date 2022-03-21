@@ -226,6 +226,7 @@ function updateName(request, response)
     let id = request.params.id;
     let tenantId = request.params.tenantId;
     let name = request.body.name;
+
     if (! id || ! name) {
         return response.status(401)
             .send({
@@ -242,12 +243,11 @@ function updateName(request, response)
     return connect()
         .then(client => {
             let db = client.db(tenantDB || DEFAULT_MONGODB_DATABASE);
-            let hash = generateHash();
 
             db.collection(DEFINITION_COLLECTION_NAME)
-                .findOneAndUpdate({ _id: new ObjectId(id), deleted_at: { $exists: false } }, { $set: { name } })
+                .findOne({ _id: new ObjectId(id), deleted_at: { $exists: false } })
                 .then(result => {
-                    if (! result.ok) {
+                    if (! result === null) {
                         client.close();
 
                         return response.status(401).send({
@@ -258,14 +258,19 @@ function updateName(request, response)
 
                     client.close();
 
-                    return response.send({ success: true, name });
+                    let definition = Object.assign({} as IDefinition, result);
+
+                    definition.name = name;
+                    definition.slug = name.replace(/[^\w]/g, '-').toLocaleLowerCase();
+
+                    return saveDefinition(tenantDB, definition, request, response);
                 })
                 .catch(error => {
                     client.close();
 
                     return response.status(500).send({
                         success: false,
-                        message: error.message || "failed to update definition hash",
+                        message: error.message || "failed to find definition",
                     });
                 });
         });
