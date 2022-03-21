@@ -189,7 +189,7 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         );
     }
 
-    private updateDefinition(params: GridCellEditCommitParams, user?: User)
+    private updateDefinition(params: GridCellEditCommitParams, user?: User): void
     {
         let rowParams = Object.assign({}, JSON.parse(JSON.stringify(params)));
         let definitionId = rowParams.row._id || undefined;
@@ -200,26 +200,29 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
         }
 
         API.put(`${PUBLIC_URL}/api/definitions/${definitionId}/${getTenantId(user)}`, { name })
+            .then(() => Promise.resolve())
             .catch(error => {
                 if (typeof error.response !== "undefined" && error.response.status === 409 && typeof error.response.data.key !== "undefined" && error.response.data.key === "duplicate-name") {
                     errorPopup("Workflow name already exists in your tenant! Please make sure to choose another name.");
         
-                    return;
+                    return this.loadDefinitions();
                 }
         
                 if (typeof error.response !== "undefined" && error.response.status === 409) {
                     errorPopup("The form you're currently editing is not the latest version. Please refresh your page to access it.");
         
-                    return;
+                    return this.loadDefinitions();
                 }
                 
                 if (typeof error.response !== "undefined" && error.response.status === 505) {
                     errorPopup("A new update has been released. Please refresh your page to continue editing your form.");
         
-                    return;
+                    return this.loadDefinitions();
                 }
         
                 apiError();
+
+                return this.loadDefinitions();
             });
     }
 
