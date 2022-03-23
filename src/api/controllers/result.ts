@@ -132,7 +132,7 @@ function save(request, response)
                                     _name = name.split('.').join(' ');
                                     _name = name.split('$').join(' ');
 
-                                    normalizedResponses[_name] = data.string || data.value;
+                                    normalizedResponses[_name] = data.type === "datatype" ? new Date(data.string || data.value) : data.string || data.value;
 
                                     return field;
                                 });
