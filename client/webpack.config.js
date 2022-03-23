@@ -83,6 +83,18 @@ module.exports = {
         minimize: true,
         mangleExports: true,
         minimizer: [new TerserPlugin()],
+        splitChunks: {
+            cacheGroups: {
+                vendors: {
+                    test: /node_modules/,
+                    chunks: 'initial',
+                    filename: 'vendors.[contenthash].js',
+                    priority: 1,
+                    maxInitialRequests: 2,
+                    minChunks: 3, // count of entries
+                }
+            }
+        }
     },
     stats: {
         children: true
