@@ -4,7 +4,6 @@ const Copy = require("copy-webpack-plugin");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const dotenv = require("dotenv");
-const CompressionPlugin = require("compression-webpack-plugin");
 
 const dotenvParsed = dotenv.config({ path: path.resolve("./../.env") }).parsed;
 
@@ -78,8 +77,7 @@ module.exports = {
         new webpack.DefinePlugin({
             "process.env": JSON.stringify(dotenvParsed),
             "process.env.NODE_DEBUG": JSON.stringify(process.env.NODE_DEBUG)
-        }),
-        new CompressionPlugin()
+        })
     ],
     optimization: {
         minimize: true,
