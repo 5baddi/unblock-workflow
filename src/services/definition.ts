@@ -50,16 +50,46 @@ async function loadSubClusters(db: Db, cluster: ICluster): Promise<ICluster>
                 return;
             }
 
-            subDefinition.clusters.map(function (subCluster) {
+            await Promise.all(subDefinition.clusters.map(async(subCluster) => {
                 let _index = index + 1;
 
-                _cluster.nodes?.splice(_index, 0, ...subCluster.nodes ?? []);
+                let _loadedSubCluster = await loadSubNodes(db, subCluster);
+                _cluster.nodes?.splice(_index, 0, ..._loadedSubCluster.nodes ?? []);
+                
                 if (! Array.isArray(_cluster.branches)) {
                     _cluster.branches = [];
                 }
 
                 _cluster.branches?.push(...subCluster.branches ?? []);
-            });
+            }));
+        }));
+    }
+
+    return _cluster as ICluster;
+}
+
+async function loadSubNodes(db: Db, cluster: ICluster): Promise<ICluster>
+{
+    let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
+
+    if (typeof _cluster.nodes !== "undefined" && _cluster.nodes.length > 0) {
+        await Promise.all(_cluster.nodes.map(async(node, index) => {
+            if (! isProcessTaskBlock(node)) {
+                return;
+            }
+
+            let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block.definitionId);
+            if (typeof subDefinition === "undefined") {
+                return;
+            }
+
+            await Promise.all(subDefinition.clusters.map(async (subCluster) => {
+                let _index = index + 1;
+
+                let _subCluster = await loadSubNodes(db, subCluster);
+
+                _cluster.nodes?.splice(_index, 0, ..._subCluster.nodes ?? []);
+            }));
         }));
     }
 
