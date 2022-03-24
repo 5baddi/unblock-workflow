@@ -1,6 +1,6 @@
 import { IDefinition, ISnapshot } from "../interfaces/definition";
 import { connect } from "./mongodb";
-import { DEFINITION_COLLECTION_NAME, DEFAULT_MONGODB_DATABASE, NORMALIZED_RESPONSE_COLLECTION_NAME, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, ROOT_USER_ID, ENV } from "../settings";
+import { DEFINITION_COLLECTION_NAME, DEFAULT_MONGODB_DATABASE, NORMALIZED_RESPONSE_COLLECTION_NAME, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, ROOT_USER_ID, ENV, RESPONSE_COLLECTION_NAME } from "../settings";
 import { Db, ObjectId } from "mongodb";
 import { IBranch, ICluster, INode } from "@tripetto/map";
 import { IMongoDBFilter } from "../interfaces";
@@ -136,6 +136,17 @@ async function loadSubDefinitions(db: Db, definition: IDefinition): Promise<IDef
         });
 }
 
+function getNodesDiffNames(existsNode: INode, newNode: INode): { existsName: string, newName: string }
+{
+    let newName = newNode.name || '';
+    newName = newName.split('.').join(' ').split('$').join(' ');
+    
+    let existsName = existsNode.name || '';
+    existsName = existsName.split('.').join(' ').split('$').join(' ');
+
+    return { existsName, newName };
+}
+
 async function saveDefinition(tenantDB, definition, request, response?) 
 {
     return connect()
@@ -185,23 +196,39 @@ async function saveDefinition(tenantDB, definition, request, response?)
                     let existsNodes: INode[] = getDefinitionsNodes(query.existDefinition);
                     let newNodes: INode[] = getDefinitionsNodes(definition);
 
-                    await Promise.all([existsNodes.forEach(async(existsNode) => {
+                    let filedsShouldBeUpdated = existsNodes.filter((existsNode) => {
                         let newNode: INode | undefined = newNodes.find(node => node.id === existsNode.id);
                         if (typeof newNode !== "undefined") {
-                            let newName = newNode.name || '';
-                            newName = newName.split('.').join(' ');
-                            newName = newName.split('$').join(' ');
-                            
-                            let existsName = existsNode.name || '';
-                            existsName = existsName.split('.').join(' ');
-                            existsName = existsName.split('$').join(' ');
+                            let { newName, existsName } = getNodesDiffNames(existsNode, newNode);
 
-                            if (newName !== existsName && typeof query.definition.slug !== "undefined") {
-                                await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`)
-                                    .updateMany({ [existsName]: { $exists: true } }, { $rename: { [existsName]: newName } })
-                            }
+                            return newName !== existsName;
                         }
-                    })]);
+
+                        return false;
+                    });
+
+                    await Promise.all([
+                        filedsShouldBeUpdated.forEach(async(existsNode) => {
+                            let newNode: INode | undefined = newNodes.find(node => node.id === existsNode.id);
+
+                            if (typeof newNode !== "undefined" && typeof query.definition.slug !== "undefined") {
+                                let { newName, existsName } = getNodesDiffNames(existsNode, newNode);
+
+                                await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`)
+                                    .updateMany({ [existsName]: { $exists: true } }, { $rename: { [existsName]: newName } });
+                            }
+                        }),
+                        filedsShouldBeUpdated.forEach(async(existsNode) => {
+                            let newNode: INode | undefined = newNodes.find(node => node.id === existsNode.id);
+
+                            if (typeof newNode !== "undefined" && query.existDefinition && typeof query.existDefinition._id !== "undefined") {
+                                let { newName } = getNodesDiffNames(existsNode, newNode);
+
+                                await query.db.collection(`${RESPONSE_COLLECTION_NAME}`)
+                                    .updateMany({ definition_id: query.existDefinition._id.toString(), "fields.node.id": existsNode.id }, { $set: { "fields.$.name": newName } });
+                            }
+                        })
+                    ]);
 
                     return query;
                 } catch (error) {
