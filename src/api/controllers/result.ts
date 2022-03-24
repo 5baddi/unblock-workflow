@@ -4,7 +4,7 @@ import { connect } from "../../services/mongodb";
 import { v4 as uuidv4 } from "uuid";
 import { IResponse, IDefinition } from "../../interfaces/definition";
 import * as Superagent from "superagent";
-import { getDefinitionsNodes } from "../../services/definition";
+import { getDefinitionsNode } from "../../services/definition";
 import { INode } from "@tripetto/map";
 
 function save(request, response)
@@ -81,9 +81,9 @@ function save(request, response)
                                     if (Object.values(keysToIgnore).includes(data.key)) {
                                         return;
                                     } else {
-                                        let nodes: INode[] = getDefinitionsNodes(definition, id);
-                                        if (Array.isArray(nodes) && nodes.length === 1) {
-                                            data.name = nodes[0].name || '';
+                                        let node: INode | undefined = getDefinitionsNode(definition, id);
+                                        if (typeof node !== "undefined") {
+                                            data.name = node.name || '';
                                             data.value = values;
 
                                             return _fields.push(data);
@@ -97,9 +97,9 @@ function save(request, response)
                             }
 
                             if (typeof data.node.id !== "undefined") {
-                                let nodes: INode[] = getDefinitionsNodes(definition, data.node.id);
-                                if (Array.isArray(nodes) && nodes.length === 1) {
-                                    data.name = nodes[0].name || data.name || '';
+                                let node: INode | undefined = getDefinitionsNode(definition, data.node.id);
+                                if (typeof node !== "undefined") {
+                                    data.name = node.name || data.name || '';
                                 }
                             }
 

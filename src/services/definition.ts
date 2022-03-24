@@ -340,6 +340,16 @@ function getDefinitionsNodes(definition: IDefinition, id?: string): INode[]
     return nodes;
 }
 
+function getDefinitionsNode(definition: IDefinition, id: string): INode | undefined
+{
+    let nodes: INode[] = getDefinitionsNodes(definition, id);
+    if (Array.isArray(nodes) && nodes.length === 1) {
+        return nodes[0];
+    }
+
+    return undefined;
+}
+
 function getClusterNodes(cluster: ICluster, id?: string): INode[]
 {
     let nodes: INode[] = [];
@@ -365,5 +375,6 @@ export {
     loadSubDefinitions,
     checkDefinitionVersion,
     saveDefinition,
-    getDefinitionsNodes
+    getDefinitionsNodes,
+    getDefinitionsNode
 }
