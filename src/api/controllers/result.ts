@@ -96,6 +96,13 @@ function save(request, response)
                                 data.value = new Date(data.string || data.value);
                             }
 
+                            if (typeof data.node.id !== "undefined") {
+                                let nodes: INode[] = getDefinitionsNodes(definition, data.node.id);
+                                if (Array.isArray(nodes) && nodes.length === 1) {
+                                    data.name = nodes[0].name || data.name || '';
+                                }
+                            }
+
                             return _fields.push(data);
                         });
 
