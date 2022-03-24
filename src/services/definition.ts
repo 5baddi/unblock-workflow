@@ -2,7 +2,7 @@ import { IDefinition, ISnapshot } from "../interfaces/definition";
 import { connect } from "./mongodb";
 import { DEFINITION_COLLECTION_NAME, DEFAULT_MONGODB_DATABASE, NORMALIZED_RESPONSE_COLLECTION_NAME, SNAPSHOT_COLLECTION_NAME, SUPPORTED_VERSION, ROOT_USER_ID, ENV } from "../settings";
 import { Db, ObjectId } from "mongodb";
-import { ICluster, INode } from "@tripetto/map";
+import { IBranch, ICluster, INode } from "@tripetto/map";
 import { IMongoDBFilter } from "../interfaces";
 
 function checkDefinitionVersion(definition: IDefinition): boolean
@@ -329,8 +329,41 @@ async function saveDefinition(tenantDB, definition, request, response?)
         });
 }
 
+function getDefinitionsNodes(definition: IDefinition, id?: string): INode[]
+{
+    let nodes: INode[] = [];
+
+    (definition.clusters ?? []).map((cluster: ICluster) => {
+        nodes.push(...getClusterNodes(cluster, id));
+    });
+
+    return nodes;
+}
+
+function getClusterNodes(cluster: ICluster, id?: string): INode[]
+{
+    let nodes: INode[] = [];
+
+    if (Array.isArray(cluster.nodes) && typeof id === "undefined") {
+        nodes.push(...cluster.nodes);
+    }
+
+    if (Array.isArray(cluster.nodes) && typeof id === "string") {
+        nodes.push(...cluster.nodes.filter((node: INode) => { return node.id === id; }));
+    }
+
+    (cluster.branches ?? []).map((branch: IBranch) => {
+        (branch.clusters ?? []).map((cluster: ICluster) => {
+            nodes.push(...getClusterNodes(cluster, id));
+        });
+    });
+
+    return nodes;
+}
+
 export {
     loadSubDefinitions,
     checkDefinitionVersion,
-    saveDefinition
+    saveDefinition,
+    getDefinitionsNodes
 }

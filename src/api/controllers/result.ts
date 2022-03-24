@@ -1,9 +1,11 @@
 import { ObjectId } from "mongodb";
-import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, RESPONSE_COLLECTION_NAME, RESULT_WEBHOOK, NORMALIZED_RESPONSE_COLLECTION_NAME } from '../../settings';
+import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME, RESPONSE_COLLECTION_NAME, RESULT_WEBHOOK, NORMALIZED_RESPONSE_COLLECTION_NAME } from "../../settings";
 import { connect } from "../../services/mongodb";
-import { v4 as uuidv4 } from 'uuid';
-import { IResponse, IDefinition } from '../../interfaces/definition';
+import { v4 as uuidv4 } from "uuid";
+import { IResponse, IDefinition } from "../../interfaces/definition";
 import * as Superagent from "superagent";
+import { getDefinitionsNodes } from "../../services/definition";
+import { INode } from "@tripetto/map";
 
 function save(request, response)
 {
@@ -42,17 +44,62 @@ function save(request, response)
                             });
                         }
 
-                        fields = Object.values(fields).map((field) => {
+                        let definition: IDefinition = Object.assign({} as IDefinition, result);
+
+                        let _fields: any[] = [];
+
+                        Object.values(fields).forEach((field) => {
                             let data = JSON.parse(JSON.stringify(field));
 
                             data.type = data.type.replace("tripetto-block-", "");
 
-                            return data;
+                            if (data.type === "multiple-choice") {
+                                let id = data.node.id || undefined;
+                                
+                                if (typeof id !== "undefined") {
+                                    let values = '';
+                                    let firstKey = undefined;
+                                    let keysToIgnore: string[] = [];
+                                    
+                                    Object.values(fields).forEach((field) => {
+                                        let data = JSON.parse(JSON.stringify(field));
+                                        if (typeof data.node.id !== "undefined" && data.node.id === id) {
+                                            if (values !== '') {
+                                                values = values.concat(',');
+                                            }
+                                            
+                                            values = values.concat(data.name);
+
+                                            if (typeof firstKey === "undefined") {
+                                                firstKey = data.key;
+                                            } else {
+                                                keysToIgnore.push(data.key);
+                                            }
+                                        }
+                                    });
+
+                                    if (Object.values(keysToIgnore).includes(data.key)) {
+                                        return;
+                                    } else {
+                                        let nodes: INode[] = getDefinitionsNodes(definition, id);
+                                        if (Array.isArray(nodes) && nodes.length === 1) {
+                                            data.name = nodes[0].name || '';
+                                            data.value = values;
+
+                                            return _fields.push(data);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (data.type === "date") {
+                                data.value = new Date(data.string || data.value);
+                            }
+
+                            return _fields.push(data);
                         });
 
-                        let definition: IDefinition = Object.assign({} as IDefinition, result);
-
-                        let _response: IResponse = Object.assign({} as IResponse, { fields });
+                        let _response: IResponse = Object.assign({} as IResponse, { _fields });
                         _response.definition_id = <string> definition._id;
                         _response.tenant_id = definition.tenant_id;
                         _response.tenants_ids = definition.tenants_ids;
@@ -64,7 +111,7 @@ function save(request, response)
                                 let query = "INSERT INTO `results` (`id`, `definition_id`, `key`, `type`, `version`, `data_type`, `name`, `value`, `snapshot`, `updated_at`, `created_at`) VALUES ?";
                                 let key = uuidv4();
 
-                                let rows = Object.values(fields).map((field) => {
+                                let rows = Object.values(_fields).map((field) => {
                                     let data = JSON.parse(JSON.stringify(field));
 
                                     return [
@@ -120,7 +167,7 @@ function save(request, response)
                                     created_at: new Date()
                                 };
                                  
-                                Object.values(fields).map((field) => {
+                                Object.values(_fields).map((field) => {
                                     let data = JSON.parse(JSON.stringify(field));
 
                                     let name = data.name;
@@ -132,7 +179,7 @@ function save(request, response)
                                     _name = name.split('.').join(' ');
                                     _name = name.split('$').join(' ');
 
-                                    normalizedResponses[_name] = data.type === "datatype" ? new Date(data.string || data.value) : data.string || data.value;
+                                    normalizedResponses[_name] = data.value;
 
                                     return field;
                                 });
