@@ -55,6 +55,21 @@ async function loadSubClusters(db: Db, cluster: ICluster): Promise<ICluster>
 
                 let _loadedSubCluster = await loadSubNodes(db, subCluster);
                 _cluster.nodes?.splice(_index, 0, ..._loadedSubCluster.nodes ?? []);
+
+                if (! Array.isArray(_cluster.branches)) {
+                    _cluster.branches = [];
+                }
+
+                _cluster.branches?.push(...subCluster.branches ?? []);
+            }));
+            
+            await Promise.all((_cluster.branches ?? []).map(async(branche, index) => {
+                await Promise.all((branche.clusters ?? []).map(async(subCluster, clusterIndex) => {
+                    let _loadedSubCluster = await loadSubClusters(db, subCluster);
+                    branche.clusters[clusterIndex] = _loadedSubCluster;
+                }));
+
+                _cluster.branches[index] = branche;
             }));
         }));
     }
@@ -82,40 +97,9 @@ async function loadSubNodes(db: Db, cluster: ICluster): Promise<ICluster>
 
                 let _subCluster = await loadSubNodes(db, subCluster);
                 _cluster.nodes?.splice(_index, 0, ..._subCluster.nodes ?? []);
-
-                // TODO: Fix loading branches
-                // let _loadedSubBranches = await loadSubBranches(db, _subCluster);
-                // _cluster.branches?.push(..._loadedSubBranches.branches ?? []);
             }));
         }));
     }
-
-    return _cluster as ICluster;
-}
-
-async function loadSubBranches(db: Db, cluster: ICluster): Promise<ICluster>
-{
-    let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
-
-    if (! Array.isArray(_cluster.branches)) {
-        _cluster.branches = [];
-    }
-    
-    await Promise.all(_cluster.branches.map(async(branche, index) => {
-        await Promise.all((branche.clusters || []).map(async (subCluster) => {
-            let _index = index + 1;
-
-            let _subCluster = await loadSubNodes(db, subCluster);
-            _cluster.nodes?.splice(_index, 0, ..._subCluster.nodes ?? []);
-
-            let _loadedSubBranches = await loadSubBranches(db, _subCluster);
-            _cluster.branches?.push(..._loadedSubBranches.branches ?? []);
-        }));
-        
-        // await Promise.all((branche.conditions || []).map(async (condition, _conditionIndex) => {
-        //     let _index = _conditionIndex + 1;
-        // }));
-    }));
 
     return _cluster as ICluster;
 }
