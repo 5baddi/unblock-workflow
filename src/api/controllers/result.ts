@@ -106,7 +106,7 @@ function save(request, response)
                             return _fields.push(data);
                         });
 
-                        let _response: IResponse = Object.assign({} as IResponse, { _fields });
+                        let _response: IResponse = Object.assign({} as IResponse, { fields: _fields });
                         _response.definition_id = <string> definition._id;
                         _response.tenant_id = definition.tenant_id;
                         _response.tenants_ids = definition.tenants_ids;

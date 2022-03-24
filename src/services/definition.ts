@@ -168,7 +168,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
                 });
         })
         .then(async(query) => {
-            if (query.existDefinition !== null && query.existDefinition.slug !== query.definition.slug && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
+            if (query.existDefinition !== null && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
                 try {
                     let existsCollection = await query.db.listCollections({name: `${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`}).toArray();
                     if (! Array.isArray(existsCollection) || existsCollection.length === 0) {
@@ -177,13 +177,44 @@ async function saveDefinition(tenantDB, definition, request, response?)
                         return query;
                     }
                     
-                    await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`)
-                        .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
+                    if (query.existDefinition.slug !== query.definition.slug) {
+                        await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`)
+                            .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
+                    }
+
+                    let existsNodes: INode[] = getDefinitionsNodes(query.existDefinition);
+                    let newNodes: INode[] = getDefinitionsNodes(definition);
+
+                    await Promise.all([existsNodes.forEach(async(existsNode) => {
+                        let newNode: INode | undefined = newNodes.find(node => node.id === existsNode.id);
+                        if (typeof newNode !== "undefined") {
+                            let newName = newNode.name || '';
+                            newName = newName.split('.').join(' ');
+                            newName = newName.split('$').join(' ');
+                            
+                            let existsName = existsNode.name || '';
+                            existsName = existsName.split('.').join(' ');
+                            existsName = existsName.split('$').join(' ');
+
+                            if (newName !== existsName && typeof query.definition.slug !== "undefined") {
+                                await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`)
+                                    .updateMany({ [existsName]: { $exists: true } }, { $rename: { [existsName]: newName } })
+                            }
+                        }
+                    })]);
 
                     return query;
                 } catch (error) {
                     if (ENV === "development") {
                         console.log(error);
+                    }
+
+                    if (typeof response !== "undefined") {
+                        return response.status(401)
+                            .send({
+                                success: false,
+                                message: error.message || "failed to take snapshot of definition",
+                            });
                     }
                 }
             }
@@ -236,6 +267,14 @@ async function saveDefinition(tenantDB, definition, request, response?)
                 } catch (error) {
                     if (ENV === "development") {
                         console.log(error);
+                    }
+
+                    if (typeof response !== "undefined") {
+                        return response.status(401)
+                            .send({
+                                success: false,
+                                message: error.message || "failed to take snapshot of definition",
+                            });
                     }
                 }
             }

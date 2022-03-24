@@ -25,10 +25,14 @@ function parseDefinition(submittedDefinition: TripettoDefinition, currentDefinit
     if (currentDefinition && typeof currentDefinition._id === "string") {
         definition._id = currentDefinition._id;
     }
+    
+    if (currentDefinition && typeof currentDefinition.slug === "string" && typeof definition.slug === "undefined") {
+        definition.slug = currentDefinition.slug;
+    }
 
-    let slug = definition.name.replace(/[^\w]/g, '-');
-    if (definition.name !== DEFAULT_NAME && (typeof definition.slug === "undefined" && definition.slug !== slug)) {
-        definition.slug = slug.toLocaleLowerCase();
+    let slug = definition.name.replace(/[^\w]/g, '-').toLocaleLowerCase();
+    if (definition.name !== DEFAULT_NAME && definition.slug !== slug) {
+        definition.slug = slug;
     }
     
     if (currentDefinition && typeof currentDefinition.created_at !== "undefined") {
