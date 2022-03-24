@@ -60,6 +60,8 @@ async function loadSubClusters(db: Db, cluster: ICluster): Promise<ICluster>
                     _cluster.branches = [];
                 }
 
+                _cluster.branches?.push(...subCluster.branches ?? []);
+
                 await Promise.all((_cluster.branches ?? []).map(async(branche, index) => {
                     await Promise.all((branche.clusters ?? []).map(async(subCluster, clusterIndex) => {
                         let _loadedSubCluster = await loadSubClusters(db, subCluster);
