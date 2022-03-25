@@ -193,8 +193,8 @@ async function saveDefinition(tenantDB, definition, request, response?)
                             .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
                     }
 
-                    let existsNodes: INode[] = getDefinitionsNodes(query.existDefinition);
-                    let newNodes: INode[] = getDefinitionsNodes(definition);
+                    let existsNodes: INode[] = getDefinitionNodes(query.existDefinition);
+                    let newNodes: INode[] = getDefinitionNodes(definition);
 
                     let filedsShouldBeUpdated = existsNodes.filter((existsNode) => {
                         let newNode: INode | undefined = newNodes.find(node => node.id === existsNode.id);
@@ -395,7 +395,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
         });
 }
 
-function getDefinitionsNodes(definition: IDefinition, id?: string): INode[]
+function getDefinitionNodes(definition: IDefinition, id?: string): INode[]
 {
     let nodes: INode[] = [];
 
@@ -406,9 +406,9 @@ function getDefinitionsNodes(definition: IDefinition, id?: string): INode[]
     return nodes;
 }
 
-function getDefinitionsNode(definition: IDefinition, id: string): INode | undefined
+function getDefinitionNode(definition: IDefinition, id: string): INode | undefined
 {
-    let nodes: INode[] = getDefinitionsNodes(definition, id);
+    let nodes: INode[] = getDefinitionNodes(definition, id);
     if (Array.isArray(nodes) && nodes.length === 1) {
         return nodes[0];
     }
@@ -441,6 +441,6 @@ export {
     loadSubDefinitions,
     checkDefinitionVersion,
     saveDefinition,
-    getDefinitionsNodes,
-    getDefinitionsNode
+    getDefinitionNodes,
+    getDefinitionNode
 }

@@ -4,7 +4,7 @@ import { connect } from "../../services/mongodb";
 import { v4 as uuidv4 } from "uuid";
 import { IResponse, IDefinition } from "../../interfaces/definition";
 import * as Superagent from "superagent";
-import { getDefinitionsNode } from "../../services/definition";
+import { getDefinitionNode } from "../../services/definition";
 import { INode } from "@tripetto/map";
 import { isDate } from "../../helpers/date";
 import { IExportableField } from "../../interfaces/results";
@@ -60,43 +60,47 @@ function save(request, response)
                                 let id = data.node.id || undefined;
                                 
                                 if (typeof id !== "undefined") {
-                                    let values = '';
-                                    let firstKey = undefined;
-                                    let keysToIgnore: string[] = [];
-                                    
-                                    Object.values(fields).forEach((field) => {
-                                        let data = JSON.parse(JSON.stringify(field));
-                                        if (typeof data.node.id !== "undefined" && data.node.id === id) {
-                                            if (data.value === true) {
-                                                if (values !== '') {
-                                                    values = values.concat(', ');
+                                    let node: INode | undefined = getDefinitionNode(definition, id);
+
+                                    if (typeof node !== "undefined" && typeof node?.block?.multiple !== "undefined" && node?.block?.multiple === true) {
+                                        let values = '';
+                                        let firstKey = undefined;
+                                        let keysToIgnore: string[] = [];
+                                        
+                                        Object.values(fields).forEach((field) => {
+                                            let data = JSON.parse(JSON.stringify(field));
+                                            if (typeof data.node.id !== "undefined" && data.node.id === id) {
+                                                if (data.value === true) {
+                                                    if (values !== '') {
+                                                        values = values.concat(', ');
+                                                    }
+                                                    
+                                                    values = values.concat(data.name);
                                                 }
-                                                
-                                                values = values.concat(data.name);
-                                            }
 
-                                            if (typeof firstKey === "undefined" && data.value === true) {
-                                                firstKey = data.key;
-                                            } else {
-                                                keysToIgnore.push(data.key);
+                                                if (typeof firstKey === "undefined" && data.value === true) {
+                                                    firstKey = data.key;
+                                                } else {
+                                                    keysToIgnore.push(data.key);
+                                                }
+                                            }
+                                        });
+
+                                        if (Object.values(keysToIgnore).includes(data.key)) {
+                                            return;
+                                        } else {
+                                            let node: INode | undefined = getDefinitionNode(definition, id);
+                                            if (typeof node !== "undefined") {
+                                                data.name = node.name || '';
+                                                data.value = values;
+
+                                                return _fields.push(data);
                                             }
                                         }
-                                    });
 
-                                    if (Object.values(keysToIgnore).includes(data.key)) {
                                         return;
-                                    } else {
-                                        let node: INode | undefined = getDefinitionsNode(definition, id);
-                                        if (typeof node !== "undefined") {
-                                            data.name = node.name || '';
-                                            data.value = values;
-
-                                            return _fields.push(data);
-                                        }
                                     }
                                 }
-
-                                return;
                             }
 
                             if (isDate(field)) {
@@ -104,7 +108,7 @@ function save(request, response)
                             }
 
                             if (typeof data.node.id !== "undefined") {
-                                let node: INode | undefined = getDefinitionsNode(definition, data.node.id);
+                                let node: INode | undefined = getDefinitionNode(definition, data.node.id);
                                 if (typeof node !== "undefined") {
                                     data.name = node.name || data.name || '';
                                 }
