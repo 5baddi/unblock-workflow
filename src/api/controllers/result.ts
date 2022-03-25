@@ -6,6 +6,9 @@ import { IResponse, IDefinition } from "../../interfaces/definition";
 import * as Superagent from "superagent";
 import { getDefinitionsNode } from "../../services/definition";
 import { INode } from "@tripetto/map";
+import { isDate } from "../../helpers/date";
+import { IExportableField } from "../../interfaces/results";
+import { isMultipleChoice } from "../../helpers/multiple-choice";
 
 function save(request, response)
 {
@@ -48,12 +51,12 @@ function save(request, response)
 
                         let _fields: any[] = [];
 
-                        Object.values(fields).forEach((field) => {
+                        Object.values(fields).forEach((field: IExportableField) => {
                             let data = JSON.parse(JSON.stringify(field));
 
                             data.type = data.type.replace("tripetto-block-", "");
 
-                            if (data.type === "multiple-choice") {
+                            if (isMultipleChoice(field)) {
                                 let id = data.node.id || undefined;
                                 
                                 if (typeof id !== "undefined") {
@@ -64,13 +67,15 @@ function save(request, response)
                                     Object.values(fields).forEach((field) => {
                                         let data = JSON.parse(JSON.stringify(field));
                                         if (typeof data.node.id !== "undefined" && data.node.id === id) {
-                                            if (values !== '') {
-                                                values = values.concat(',');
+                                            if (data.string === "Selected") {
+                                                if (values !== '') {
+                                                    values = values.concat(', ');
+                                                }
+                                                
+                                                values = values.concat(data.name);
                                             }
-                                            
-                                            values = values.concat(data.name);
 
-                                            if (typeof firstKey === "undefined") {
+                                            if (typeof firstKey === "undefined" && data.string === "Selected") {
                                                 firstKey = data.key;
                                             } else {
                                                 keysToIgnore.push(data.key);
@@ -92,7 +97,7 @@ function save(request, response)
                                 }
                             }
 
-                            if (data.type === "date") {
+                            if (isDate(field)) {
                                 data.value = new Date(data.string || data.value);
                             }
 
