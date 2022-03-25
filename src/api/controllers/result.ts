@@ -67,7 +67,7 @@ function save(request, response)
                                     Object.values(fields).forEach((field) => {
                                         let data = JSON.parse(JSON.stringify(field));
                                         if (typeof data.node.id !== "undefined" && data.node.id === id) {
-                                            if (data.string === "Selected") {
+                                            if (data.value === true) {
                                                 if (values !== '') {
                                                     values = values.concat(', ');
                                                 }
@@ -75,7 +75,7 @@ function save(request, response)
                                                 values = values.concat(data.name);
                                             }
 
-                                            if (typeof firstKey === "undefined" && data.string === "Selected") {
+                                            if (typeof firstKey === "undefined" && data.value === true) {
                                                 firstKey = data.key;
                                             } else {
                                                 keysToIgnore.push(data.key);
