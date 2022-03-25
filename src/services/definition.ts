@@ -198,6 +198,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
 
                     let filedsShouldBeUpdated = existsNodes.filter((existsNode) => {
                         let newNode: INode | undefined = newNodes.find(node => node.id === existsNode.id);
+
                         if (typeof newNode !== "undefined") {
                             let { newName, existsName } = getNodesDiffNames(existsNode, newNode);
 
