@@ -95,6 +95,8 @@ function save(request, response)
                                         }
                                     }
                                 }
+
+                                return;
                             }
 
                             if (isDate(field)) {
