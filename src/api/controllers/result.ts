@@ -103,14 +103,19 @@ function save(request, response)
                                 }
                             }
 
-                            if (isDate(field)) {
-                                data.value = new Date(data.string || data.value);
-                            }
-
                             if (typeof data.node.id !== "undefined") {
                                 let node: INode | undefined = getDefinitionNode(definition, data.node.id);
                                 if (typeof node !== "undefined") {
                                     data.name = node.name || data.name || '';
+                                }
+
+
+                                if (isDate(field)) {
+                                    data.value = new Date(data.value);
+
+                                    if (typeof node?.block?.time === "boolean" && node?.block?.time === true) {
+                                        data.type = "datetime";
+                                    }
                                 }
                             }
 
