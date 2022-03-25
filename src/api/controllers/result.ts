@@ -110,12 +110,8 @@ function save(request, response)
                                 }
 
 
-                                if (isDate(field)) {
-                                    data.value = new Date(data.value);
-
-                                    if (typeof node?.block?.time === "boolean" && node?.block?.time === true) {
-                                        data.type = "datetime";
-                                    }
+                                if (isDate(field) && typeof node?.block?.time === "boolean" && node?.block?.time === true) {
+                                    data.type = "datetime";
                                 }
                             }
 
@@ -202,7 +198,7 @@ function save(request, response)
                                     _name = name.split('.').join(' ');
                                     _name = name.split('$').join(' ');
 
-                                    normalizedResponses[_name] = data.value;
+                                    normalizedResponses[_name] = (data.type === "date" || data.type === "datetime") ? new Date(data.value) : data.value;
 
                                     return field;
                                 });
