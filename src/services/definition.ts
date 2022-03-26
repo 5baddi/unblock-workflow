@@ -60,16 +60,22 @@ async function loadSubClusters(db: Db, cluster: ICluster): Promise<ICluster>
                     _cluster.branches = [];
                 }
 
-                _cluster.branches?.push(...subCluster.branches ?? []);
+                let _loadedCluster = JSON.parse(JSON.stringify(_loadedSubCluster));
+                if (! Array.isArray(_loadedCluster.branches)) {
+                    _loadedCluster.branches = [];
+                }
 
-                await Promise.all((_cluster.branches ?? []).map(async(branche, index) => {
+                await Promise.all((_loadedCluster.branches ?? []).map(async(branche, index) => {
                     await Promise.all((branche.clusters ?? []).map(async(subCluster, clusterIndex) => {
                         let _loadedSubCluster = await loadSubClusters(db, subCluster);
-                        branche.clusters?.splice(clusterIndex, 0, _loadedSubCluster);
+
+                        branche.clusters[clusterIndex] = _loadedSubCluster;
                     }));
     
-                    _cluster.branches[index] = branche;
+                    _loadedCluster.branches[index] = branche;
                 }));
+
+                _cluster.branches?.push(..._loadedCluster.branches ?? []);
             }));
         }));
     }
