@@ -76,17 +76,17 @@ export class ProcessTask extends NodeBlock
     @editor
     defineEditor() 
     {
-        let defaultOptions = [
-            {
-                label: 'Loading workflows...',
-                value: '-1',
-            }
-        ];
-
-        this.dropdown = (new Forms.Dropdown(defaultOptions, Forms.Text.bind(this, "definitionId", "")))
-            .await();
-
         if (! Array.isArray(this.options) || this.options.length === 0) {
+            let defaultOptions = [
+                {
+                    label: 'Loading workflows...',
+                    value: '-1',
+                }
+            ];
+
+            this.dropdown = (new Forms.Dropdown(defaultOptions, Forms.Text.bind(this, "definitionId", "")))
+                .await();
+
             this.loadDefinitions();
         }
 
