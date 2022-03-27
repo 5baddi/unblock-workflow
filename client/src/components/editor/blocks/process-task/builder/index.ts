@@ -67,10 +67,6 @@ export class ProcessTask extends NodeBlock
 
                 this.dropdown.options(this.options);
 
-                if (this.definitionId !== "") {
-                    this.dropdown.select(this.definitionId);
-                }
-
                 if (Array.isArray(this.options) && this.options.length > 0) {
                     this.dropdown.isAwaiting = false;
                 }
@@ -90,7 +86,9 @@ export class ProcessTask extends NodeBlock
         this.dropdown = (new Forms.Dropdown(defaultOptions, Forms.Text.bind(this, "definitionId", "")))
             .await();
 
-        this.loadDefinitions();
+        if (! Array.isArray(this.options) || this.options.length === 0) {
+            this.loadDefinitions();
+        }
 
         this.editor.name(false, false, "Name", false).focus();
         this.node.nameVisible = false;
