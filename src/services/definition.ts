@@ -119,10 +119,10 @@ async function loadSubDefinitions(db: Db, definition: IDefinition): Promise<IDef
     let clusters: ICluster[] = [];
 
     return Promise.all(
-            definition.clusters.map(async(cluster) => {
+            definition.clusters.map(async(cluster, index) => {
                 let _cluster = await loadSubClusters(db, cluster);
 
-                clusters.push(_cluster as ICluster);
+                clusters[index] = _cluster as ICluster;
             })
         )
         .then(() => {
