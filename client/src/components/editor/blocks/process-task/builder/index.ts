@@ -86,6 +86,10 @@ export class ProcessTask extends NodeBlock
         this.dropdown = (new Forms.Dropdown(defaultOptions, Forms.Text.bind(this, "definitionId", "")))
             .await();
 
+        if (this.definitionId !== "") {
+            this.dropdown.select(this.definitionId);
+        }
+
         this.loadDefinitions();
 
         this.editor.name(false, false, "Name", false).focus();
