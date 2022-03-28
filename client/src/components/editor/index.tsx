@@ -17,6 +17,7 @@ import { popup, error as errorPopup, apiError, confirm as confirmPopup} from "./
 import "./blocks";
 
 import "./style.scss";
+import { Glue42Web } from "@glue42/web";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -142,6 +143,16 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
         window.addEventListener("beforeunload", this.beforeUnload);
+
+        // init run notification handler
+        if(this.props.glue) {
+            const handler = async (args: any) => {
+                this.state.glueWorkspace 
+                    .addGroup({type: "group", children: [{type: "window", appName: RUNNER_RUN_APP}]});
+            }
+
+            this.props.glue.interop.register("runWorkflow", handler);
+        }
     }
 
     componentWillUnmount()
@@ -636,10 +647,28 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        this.state.glueWorkspace 
-            .addGroup({type: "group", children: [{type: "window", appName: RUNNER_RUN_APP}]});
+        const options: Glue42Web.Notifications.RaiseOptions = {
+            title: "You've got a new request!",
+            body: "New request",
+            focusPlatformOnDefaultClick: true,
+            actions: [
+                {
+                    action: "acceptRequest",
+                    interop: {
+                    method: "runWorkflow",
+                    // arguments:
+                    },
+                    title: "Accept Request",
+                },
+                {
+                    action: "declineRequest",
+                    title: "Decline Request",
+                },
+            ],
+        };
 
         
+        this.props.glue.notifications.raise(options);
     }
 
     private share(): void
