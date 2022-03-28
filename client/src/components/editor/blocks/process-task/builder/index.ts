@@ -91,9 +91,7 @@ export class ProcessTask extends NodeBlock
     {
         this.dropdown = new Forms.Dropdown(this.options ?? DEFAULT_OPTIONS, Forms.Text.bind(this, "definitionId", this.definitionId));
 
-        if (! Array.isArray(this.options) || this.options.length === 0) {
-            this.loadDefinitions();
-        }
+        this.loadDefinitions();
 
         this.editor.name(false, false, "Name", false).focus();
         this.node.nameVisible = false;
