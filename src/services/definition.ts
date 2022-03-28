@@ -35,12 +35,85 @@ async function loadSubDefinition(db: Db, definitionId: string): Promise<IDefinit
     return subDefinition;
 }
 
-async function loadSubClusters(db: Db, cluster: ICluster): Promise<ICluster>
+async function loadSubDefinitions(db: Db, definition: IDefinition, newIndexs: number = 0): Promise<IDefinition>
+{
+    if (! Array.isArray(definition.clusters)) {
+        return Promise.resolve(definition);
+    }
+
+    await Promise.all(
+        await definition.clusters.map(async(cluster, clusterIndex) => {
+            let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
+
+            await Promise.all(
+                await (cluster.nodes ?? []).map(async(node, nodeIndex) => {
+                    if (! isProcessTaskBlock(node)) {
+                        return;
+                    }
+
+                    if (Array.isArray(cluster.nodes)) {
+                        _cluster.nodes[nodeIndex].fetched = true;
+                    }
+
+                    let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block?.definitionId);
+                    if (typeof subDefinition === "undefined") {
+                        return;
+                    }
+
+                    newIndexs += subDefinition.clusters?.length || 0;
+
+                    subDefinition.clusters?.forEach(subCluter => {
+                        definition.clusters.splice((newIndexs + clusterIndex + 1), 0, subCluter);
+                    });
+                }),
+            //     await (cluster.branches ?? []).map(async(branch, branchIndex) => {
+            //         await (branch.clusters ?? []).map(async(cluster, clusterIndex) => {
+            //             await Promise.all(
+            //                 await (cluster.nodes ?? []).map(async(node) => {
+            //                     if (! isProcessTaskBlock(node)) {
+            //                         return;
+            //                     }
+            // console.log(node.block?.definitionId);
+            //                     let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block?.definitionId);
+            //                     if (typeof subDefinition === "undefined") {
+            //                         return;
+            //                     }
+            
+            //                     newIndexs += subDefinition.clusters?.length || 0;
+            // console.log(subDefinition.clusters);
+            //                     subDefinition.clusters?.forEach(subCluter => {
+            //                         branch.clusters?.splice((newIndexs + clusterIndex + 1), 0, subCluter);
+            //                     });
+            //                 })
+            //             );
+            //         });
+
+            //         if (Array.isArray(cluster.branches)) {
+            //             cluster.branches[branchIndex] = branch;
+            //         }
+            //     })
+            );
+
+            definition.clusters[clusterIndex] = _cluster;
+        })
+    );
+
+    let processTaskBlocks = getDefinitionNodes(definition, undefined, "process-task");
+    let unfetched = (processTaskBlocks ?? []).filter(node => { return node.fetched === false; });
+
+    if (Array.isArray(unfetched) && unfetched.length > 0) {
+        return loadSubDefinitions(db, definition, newIndexs);
+    }
+
+    return Promise.resolve(definition);
+}
+
+async function loadSubClusters(db: Db, definition: IDefinition, cluster: ICluster): Promise<IDefinition>
 {
     let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
 
     if (typeof _cluster.nodes !== "undefined" && _cluster.nodes.length > 0) {
-        await Promise.all(_cluster.nodes.map(async(node, index) => {
+        await Promise.all(await _cluster.nodes.map(async(node, index) => {
             if (! isProcessTaskBlock(node)) {
                 return;
             }
@@ -50,37 +123,59 @@ async function loadSubClusters(db: Db, cluster: ICluster): Promise<ICluster>
                 return;
             }
 
-            await Promise.all(subDefinition.clusters.map(async(subCluster) => {
-                let _index = index + 1;
+            let _index = index;
+
+            await Promise.all(await subDefinition.clusters.map(async(subCluster) => {
+                if (Array.isArray(subCluster.branches)) {
+                    if (! Array.isArray(_cluster.branches)) {
+                        _cluster.branches = [];
+                    }
+
+                    _cluster.branches = _cluster.branches.concat(subCluster.branches);
+                }
 
                 let _loadedSubCluster = await loadSubNodes(db, subCluster);
-                _cluster.nodes?.splice(_index, 0, ..._loadedSubCluster.nodes ?? []);
+                if (typeof _loadedSubCluster !== "undefined") {
+                    (_loadedSubCluster.nodes ?? []).forEach(node => {
+                        ++_index;
 
-                if (! Array.isArray(_cluster.branches)) {
-                    _cluster.branches = [];
+                        _cluster.nodes.push(_index, node);
+                    });
+
+                    // let _loadedCluster = JSON.parse(JSON.stringify(_loadedSubCluster));
+                    // if (! Array.isArray(_loadedCluster.branches)) {
+                    //     _loadedCluster.branches = [];
+                    // }
+
+                    // await Promise.all(await (_loadedCluster.branches ?? []).map(async(branche, index) => {
+                    //     await Promise.all((branche.clusters ?? []).map(async(subCluster, clusterIndex) => {
+                    //         let _loadedSubCluster = await loadSubClusters(db, subCluster);
+
+                    //         branche.clusters[clusterIndex] = _loadedSubCluster;
+                    //     }));
+        
+                    //     _loadedCluster.branches[index] = branche;
+                    // }));
+
+                    // if (Array.isArray(_loadedCluster.branches)) {
+                    //     if (! Array.isArray(_cluster.branches)) {
+                    //         _cluster.branches = [];
+                    //     }
+
+                    //     _cluster.branches?.push(..._loadedCluster.branches ?? []);
+                    // }
                 }
-
-                let _loadedCluster = JSON.parse(JSON.stringify(_loadedSubCluster));
-                if (! Array.isArray(_loadedCluster.branches)) {
-                    _loadedCluster.branches = [];
-                }
-
-                await Promise.all((_loadedCluster.branches ?? []).map(async(branche, index) => {
-                    await Promise.all((branche.clusters ?? []).map(async(subCluster, clusterIndex) => {
-                        let _loadedSubCluster = await loadSubClusters(db, subCluster);
-
-                        branche.clusters[clusterIndex] = _loadedSubCluster;
-                    }));
-    
-                    _loadedCluster.branches[index] = branche;
-                }));
-
-                _cluster.branches?.push(..._loadedCluster.branches ?? []);
             }));
         }));
     }
 
-    return _cluster as ICluster;
+    definition.clusters.forEach((cluster, index) => {
+        if (cluster.id === _cluster.id) {
+            definition.clusters[index] = _cluster as ICluster;
+        }
+    });
+
+    return definition;
 }
 
 async function loadSubNodes(db: Db, cluster: ICluster): Promise<ICluster>
@@ -88,58 +183,37 @@ async function loadSubNodes(db: Db, cluster: ICluster): Promise<ICluster>
     let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
 
     if (typeof _cluster.nodes !== "undefined" && _cluster.nodes.length > 0) {
-        await Promise.all(_cluster.nodes.map(async(node, index) => {
-            if (! isProcessTaskBlock(node)) {
-                return;
-            }
+        await Promise.all(
+            await _cluster.nodes.map(async(node, index) => {
+                if (! isProcessTaskBlock(node)) {
+                    return;
+                }
+    
+                let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block.definitionId);
+                if (typeof subDefinition === "undefined") {
+                    return;
+                }
 
-            let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block.definitionId);
-            if (typeof subDefinition === "undefined") {
-                return;
-            }
+                let _index = index;
+    
+                await Promise.all(
+                    await subDefinition.clusters.map(async (subCluster) => {        
+                        let _subCluster = await loadSubNodes(db, subCluster);
 
-            await Promise.all(subDefinition.clusters.map(async (subCluster) => {
-                let _index = index + 1;
-
-                let _subCluster = await loadSubNodes(db, subCluster);
-                _cluster.nodes?.splice(_index, 0, ..._subCluster.nodes ?? []);
-            }));
-        }));
+                        if (typeof _subCluster !== "undefined") {
+                            (_subCluster.nodes ?? []).forEach(node => {
+                                ++_index;
+        
+                                _cluster.nodes?.splice(_index, 0, node);
+                            });
+                        }
+                    })
+                );
+            })
+        );
     }
 
     return _cluster as ICluster;
-}
-
-async function loadSubDefinitions(db: Db, definition: IDefinition): Promise<IDefinition>
-{
-    if (! Array.isArray(definition.clusters)) {
-        return Promise.resolve(definition);
-    }
-
-    let clusters: ICluster[] = [];
-
-    return Promise.all(
-            definition.clusters.map(async(cluster, index) => {
-                let _cluster = await loadSubClusters(db, cluster);
-
-                clusters[index] = _cluster as ICluster;
-            })
-        )
-        .then(() => {
-            return Promise.resolve({
-                clusters: clusters,
-                builder: definition.builder,
-                _id: definition._id,
-                name: definition.name,
-                description: definition.description,
-                keywords: definition.keywords,
-                language: definition.language,
-                prologue: definition.prologue,
-                epilogue: definition.epilogue,
-                tenant_id: definition.tenant_id,
-                tenants_ids: definition.tenants_ids,
-            } as IDefinition);
-        });
 }
 
 function getNodesDiffNames(existsNode: INode, newNode: INode): { existsName: string, newName: string }
@@ -402,20 +476,20 @@ async function saveDefinition(tenantDB, definition, request, response?)
         });
 }
 
-function getDefinitionNodes(definition: IDefinition, id?: string): INode[]
+function getDefinitionNodes(definition: IDefinition, id?: string, type?: string): INode[]
 {
     let nodes: INode[] = [];
 
     (definition.clusters ?? []).map((cluster: ICluster) => {
-        nodes.push(...getClusterNodes(cluster, id));
+        nodes.push(...getClusterNodes(cluster, id, type));
     });
 
     return nodes;
 }
 
-function getDefinitionNode(definition: IDefinition, id: string): INode | undefined
+function getDefinitionNode(definition: IDefinition, id: string, type?: string): INode | undefined
 {
-    let nodes: INode[] = getDefinitionNodes(definition, id);
+    let nodes: INode[] = getDefinitionNodes(definition, id, type);
     if (Array.isArray(nodes) && nodes.length === 1) {
         return nodes[0];
     }
@@ -423,11 +497,11 @@ function getDefinitionNode(definition: IDefinition, id: string): INode | undefin
     return undefined;
 }
 
-function getClusterNodes(cluster: ICluster, id?: string): INode[]
+function getClusterNodes(cluster: ICluster, id?: string, type?: string): INode[]
 {
     let nodes: INode[] = [];
 
-    if (Array.isArray(cluster.nodes) && typeof id === "undefined") {
+    if (Array.isArray(cluster.nodes) && typeof id === "undefined" && typeof type === "undefined") {
         nodes.push(...cluster.nodes);
     }
 
@@ -435,9 +509,13 @@ function getClusterNodes(cluster: ICluster, id?: string): INode[]
         nodes.push(...cluster.nodes.filter((node: INode) => { return node.id === id; }));
     }
 
+    if (Array.isArray(cluster.nodes) && typeof type === "string") {
+        nodes.push(...cluster.nodes.filter((node: INode) => { return node.block?.type === type; }));
+    }
+
     (cluster.branches ?? []).map((branch: IBranch) => {
         (branch.clusters ?? []).map((cluster: ICluster) => {
-            nodes.push(...getClusterNodes(cluster, id));
+            nodes.push(...getClusterNodes(cluster, id, type));
         });
     });
 
