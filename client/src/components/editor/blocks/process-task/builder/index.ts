@@ -20,7 +20,7 @@ import { ENV } from "../../../../../settings";
 })
 export class ProcessTask extends NodeBlock
 {
-    private options?: Array<TOption<IProcessTaskOptionInterface>> = undefined;
+    private options: Array<TOption<IProcessTaskOptionInterface>> = DEFAULT_OPTIONS;
 
     @definition("string", "required", "rw")
     definitionId: string = "";
@@ -28,7 +28,7 @@ export class ProcessTask extends NodeBlock
     @definition("boolean")
     sendable: boolean = false;
 
-    dropdown: Forms.Dropdown<IProcessTaskOptionInterface> = new Forms.Dropdown(DEFAULT_OPTIONS, Forms.Text.bind(this, "definitionId", ""));
+    dropdown?: Forms.Dropdown<IProcessTaskOptionInterface>;
 
     loadDefinitions(): void
     {
@@ -45,12 +45,14 @@ export class ProcessTask extends NodeBlock
             endpoint = endpoint.concat(`/${userId}`);
         }
 
-        this.dropdown.await();
+        this.dropdown?.disabled(true);
+        this.dropdown?.options(this.options)
+        this.dropdown?.await();
 
         API.get(endpoint)
             .then(response => {
                 if (! response.data || ! response.data.definitions || ! Array.isArray(response.data.definitions)) {
-                    this.dropdown.options([]);
+                    this.dropdown?.options([]);
                 }
 
                 let definitions = response.data.definitions.filter(definition => {
@@ -67,29 +69,37 @@ export class ProcessTask extends NodeBlock
                         label: <string> definition.name
                     };
                 });
-  
-                this.dropdown
-                    .options(this.options ?? [])
-                    .select(this.definitionId)
-                    .focus();
 
-                if (Array.isArray(this.options) && this.options.length > 0) {
+                this.dropdown?.options(this.options);
+                this.dropdown?.select(this.definitionId);
+
+                if (! Array.isArray(this.options) || this.options.length === 0) {
+                    this.dropdown?.options(DEFAULT_OPTIONS);
+                }
+
+                if (typeof this.dropdown !== "undefined") {
                     this.dropdown.isAwaiting = false;
                 }
+
+                this.dropdown?.disabled(false);
             })
             .catch(error => {
                 if (ENV === "development") {
                     console.log("opening the editor");
                 }
 
-                this.dropdown.isAwaiting = false;
+                if (typeof this.dropdown !== "undefined") {
+                    this.dropdown.isAwaiting = false;
+                }
+
+                this.dropdown?.disabled(false);
             });
     }
 
     @editor
-    defineEditor() 
+    defineEditor()
     {
-        this.dropdown = new Forms.Dropdown(this.options ?? DEFAULT_OPTIONS, Forms.Text.bind(this, "definitionId", this.definitionId));
+        this.dropdown = new Forms.Dropdown(this.options, Forms.Dropdown.bind(this, "definitionId", this.definitionId));
 
         this.loadDefinitions();
 
