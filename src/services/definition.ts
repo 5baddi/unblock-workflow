@@ -66,32 +66,6 @@ async function loadSubDefinitions(db: Db, definition: IDefinition, newIndexs: nu
                         definition.clusters.splice((newIndexs + clusterIndex + 1), 0, subCluter);
                     });
                 }),
-            //     await (cluster.branches ?? []).map(async(branch, branchIndex) => {
-            //         await (branch.clusters ?? []).map(async(cluster, clusterIndex) => {
-            //             await Promise.all(
-            //                 await (cluster.nodes ?? []).map(async(node) => {
-            //                     if (! isProcessTaskBlock(node)) {
-            //                         return;
-            //                     }
-            // console.log(node.block?.definitionId);
-            //                     let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block?.definitionId);
-            //                     if (typeof subDefinition === "undefined") {
-            //                         return;
-            //                     }
-            
-            //                     newIndexs += subDefinition.clusters?.length || 0;
-            // console.log(subDefinition.clusters);
-            //                     subDefinition.clusters?.forEach(subCluter => {
-            //                         branch.clusters?.splice((newIndexs + clusterIndex + 1), 0, subCluter);
-            //                     });
-            //                 })
-            //             );
-            //         });
-
-            //         if (Array.isArray(cluster.branches)) {
-            //             cluster.branches[branchIndex] = branch;
-            //         }
-            //     })
             );
 
             definition.clusters[clusterIndex] = _cluster;
@@ -104,6 +78,53 @@ async function loadSubDefinitions(db: Db, definition: IDefinition, newIndexs: nu
     if (Array.isArray(unfetched) && unfetched.length > 0) {
         return loadSubDefinitions(db, definition, newIndexs);
     }
+
+    return Promise.resolve(definition);
+}
+
+async function loadSubBranches(db: Db, definition: IDefinition, newIndexs: number = 0): Promise<IDefinition>
+{
+    if (! Array.isArray(definition.clusters)) {
+        return Promise.resolve(definition);
+    }
+
+    // await Promise.all(
+    //     await definition.clusters.map(async(cluster, clusterIndex) => {
+    //         let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
+
+    //         await Promise.all(
+    //             await (cluster.nodes ?? []).map(async(node, nodeIndex) => {
+    //                 if (! isProcessTaskBlock(node)) {
+    //                     return;
+    //                 }
+
+    //                 if (Array.isArray(cluster.nodes)) {
+    //                     _cluster.nodes[nodeIndex].fetched = true;
+    //                 }
+
+    //                 let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block?.definitionId);
+    //                 if (typeof subDefinition === "undefined") {
+    //                     return;
+    //                 }
+
+    //                 newIndexs += subDefinition.clusters?.length || 0;
+
+    //                 subDefinition.clusters?.forEach(subCluter => {
+    //                     definition.clusters.splice((newIndexs + clusterIndex + 1), 0, subCluter);
+    //                 });
+    //             }),
+    //         );
+
+    //         definition.clusters[clusterIndex] = _cluster;
+    //     })
+    // );
+
+    // let processTaskBlocks = getDefinitionNodes(definition, undefined, "process-task", true);
+    // let unfetched = (processTaskBlocks ?? []).filter(node => { return node.fetched === false; });
+
+    // if (Array.isArray(unfetched) && unfetched.length > 0) {
+    //     return loadSubDefinitions(db, definition, newIndexs);
+    // }
 
     return Promise.resolve(definition);
 }
@@ -476,20 +497,20 @@ async function saveDefinition(tenantDB, definition, request, response?)
         });
 }
 
-function getDefinitionNodes(definition: IDefinition, id?: string, type?: string): INode[]
+function getDefinitionNodes(definition: IDefinition, id?: string, type?: string, onlyBranches?: boolean): INode[]
 {
     let nodes: INode[] = [];
 
     (definition.clusters ?? []).map((cluster: ICluster) => {
-        nodes.push(...getClusterNodes(cluster, id, type));
+        nodes.push(...getClusterNodes(cluster, id, type, onlyBranches));
     });
 
     return nodes;
 }
 
-function getDefinitionNode(definition: IDefinition, id: string, type?: string): INode | undefined
+function getDefinitionNode(definition: IDefinition, id: string, type?: string, onlyBranches?: boolean): INode | undefined
 {
-    let nodes: INode[] = getDefinitionNodes(definition, id, type);
+    let nodes: INode[] = getDefinitionNodes(definition, id, type, onlyBranches);
     if (Array.isArray(nodes) && nodes.length === 1) {
         return nodes[0];
     }
@@ -497,33 +518,36 @@ function getDefinitionNode(definition: IDefinition, id: string, type?: string): 
     return undefined;
 }
 
-function getClusterNodes(cluster: ICluster, id?: string, type?: string): INode[]
+function getClusterNodes(cluster: ICluster, id?: string, type?: string, onlyBranches?: boolean): INode[]
 {
     let nodes: INode[] = [];
 
-    if (Array.isArray(cluster.nodes) && typeof id === "undefined" && typeof type === "undefined") {
+    if (Array.isArray(cluster.nodes) && typeof id === "undefined" && typeof type === "undefined" && (typeof onlyBranches === "undefined" || onlyBranches === false)) {
         nodes.push(...cluster.nodes);
     }
 
-    if (Array.isArray(cluster.nodes) && typeof id === "string") {
+    if (Array.isArray(cluster.nodes) && typeof id === "string" && (typeof onlyBranches === "undefined" || onlyBranches === false)) {
         nodes.push(...cluster.nodes.filter((node: INode) => { return node.id === id; }));
     }
 
-    if (Array.isArray(cluster.nodes) && typeof type === "string") {
+    if (Array.isArray(cluster.nodes) && typeof type === "string" && (typeof onlyBranches === "undefined" || onlyBranches === false)) {
         nodes.push(...cluster.nodes.filter((node: INode) => { return node.block?.type === type; }));
     }
 
-    (cluster.branches ?? []).map((branch: IBranch) => {
-        (branch.clusters ?? []).map((cluster: ICluster) => {
-            nodes.push(...getClusterNodes(cluster, id, type));
+    if (typeof onlyBranches === "undefined" || onlyBranches === true) {
+        (cluster.branches ?? []).map((branch: IBranch) => {
+            (branch.clusters ?? []).map((cluster: ICluster) => {
+                nodes.push(...getClusterNodes(cluster, id, type));
+            });
         });
-    });
+    }
 
     return nodes;
 }
 
 export {
     loadSubDefinitions,
+    loadSubBranches,
     checkDefinitionVersion,
     saveDefinition,
     getDefinitionNodes,
