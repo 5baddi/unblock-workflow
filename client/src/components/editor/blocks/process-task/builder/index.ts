@@ -1,9 +1,10 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
 import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
-import API from '../../../../../api';
-import { IProcessTaskOptionInterface } from '../interfaces';
-import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS } from '../constants';
-import { USER_ID_KEY, USER_TENANT_ID_KEY } from '../../../../../global';
+import API from "../../../../../api";
+import { IProcessTaskOptionInterface } from "../interfaces";
+import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS } from "../constants";
+import { USER_ID_KEY, USER_TENANT_ID_KEY } from "../../../../../global";
+import { ENV } from "../../../../../settings";
 
 @tripetto({
     type: "node",
@@ -44,6 +45,8 @@ export class ProcessTask extends NodeBlock
             endpoint = endpoint.concat(`/${userId}`);
         }
 
+        this.dropdown.await();
+
         API.get(endpoint)
             .then(response => {
                 if (! response.data || ! response.data.definitions || ! Array.isArray(response.data.definitions)) {
@@ -73,6 +76,13 @@ export class ProcessTask extends NodeBlock
                 if (Array.isArray(this.options) && this.options.length > 0) {
                     this.dropdown.isAwaiting = false;
                 }
+            })
+            .catch(error => {
+                if (ENV === "development") {
+                    console.log("opening the editor");
+                }
+
+                this.dropdown.isAwaiting = false;
             });
     }
 
@@ -81,9 +91,9 @@ export class ProcessTask extends NodeBlock
     {
         this.dropdown = new Forms.Dropdown(this.options ?? DEFAULT_OPTIONS, Forms.Text.bind(this, "definitionId", this.definitionId));
 
-        this.dropdown.await();
-
-        this.loadDefinitions();
+        if (! Array.isArray(this.options) || this.options.length === 0) {
+            this.loadDefinitions();
+        }
 
         this.editor.name(false, false, "Name", false).focus();
         this.node.nameVisible = false;
