@@ -1,8 +1,8 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
-import { NodeBlock, tripetto, editor, Forms, definition, slots } from "tripetto";
+import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
 import API from '../../../../../api';
 import { IProcessTaskOptionInterface } from '../interfaces';
-import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL } from '../constants';
+import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS } from '../constants';
 import { USER_ID_KEY, USER_TENANT_ID_KEY } from '../../../../../global';
 
 @tripetto({
@@ -19,15 +19,15 @@ import { USER_ID_KEY, USER_TENANT_ID_KEY } from '../../../../../global';
 })
 export class ProcessTask extends NodeBlock
 {
-    private options: Array<TOption<IProcessTaskOptionInterface>> = [];
+    private options?: Array<TOption<IProcessTaskOptionInterface>> = undefined;
 
-    @definition("string")
+    @definition("string", "required", "rw")
     definitionId: string = "";
-    
+
     @definition("boolean")
     sendable: boolean = false;
 
-    dropdown?;
+    dropdown: Forms.Dropdown<IProcessTaskOptionInterface> = new Forms.Dropdown(DEFAULT_OPTIONS, Forms.Text.bind(this, "definitionId", ""));
 
     loadDefinitions(): void
     {
@@ -47,7 +47,7 @@ export class ProcessTask extends NodeBlock
         API.get(endpoint)
             .then(response => {
                 if (! response.data || ! response.data.definitions || ! Array.isArray(response.data.definitions)) {
-                    this.dropdown.options = [];
+                    this.dropdown.options([]);
                 }
 
                 let definitions = response.data.definitions.filter(definition => {
@@ -64,8 +64,11 @@ export class ProcessTask extends NodeBlock
                         label: <string> definition.name
                     };
                 });
-
-                this.dropdown.options(this.options);
+  
+                this.dropdown
+                    .options(this.options ?? [])
+                    .select(this.definitionId)
+                    .focus();
 
                 if (Array.isArray(this.options) && this.options.length > 0) {
                     this.dropdown.isAwaiting = false;
@@ -76,19 +79,11 @@ export class ProcessTask extends NodeBlock
     @editor
     defineEditor() 
     {
-        if (! Array.isArray(this.options) || this.options.length === 0) {
-            let defaultOptions = [
-                {
-                    label: 'Loading workflows...',
-                    value: '-1',
-                }
-            ];
+        this.dropdown = new Forms.Dropdown(this.options ?? DEFAULT_OPTIONS, Forms.Text.bind(this, "definitionId", this.definitionId));
 
-            this.dropdown = (new Forms.Dropdown(defaultOptions, Forms.Text.bind(this, "definitionId", "")))
-                .await();
+        this.dropdown.await();
 
-            this.loadDefinitions();
-        }
+        this.loadDefinitions();
 
         this.editor.name(false, false, "Name", false).focus();
         this.node.nameVisible = false;
