@@ -20,7 +20,7 @@ import { ENV } from "../../../../../settings";
 })
 export class ProcessTask extends NodeBlock
 {
-    private options: Array<TOption<IProcessTaskOptionInterface>> = DEFAULT_OPTIONS;
+    private options?: Array<TOption<IProcessTaskOptionInterface>>;
 
     @definition("string", "required", "rw")
     definitionId: string = "";
@@ -46,7 +46,7 @@ export class ProcessTask extends NodeBlock
         }
 
         this.dropdown?.disabled(true);
-        this.dropdown?.options(this.options)
+        this.dropdown?.options(DEFAULT_OPTIONS)
         this.dropdown?.await();
 
         API.get(endpoint)
@@ -70,7 +70,7 @@ export class ProcessTask extends NodeBlock
                     };
                 });
 
-                this.dropdown?.options(this.options);
+                this.dropdown?.options(this.options ?? DEFAULT_OPTIONS);
                 this.dropdown?.select(this.definitionId);
 
                 if (! Array.isArray(this.options) || this.options.length === 0) {
@@ -92,6 +92,7 @@ export class ProcessTask extends NodeBlock
                     this.dropdown.isAwaiting = false;
                 }
 
+                this.dropdown?.options(DEFAULT_OPTIONS);
                 this.dropdown?.disabled(false);
             });
     }
@@ -99,7 +100,7 @@ export class ProcessTask extends NodeBlock
     @editor
     defineEditor()
     {
-        this.dropdown = new Forms.Dropdown(this.options, Forms.Dropdown.bind(this, "definitionId", this.definitionId));
+        this.dropdown = new Forms.Dropdown(DEFAULT_OPTIONS, Forms.Dropdown.bind(this, "definitionId", this.definitionId));
 
         this.loadDefinitions();
 
