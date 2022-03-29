@@ -133,12 +133,12 @@ async function findForRunner(request, response)
                     }
 
                     let definition = Object.assign({} as IDefinition, result);
-                    let _definition: IDefinition = await loadSubDefinitions(db, definition);
-                    _definition = await loadSubBranches(db, definition);
+                    // let _definition: IDefinition = await loadSubDefinitions(db, definition);
+                    // _definition = await loadSubBranches(db, definition);
 
                     client.close();
 
-                    return response.send({ success: true, definition: _definition });
+                    return response.send({ success: true, definition });
                 })
                 .catch(error => {
                     client.close();

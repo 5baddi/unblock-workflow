@@ -218,40 +218,39 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
 
     private async onAction(type, definition, block?: { readonly id: string; readonly name: string; }): Promise<void>
     {
-        // await this.openBlockApp();
+        if (type === "stage") {
+            await this.openBlockApp();
+        }
+        
+        if (type === "unstage") {
+            window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
 
-        // if (type === "unstage") {
-        //     window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
-
-        //     return;
-        // }
-
-        // if (this.props.previewMode === true) {
-        //     return;
-        // }
-
-        // if (ENV === "development") {
-        //     console.log(this.exportables);
-
-        //     return;
-        // }
-
-        // this.sendDataToWebhooks(this.exportables);
+            if (this.props.previewMode === true) {
+                return;
+            }
+    
+            if (ENV === "development") {
+                console.log(this.exportables);
+    
+                return;
+            }
+    
+            this.sendDataToWebhooks(this.exportables);
+        }
     }
 
     private async openBlockApp(): Promise<void>
     {
-        let appsToOpenList = window.sessionStorage.getItem(APP_TO_OPEN_KEY) || undefined;
-        if (typeof appsToOpenList !== "string"  || appsToOpenList === "") {
+        let appToOpenObj = window.sessionStorage.getItem(APP_TO_OPEN_KEY) || undefined;
+        if (typeof appToOpenObj !== "string"  || appToOpenObj === "") {
             return;
         }
         
-        let appsToOpen = JSON.parse(appsToOpenList);
-        if (typeof appsToOpen !== "object") {
+        let appToOpen = JSON.parse(appToOpenObj);
+        if (typeof appToOpen !== "object") {
             return;
         }
 
-console.log(appsToOpen);
         // appsToOpen.every((app, index) => {
         //     if (typeof app.blockId === "string" || app.blockId === blockId) {
         //         return true;
@@ -273,17 +272,19 @@ console.log(appsToOpen);
 
         // let app = appsToOpen[appIndex];
 
-        // if (typeof this.state.glueWorkspace !== "undefined" && typeof app.appName === "string" && app.appName !== "") {
-        //     if (typeof this.appsGroup === "undefined") {
-        //         console.log(`Group: ${app.appName}`);
+        if (typeof this.state.glueWorkspace !== "undefined" && typeof appToOpen.appName === "string" && appToOpen.appName !== "") {
+            console.log(this.appsGroup);
+            if (typeof this.appsGroup === "undefined") {
+                console.log(`Group: ${appToOpen.appName}`);
 
-        //         this.appsGroup = await this.state.glueWorkspace 
-        //             .addGroup({type: "group", children: [{type: "window", appName: app.appName}]});
-        //     } else {
-        //         console.log(`Row: ${app.appName}`);
-        //         this.appsGroup.addRow({type: "row", children: [{type: "window", appName: app.appName}]});
-        //     }
-        // }
+                this.appsGroup = await this.state.glueWorkspace 
+                    .addGroup({type: "group", children: [{type: "window", appName: appToOpen.appName}]});
+            } else {
+                console.log(`Row: ${appToOpen.appName}`);
+                this.appsGroup.addRow({type: "row", children: [{type: "window", appName: appToOpen.appName}]});
+            }
+            console.log(this.appsGroup);
+        }
     }
 
     private async sendDataToWebhooks(exportables?: Export.IExportables): Promise<boolean>
