@@ -11,7 +11,13 @@ export class ExternalApp extends HeadlessBlock<IExternalAppField>
 {
     do(): void
     {
-        console.log(this.props);
-        window.sessionStorage.setItem(APP_TO_OPEN_KEY, this.props.appName);
+        let app: IExternalAppField = {
+            appName: this.props.appName,
+            removeSelectedApp: this.props.removeSelectedApp,
+            replaceOpenedApps: this.props.replaceOpenedApps,
+            closeOpenedApps: this.props.closeOpenedApps,
+        };
+
+        window.sessionStorage.setItem(APP_TO_OPEN_KEY, JSON.stringify(app));
     }
 }

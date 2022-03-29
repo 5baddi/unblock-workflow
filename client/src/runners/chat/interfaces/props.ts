@@ -4,6 +4,9 @@ import * as React from "react";
 import { IChatController } from "../hooks/controller";
 import { IChatSnapshot } from "./snapshot";
 import { IChatStyles } from "./styles";
+import { Glue42 } from "@glue42/desktop";
+import { Glue42Web } from "@glue42/web";
+import { User } from "@frontegg/redux-store";
 
 export type TChatDisplay = "inline" | "button" | "page";
 
@@ -34,4 +37,6 @@ export interface IChatProps extends IRunnerProps<IChatSnapshot> {
     readonly onEdit?: (type: "prologue" | "epilogue" | "styles" | "l10n" | "block", id?: string) => void;
     readonly onPause?: TChatPause;
     readonly onTouch?: () => void;
+    readonly user?: User;
+    readonly glue?: Glue42Web.API | Glue42.Glue;
 }

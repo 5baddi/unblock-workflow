@@ -10,7 +10,7 @@ import { IChatRunner } from "./interfaces/runner";
 import { IChatSnapshot } from "./interfaces/snapshot";
 import { ChatRunner } from "./chat";
 import { namespace } from "./namespace";
-import { PACKAGE_NAME, PACKAGE_VERSION } from './constants';
+import { PACKAGE_NAME, PACKAGE_VERSION } from "./constants";
 
 /** This counter is incremented on each run. */
 let runCounter = 0;
@@ -146,6 +146,8 @@ async function run(props: IChat): Promise<IChatRunner> {
             onEdit={props.onEdit}
             onPause={props.onPause}
             onDestroy={props.onDestroy}
+            user={props.user}
+            glue={props.glue}
         />,
         element
     );

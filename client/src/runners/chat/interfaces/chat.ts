@@ -5,6 +5,9 @@ import { TChatDisplay, TChatPause } from "./props";
 import { IChatStyles } from "./styles";
 import { IChatSnapshot } from "./snapshot";
 import { IDefinition } from "../../../interfaces";
+import { Glue42 } from "@glue42/desktop";
+import { Glue42Web } from "@glue42/web";
+import { User } from "@frontegg/redux-store";
 
 export interface IChat {
     /** Specifies the parent element for the runner. */
@@ -79,7 +82,7 @@ export interface IChat {
             readonly id: string;
             readonly name: string;
         }
-    ) => void;
+    ) => Promise<void> | void;
 
     /** Invoked when data can be imported into the instance. */
     readonly onImport?: (instance: Instance) => void;
@@ -112,4 +115,8 @@ export interface IChat {
 
     /** Specifies a function that is invoked when the runner is destroyed. */
     readonly onDestroy?: () => void;
+
+    readonly user?: User;
+
+    readonly glue?: Glue42Web.API | Glue42.Glue;
 }

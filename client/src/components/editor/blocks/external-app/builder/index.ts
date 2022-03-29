@@ -25,6 +25,9 @@ export class ExternalApp extends NodeBlock
     appName: string = "";
 
     @definition("boolean")
+    removeSelectedApp: boolean = false;
+    
+    @definition("boolean")
     replaceOpenedApps: boolean = false;
     
     @definition("boolean")
@@ -39,7 +42,7 @@ export class ExternalApp extends NodeBlock
         this.dropdown?.await();
 
         try {
-            let apps = JSON.parse(window.sessionStorage.getItem(APPS_LIST_KEY) || "null") || undefined;
+            let apps = JSON.parse(window.sessionStorage.getItem(APPS_LIST_KEY) || "undefined") || undefined;
 
             if (typeof apps !== "undefined" && Array.isArray(apps)) {
                 this.options = Object.values(apps).map(appName => {
@@ -88,10 +91,12 @@ export class ExternalApp extends NodeBlock
 
         this.editor.option({
             name: "Open an app",
+            locked: true,
             form: {
                 title: "Select an app",
                 controls: [
-                    this.dropdown
+                    this.dropdown,
+                    new Forms.Checkbox("Remove selected app", Forms.Checkbox.bind(this, "removeSelectedApp", false))
                 ]
             }
         });
