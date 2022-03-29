@@ -34,8 +34,7 @@ import "tripetto-block-variable";
 import "tripetto-block-calculator";
 
 import "./process-task/builder";
-
-import "./zendesk/builder";
+import "./external-app/builder";
 
 import "./action-network";
 import "./activecampaign";
@@ -328,6 +327,7 @@ import "./wufoo-trigger";
 import "./xero";
 import "./xml";
 import "./yourls";
+import "./zendesk";
 import "./zoho-crm";
 import "./zoom";
 import "./zulip";

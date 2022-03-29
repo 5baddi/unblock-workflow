@@ -32,3 +32,7 @@ import "./text/text";
 import "./textarea/textarea";
 import "./url/url";
 import "./yes-no/yes-no";
+
+
+import "../../../components/editor/blocks/process-task/runner";
+import "../../../components/editor/blocks/external-app/runner";

@@ -11,10 +11,8 @@ import { IChatStyles } from "../../runners/chat/interfaces/styles";
 import Loader from "../loader";
 import { ENV } from "../../settings";
 
-import "../editor/blocks/process-task/runner";
-import "../editor/blocks/zendesk/runner";
-
 import "./style.scss";
+import { APP_TO_OPEN_KEY } from '../../global';
 
 export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerState>
 {
@@ -183,6 +181,8 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
 
     private onSubmit(instance: Instance, language: string, locale: string, namespace?: string): Promise<string | undefined> | boolean | void
     {
+        window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
+
         if (this.props.previewMode === true) {
             return;
         }
@@ -203,13 +203,15 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
         this.exportables = Export.exportables(instance);
     }
     
-    private onAction(type, definition, block?): void
+    private async onAction(type, definition, block?): Promise<void>
     {
-        if (this.props.previewMode === true) {
+        if (type !== "unstage") {
             return;
         }
 
-        if (type !== "unstage") {
+        await this.openBlockApp();
+
+        if (this.props.previewMode === true) {
             return;
         }
 
@@ -220,6 +222,18 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
         }
 
         this.sendDataToWebhooks(this.exportables);
+    }
+
+    private async openBlockApp(): Promise<void>
+    {
+        let appToOpen = window.sessionStorage.getItem(APP_TO_OPEN_KEY) || undefined;
+
+        if (typeof this.state.glueWorkspace !== "undefined" && typeof appToOpen === "string" && appToOpen !== "") {
+            await this.state.glueWorkspace 
+                .addGroup({type: "group", children: [{type: "window", appName: appToOpen}]});
+
+            window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
+        }
     }
 
     private async sendDataToWebhooks(exportables?: Export.IExportables): Promise<boolean>

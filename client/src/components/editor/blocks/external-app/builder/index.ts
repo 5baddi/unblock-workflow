@@ -1,8 +1,8 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
 import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
-import { IZendeskOption } from "../interfaces";
+import { IExternalAppOption } from "../interfaces";
 import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS } from "../constants";
-import { APPS_LIST_KEY } from '../../../../../global';
+import { APPS_LIST_KEY } from "../../../../../global";
 import { ENV } from "../../../../../settings";
 
 @tripetto({
@@ -17,14 +17,14 @@ import { ENV } from "../../../../../settings";
         return BLOCK_LABEL;
     }
 })
-export class Zendesk extends NodeBlock
+export class ExternalApp extends NodeBlock
 {
-    private options?: Array<TOption<IZendeskOption>>;
+    private options?: Array<TOption<IExternalAppOption>>;
 
     @definition("string", "required", "rw")
     appName: string = "";
 
-    dropdown?: Forms.Dropdown<IZendeskOption>;
+    dropdown?: Forms.Dropdown<IExternalAppOption>;
 
     loadApps(): void
     {

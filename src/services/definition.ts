@@ -316,8 +316,10 @@ async function saveDefinition(tenantDB, definition, request, response?)
                             if (typeof newNode !== "undefined" && typeof query.definition.slug !== "undefined") {
                                 let { newName, existsName } = getNodesDiffNames(existsNode, newNode);
 
-                                await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`)
-                                    .updateMany({ [existsName]: { $exists: true } }, { $rename: { [existsName]: newName } });
+                                if (typeof newName === "string" && newName !== "" && typeof existsName === "string" && existsName !== "") {
+                                    await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`)
+                                        .updateMany({ [existsName]: { $exists: true } }, { $rename: { [existsName]: newName } });
+                                }
                             }
                         }),
                         await filedsShouldBeUpdated.forEach(async(existsNode) => {
@@ -326,8 +328,10 @@ async function saveDefinition(tenantDB, definition, request, response?)
                             if (typeof newNode !== "undefined" && query.existDefinition && typeof query.existDefinition._id !== "undefined") {
                                 let { newName } = getNodesDiffNames(existsNode, newNode);
 
-                                await query.db.collection(`${RESPONSE_COLLECTION_NAME}`)
-                                    .updateMany({ definition_id: query.existDefinition._id.toString(), "fields.node.id": existsNode.id }, { $set: { "fields.$.name": newName } });
+                                if (typeof newName === "string" && newName !== "") {
+                                    await query.db.collection(`${RESPONSE_COLLECTION_NAME}`)
+                                        .updateMany({ definition_id: query.existDefinition._id.toString(), "fields.node.id": existsNode.id }, { $set: { "fields.$.name": newName } });
+                                }
                             }
                         })
                     ]);
