@@ -37,6 +37,9 @@ async function loadSubDefinition(db: Db, definitionId: string): Promise<IDefinit
 
 async function loadSubDefinitions(db: Db, definition: IDefinition, newIndexs: number = 0): Promise<IDefinition>
 {
+    // TODO: Undo after fix blocks order issue
+    return Promise.resolve(definition);
+
     if (! Array.isArray(definition.clusters)) {
         return Promise.resolve(definition);
     }
