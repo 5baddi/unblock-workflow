@@ -3,6 +3,7 @@ import { PUBLIC_URL } from "./settings";
 
 export const USER_ID_KEY = "user-id";
 export const USER_TENANT_ID_KEY = "user-tenant-id";
+export const APPS_LIST_KEY = "apps-list";
 
 export const DEFINITION_KEY = "definition";
 export const DEFINITION_ID_KEY = "definition-id";

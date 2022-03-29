@@ -12,6 +12,7 @@ import Loader from "../loader";
 import { ENV } from "../../settings";
 
 import "../editor/blocks/process-task/runner";
+import "../editor/blocks/zendesk/runner";
 
 import "./style.scss";
 
