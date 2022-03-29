@@ -1,20 +1,15 @@
-import { tripetto, NodeBlock } from "tripetto-runner-foundation";
+import { tripetto, HeadlessBlock } from "tripetto-runner-foundation";
 import { BLOCK_NAME } from "../constants";
 import { IExternalAppField } from "../interfaces";
 import { APP_TO_OPEN_KEY } from "../../../../../global";
 
 @tripetto({
     identifier: BLOCK_NAME,
-    type: "node"
+    type: "headless"
 })
-export class ExternalApp extends NodeBlock<IExternalAppField>
+export class ExternalApp extends HeadlessBlock<IExternalAppField>
 {
-    key(sLabel?: string): string 
-    {
-        return this.node.id;
-    }
-
-    rerender(): void
+    do(): void
     {
         let app: IExternalAppField = {
             appName: this.props.appName,

@@ -218,13 +218,9 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
 
     private async onAction(type, definition, block?: { readonly id: string; readonly name: string; }): Promise<void>
     {
-        if (type === "stage") {
-            await this.openBlockApp();
-        }
+        await this.openBlockApp();
         
         if (type === "unstage") {
-            window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
-
             if (this.props.previewMode === true) {
                 return;
             }
@@ -285,6 +281,8 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
             }
             console.log(this.appsGroup);
         }
+
+        window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
     }
 
     private async sendDataToWebhooks(exportables?: Export.IExportables): Promise<boolean>
