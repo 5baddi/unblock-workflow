@@ -11,7 +11,7 @@ import { ENV } from "../../../../../settings";
     icon: BLOCK_ICON,
     alias: BLOCK_NAME,
     version: BLOCK_VERSION,
-    kind: "headless",
+    kind: "ui",
     get label() {
         // TODO: use translation
         return BLOCK_LABEL;
@@ -23,6 +23,12 @@ export class ExternalApp extends NodeBlock
 
     @definition("string", "required", "rw")
     appName: string = "";
+
+    @definition("boolean")
+    replaceOpenedApps: boolean = false;
+    
+    @definition("boolean")
+    closeOpenedApps: boolean = false;
 
     dropdown?: Forms.Dropdown<IExternalAppOption>;
 
@@ -81,12 +87,31 @@ export class ExternalApp extends NodeBlock
         this.node.nameVisible = false;
 
         this.editor.option({
-            name: "App",
-            locked: true,
+            name: "Open an app",
             form: {
                 title: "Select an app",
                 controls: [
                     this.dropdown
+                ]
+            }
+        });
+        
+        this.editor.option({
+            name: "Replace opened apps",
+            form: {
+                title: "Replace opened apps",
+                controls: [
+                    new Forms.Checkbox("Replace opened apps with selected app", Forms.Checkbox.bind(this, "replaceOpenedApps", false))
+                ]
+            }
+        });
+        
+        this.editor.option({
+            name: "Close opened apps",
+            form: {
+                title: "Close all opened apps",
+                controls: [
+                    new Forms.Checkbox("Close all opened apps", Forms.Checkbox.bind(this, "closeOpenedApps", false))
                 ]
             }
         });
