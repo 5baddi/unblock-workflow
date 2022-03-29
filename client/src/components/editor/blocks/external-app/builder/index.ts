@@ -1,13 +1,12 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
 import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
 import { IExternalAppOption } from "../interfaces";
-import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS, BLOCK_NAMESPACE } from '../constants';
+import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS } from "../constants";
 import { APPS_LIST_KEY } from "../../../../../global";
 import { ENV } from "../../../../../settings";
 
 @tripetto({
     type: "node",
-    namespace: BLOCK_NAMESPACE,
     identifier: BLOCK_NAME,
     icon: BLOCK_ICON,
     alias: BLOCK_NAME,
