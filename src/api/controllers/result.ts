@@ -129,7 +129,7 @@ function save(request, response)
 
                         let _response: IResponse = Object.assign({} as IResponse, { fields: _fields });
                         _response.definition_id = <string> definition._id;
-                        _response.definition_slug = <string> definition.slug;
+                        _response.definition_slug = definition.slug;
                         _response.tenant_id = definition.tenant_id;
                         _response.tenants_ids = definition.tenants_ids;
                         _response.created_at = new Date();
