@@ -144,7 +144,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         window.addEventListener("orientationchange",  this.onResize);
         window.addEventListener("beforeunload", this.beforeUnload);
 
-        // init run notification handler
+        // accept notification handler
         if(this.props.glue) {
             const handler = async (args: any) => {
                 this.state.glueWorkspace 
@@ -660,15 +660,15 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         const options: Glue42Web.Notifications.RaiseOptions = {
             title: "You've got a new request!",
-            body: "New request",
+            body: `${this.state.definition.name ? `${this.state.definition.name} - ` : ''}New request`,
             focusPlatformOnDefaultClick: true,
             actions: [
                 {
                     action: "acceptRequest",
                     interop: {
-                    method: "runWorkflow",
-                    // arguments:
-                    },
+                        method: "runWorkflow",
+                        // arguments:
+                        },
                     title: "Accept Request",
                 },
                 {
