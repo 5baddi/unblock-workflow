@@ -105,6 +105,7 @@ function save(request, response)
 
                             if (typeof data.node.id !== "undefined") {
                                 let node: INode | undefined = getDefinitionNode(definition, data.node.id);
+
                                 if (typeof node !== "undefined") {
                                     data.name = node.name || data.name || '';
                                 }
@@ -112,6 +113,14 @@ function save(request, response)
 
                                 if (isDate(field) && typeof node?.block?.time === "boolean" && node?.block?.time === true) {
                                     data.type = "datetime";
+                                }
+
+                                if (typeof node?.slots !== "undefined" && Array.isArray(node?.slots) && node?.slots.length > 0 && typeof data.slot === "string") {
+                                    let slot = (node?.slots ?? []).find((slot) => slot.reference === data.slot);
+                                    
+                                    if (typeof slot !== "undefined" && typeof slot.alias === "string") {
+                                        data.alias = slot.alias;
+                                    }
                                 }
                             }
 
