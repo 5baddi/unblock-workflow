@@ -94,6 +94,14 @@ function save(request, response)
                                                 data.name = node.name || '';
                                                 data.value = values;
 
+                                                if (typeof node?.slots !== "undefined" && Array.isArray(node?.slots) && node?.slots.length > 0 && typeof data.slot === "string") {
+                                                    let slot = (node?.slots ?? []).find((slot) => slot.reference === data.slot);
+                                                    
+                                                    if (typeof slot !== "undefined" && typeof slot.alias === "string") {
+                                                        data.alias = slot.alias;
+                                                    }
+                                                }
+
                                                 return _fields.push(data);
                                             }
                                         }
@@ -115,6 +123,7 @@ function save(request, response)
                                     data.type = "datetime";
                                 }
 
+                                // TODO: remove duplication
                                 if (typeof node?.slots !== "undefined" && Array.isArray(node?.slots) && node?.slots.length > 0 && typeof data.slot === "string") {
                                     let slot = (node?.slots ?? []).find((slot) => slot.reference === data.slot);
                                     
