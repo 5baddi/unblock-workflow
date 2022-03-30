@@ -208,10 +208,18 @@ function save(request, response)
                                     .then(normalizedResult => {
                                         client.close();
 
+                                        let webhookBody = {
+                                            id: definition._id,
+                                            name: definition.name,
+                                            slug: definition.slug,
+                                            keys: Object.keys(normalizedResponses),
+                                            fields: normalizedResponses,
+                                        }
+
                                         if (RESULT_WEBHOOK) {
                                             return Superagent
                                                 .post(RESULT_WEBHOOK)
-                                                .send(_response)
+                                                .send(webhookBody)
                                                 .then((webhookResult) => {
                                                     return response.send({ success: true });;
                                                 });
