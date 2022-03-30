@@ -120,6 +120,7 @@ function save(request, response)
 
                         let _response: IResponse = Object.assign({} as IResponse, { fields: _fields });
                         _response.definition_id = <string> definition._id;
+                        _response.definition_slug = <string> definition.slug;
                         _response.tenant_id = definition.tenant_id;
                         _response.tenants_ids = definition.tenants_ids;
                         _response.created_at = new Date();
@@ -208,18 +209,10 @@ function save(request, response)
                                     .then(normalizedResult => {
                                         client.close();
 
-                                        let webhookBody = {
-                                            id: definition._id,
-                                            name: definition.name,
-                                            slug: definition.slug,
-                                            keys: Object.keys(normalizedResponses),
-                                            fields: normalizedResponses,
-                                        }
-
                                         if (RESULT_WEBHOOK) {
                                             return Superagent
                                                 .post(RESULT_WEBHOOK)
-                                                .send(webhookBody)
+                                                .send(_response)
                                                 .then((webhookResult) => {
                                                     return response.send({ success: true });;
                                                 });
