@@ -105,7 +105,7 @@ export default function App (props: { app: IExternalAppField, onSubmit?: (() => 
             return;
         }
 
-        if (props.app.customAction === "closeOpenedApps") {
+        if (props.app.customAction !== "removeSelectedApp" && props.app.customAction !== "closeOpenedApps") {
             await group.addWindow({type: "window", appName: props.app.appName});
         }
         
