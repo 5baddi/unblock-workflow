@@ -247,6 +247,8 @@ export const ChatRunner = (props: IChatProps) => {
                                     focus={message.focus}
                                     break={message.break}
                                     blockIdentifier={message.blockIdentifier}
+                                    glue={props.glue}
+                                    user={props.user}
                                 >
                                     {message.input}
                                 </Input>

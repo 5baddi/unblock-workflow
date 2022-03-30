@@ -33,6 +33,7 @@ export interface ISnapshot extends IDefinition
 export interface IResponse
 {
     definition_id: string;
+    definition_slug: string;
     unblockerId?: string;
     unblockerTenantId?: string;
     tenant_id?: string;

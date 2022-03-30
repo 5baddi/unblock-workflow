@@ -2,6 +2,9 @@ import { L10n, NodeBlock } from "tripetto-runner-foundation";
 import * as React from "react";
 import { IRuntimeStyles } from "../hooks/styles";
 import { IRunnerAttachments, TRunnerViews } from "tripetto-runner-react-hook";
+import { Glue42 } from "@glue42/desktop";
+import { Glue42Web } from "@glue42/web";
+import { User } from "@frontegg/redux-store";
 
 export interface IChatRenderProps {
     readonly id: string;
@@ -25,6 +28,8 @@ export interface IChatRenderProps {
     readonly markdownifyToURL: (md: string) => string;
     readonly markdownifyToImage: (md: string) => string;
     readonly markdownifyToString: (md: string) => string;
+    readonly user?: User;
+    readonly glue?: Glue42Web.API | Glue42.Glue;
 }
 
 export interface IChatRendering extends NodeBlock {
