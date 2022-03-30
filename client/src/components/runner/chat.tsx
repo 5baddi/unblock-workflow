@@ -10,7 +10,8 @@ import { PUBLIC_URL } from "../../../../src/settings";
 import { IChatStyles } from "../../runners/chat/interfaces/styles";
 import Loader from "../loader";
 import { ENV } from "../../settings";
-import { APP_TO_OPEN_KEY } from "../../global";
+import { APPS_GROUP_ID } from "../../global";
+import { Glue42Workspaces } from "@glue42/workspaces-api";
 
 import "./style.scss";
 
@@ -65,7 +66,7 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
         );
     }
 
-    async componentDidMount()
+    componentDidMount()
     {
         this.isMounted = true;
         this.isMounted && this.open();
@@ -74,12 +75,11 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
     componentWillUnmount()
     {
         this.isMounted = false;
+        this.closeAppsGroup();
     }
 
     async open()
     {
-        window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
-
         await this.getGlueWorkspace();
         await this.loadDefinitionById(this.props.definitionId);
 
@@ -104,11 +104,37 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
             return;
         }
 
-        let glueWorkspace = await this.props.glue.workspaces?.getMyWorkspace();
-        let glueContext = await glueWorkspace?.getContext();
+        let glueWorkspace: Glue42Workspaces.Workspace | undefined = await this.props.glue.workspaces?.getMyWorkspace();
+        let glueContext: any = await glueWorkspace?.getContext();
 
         this.setState({ glueWorkspace, glueContext });
 
+        window.sessionStorage.removeItem(APPS_GROUP_ID);
+    }
+
+    private async closeAppsGroup(): Promise<void>
+    {
+        let groupId = window.sessionStorage.getItem(APPS_GROUP_ID);
+
+        if (typeof groupId === "string" && groupId !== "" && typeof this.props.glue !== "undefined") {
+            let glueWorkspace: Glue42Workspaces.Workspace | undefined = await this.props.glue.workspaces?.getMyWorkspace();
+
+            if (typeof glueWorkspace !== "undefined") {
+                let groups: Glue42Workspaces.Group[] = glueWorkspace.getAllGroups();
+
+                let group: Glue42Workspaces.Group | undefined = groups.find((group) => group.id === groupId);
+    
+                if (typeof group !== "undefined") {
+                    await Promise.all(
+                        await group.children.map(async(child: any) => {
+                            await child.close();
+                        })
+                    );
+                }
+            }
+        }
+
+        window.sessionStorage.removeItem(APPS_GROUP_ID);
     }
 
     private getTenantId(): string
@@ -118,10 +144,10 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
         }
 
         if (! this.props.user || ! this.props.user.tenantId) {
-            return '';
+            return "";
         }
 
-        return this.props.user.tenantId.replace(/[^\w]/g, '');
+        return this.props.user.tenantId.replace(/[^\w]/g, "");
     }
 
     private applyStyle(): void
@@ -203,6 +229,8 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
 
         await this.saveResult(exportables);
 
+        await this.closeAppsGroup();
+
         return undefined;
     }
 
@@ -211,9 +239,9 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
         this.exportables = Export.exportables(instance);
     }
     
-    private onComplete(instance, id?: string): void
+    private async onComplete(instance, id?: string): Promise<void>
     {
-        window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
+        await this.closeAppsGroup();
     }
 
     private async onAction(type, definition, block?: { readonly id: string; readonly name: string; }): Promise<void>
@@ -221,8 +249,6 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
         if (type !== "unstage") {
             return;
         }
-
-        // await this.openBlockApp();
 
         if (this.props.previewMode === true) {
             return;
@@ -235,56 +261,6 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
         }
 
         this.sendDataToWebhooks(this.exportables);
-    }
-
-    private async openBlockApp(): Promise<void>
-    {
-        let appToOpenObj = window.sessionStorage.getItem(APP_TO_OPEN_KEY) || undefined;
-        if (typeof appToOpenObj !== "string"  || appToOpenObj === "") {
-            return;
-        }
-        
-        let appToOpen = JSON.parse(appToOpenObj);
-        if (typeof appToOpen !== "object") {
-            return;
-        }
-
-        // appsToOpen.every((app, index) => {
-        //     if (typeof app.blockId === "string" || app.blockId === blockId) {
-        //         return true;
-        //     }
-
-        //     app.blockId = blockId;
-        //     appIndex = index;
-
-        //     appsToOpen[index] = app;
-
-        //     return true;
-        // });
-
-        // if (typeof appIndex === "undefined" || typeof appsToOpen[appIndex] === "undefined") {
-        //     return Promise.resolve(undefined);
-        // }
-
-        // window.sessionStorage.setItem(APP_TO_OPEN_KEY, JSON.stringify(appsToOpen));
-
-        // let app = appsToOpen[appIndex];
-
-        if (typeof this.state.glueWorkspace !== "undefined" && typeof appToOpen.appName === "string" && appToOpen.appName !== "") {
-            console.log(this.appsGroup);
-            if (typeof this.appsGroup === "undefined") {
-                console.log(`Group: ${appToOpen.appName}`);
-
-                this.appsGroup = await this.state.glueWorkspace 
-                    .addGroup({type: "group", children: [{type: "window", appName: appToOpen.appName}]});
-            } else {
-                console.log(`Row: ${appToOpen.appName}`);
-                this.appsGroup.addRow({type: "row", children: [{type: "window", appName: appToOpen.appName}]});
-            }
-            console.log(this.appsGroup);
-        }
-
-        window.sessionStorage.removeItem(APP_TO_OPEN_KEY);
     }
 
     private async sendDataToWebhooks(exportables?: Export.IExportables): Promise<boolean>

@@ -24,14 +24,8 @@ export class ExternalApp extends NodeBlock
     @definition("string", "required", "rw")
     appName: string = "";
 
-    @definition("boolean")
-    removeSelectedApp: boolean = false;
-    
-    @definition("boolean")
-    replaceOpenedApps: boolean = false;
-    
-    @definition("boolean")
-    closeOpenedApps: boolean = false;
+    @definition("string")
+    customAction: string = "";
 
     dropdown?: Forms.Dropdown<IExternalAppOption>;
 
@@ -96,27 +90,33 @@ export class ExternalApp extends NodeBlock
                 title: "Select an app",
                 controls: [
                     this.dropdown,
-                    new Forms.Checkbox("Remove selected app", Forms.Checkbox.bind(this, "removeSelectedApp", false))
                 ]
             }
         });
         
         this.editor.option({
-            name: "Replace opened apps",
+            name: "Custom action",
             form: {
-                title: "Replace opened apps",
+                title: "Custom action on selected app",
                 controls: [
-                    new Forms.Checkbox("Replace opened apps with selected app", Forms.Checkbox.bind(this, "replaceOpenedApps", false))
-                ]
-            }
-        });
-        
-        this.editor.option({
-            name: "Close opened apps",
-            form: {
-                title: "Close all opened apps",
-                controls: [
-                    new Forms.Checkbox("Close all opened apps", Forms.Checkbox.bind(this, "closeOpenedApps", false))
+                    new Forms.Radiobutton(
+                        [
+                            {
+                                value: "replaceOpenedApps",
+                                label: "Replace opened apps with selected app",
+                                
+                            },
+                            {
+                                value: "closeOpenedApps",
+                                label: "Close all opened apps"
+                            },
+                            {
+                                value: "removeSelectedApp",
+                                label: "Remove selected app"
+                            }
+                        ], 
+                        new Forms.Binding(this, "customAction", "")
+                    )
                 ]
             }
         });

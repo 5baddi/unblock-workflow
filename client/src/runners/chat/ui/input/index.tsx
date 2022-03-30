@@ -46,6 +46,6 @@ export const Input = (props: {
     readonly glue?: Glue42Web.API | Glue42.Glue;
 }) => (
     <InputElement props={props} ref={props.focus} data-block={props.blockIdentifier}>
-        {props.children}
+        { React.isValidElement(props.children) ? React.cloneElement(props.children, { glue: props.glue, user: props.user }) : props.children }
     </InputElement>
 );

@@ -35,5 +35,4 @@ import "./yes-no/yes-no";
 
 
 import "../../../components/editor/blocks/process-task/runner";
-// import "../../../components/editor/blocks/external-app/runner";
 import "./external-app";

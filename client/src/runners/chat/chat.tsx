@@ -250,7 +250,7 @@ export const ChatRunner = (props: IChatProps) => {
                                     glue={props.glue}
                                     user={props.user}
                                 >
-                                    {message.input}
+                                    { React.isValidElement(message.input) ? React.cloneElement(message.input, { glue: props.glue, user: props.user }) : message.input }
                                 </Input>
                             </>
                         )}
