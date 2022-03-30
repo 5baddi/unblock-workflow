@@ -1,10 +1,9 @@
 import * as React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { CssBaseline, withStyles } from "@material-ui/core";
 import Studio from "../../pages/studio";
 import ChatRunner from "../../pages/run";
 import ChatPreview from "../../pages/preview";
-import { BASE_NAME } from "../../settings";
 import GlueWeb from "@glue42/web";
 import GlueWorkspaces from "@glue42/workspaces-api";
 import { GlueProvider } from "@glue42/react-hooks";
