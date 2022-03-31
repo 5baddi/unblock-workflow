@@ -1,5 +1,5 @@
 import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
-import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
+import { NodeBlock, tripetto, editor, Forms, definition, isString } from "tripetto";
 import { IExternalAppOption } from "../interfaces";
 import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS } from "../constants";
 import { APPS_LIST_KEY } from "../../../../../global";
@@ -11,7 +11,7 @@ import { ENV } from "../../../../../settings";
     icon: BLOCK_ICON,
     alias: BLOCK_NAME,
     version: BLOCK_VERSION,
-    kind: "ui",
+    kind: "headless",
     get label() {
         // TODO: use translation
         return BLOCK_LABEL;
@@ -118,7 +118,8 @@ export class ExternalApp extends NodeBlock
                         new Forms.Binding(this, "customAction", "")
                     )
                 ]
-            }
+            },
+            activated: (isString(this.customAction) && this.customAction !== "")
         });
     }
 }
