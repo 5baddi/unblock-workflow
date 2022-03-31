@@ -660,7 +660,7 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
         const options: Glue42Web.Notifications.RaiseOptions = {
             title: "You've got a new request!",
-            body: `${this.state.definition.name ? `${this.state.definition.name} - ` : ''}New request`,
+            body: this.state.definition.name ?? `New request`,
             focusPlatformOnDefaultClick: true,
             actions: [
                 {
