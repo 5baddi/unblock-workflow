@@ -5,6 +5,7 @@ import { Glue42Web } from "@glue42/web";
 import { User } from "@frontegg/redux-store";
 import { Glue42Workspaces } from "@glue42/workspaces-api";
 import { APPS_GROUP_ID } from "../../../../global";
+import { ENV } from "../../../../settings";
 
 export default function App (props: { app: IExternalAppField, onSubmit?: (() => void) | undefined, onCancel?: (() => void) | undefined, readonly user?: User, readonly glue?: Glue42Web.API | Glue42.Glue })
 {
@@ -15,7 +16,13 @@ export default function App (props: { app: IExternalAppField, onSubmit?: (() => 
     }
 
     React.useEffect(() => {
-        initAppsGroup();
+        try {
+            initAppsGroup();
+        } catch (e) {
+            if (ENV === "development") {
+                console.log(e);
+            }
+        }
     }, []);
 
     const initAppsGroup = async () => {

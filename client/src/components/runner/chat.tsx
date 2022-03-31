@@ -114,23 +114,29 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
 
     private async closeAppsGroup(): Promise<void>
     {
-        let groupId = window.sessionStorage.getItem(APPS_GROUP_ID);
+        try {
+            let groupId = window.sessionStorage.getItem(APPS_GROUP_ID);
 
-        if (typeof groupId === "string" && groupId !== "" && typeof this.props.glue !== "undefined") {
-            let glueWorkspace: Glue42Workspaces.Workspace | undefined = await this.props.glue.workspaces?.getMyWorkspace();
+            if (typeof groupId === "string" && groupId !== "" && typeof this.props.glue !== "undefined") {
+                let glueWorkspace: Glue42Workspaces.Workspace | undefined = await this.props.glue.workspaces?.getMyWorkspace();
 
-            if (typeof glueWorkspace !== "undefined") {
-                let groups: Glue42Workspaces.Group[] = glueWorkspace.getAllGroups();
+                if (typeof glueWorkspace !== "undefined") {
+                    let groups: Glue42Workspaces.Group[] = glueWorkspace.getAllGroups();
 
-                let group: Glue42Workspaces.Group | undefined = groups.find((group) => group.id === groupId);
-    
-                if (typeof group !== "undefined") {
-                    await Promise.all(
-                        await group.children.map(async(child: any) => {
-                            await child.close();
-                        })
-                    );
+                    let group: Glue42Workspaces.Group | undefined = groups.find((group) => group.id === groupId);
+        
+                    if (typeof group !== "undefined") {
+                        await Promise.all(
+                            await group.children.map(async(child: any) => {
+                                await child.close();
+                            })
+                        );
+                    }
                 }
+            }
+        } catch (e) {
+            if (ENV === "development") {
+                console.log(e);
             }
         }
 

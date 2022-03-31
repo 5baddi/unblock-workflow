@@ -34,7 +34,7 @@ import "tripetto-block-variable";
 import "tripetto-block-calculator";
 
 import "./process-task/builder";
-// import "./external-app/builder";
+import "./external-app/builder";
 
 import "./action-network";
 import "./activecampaign";
