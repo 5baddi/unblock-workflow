@@ -23,8 +23,6 @@ export class ChatRunner extends React.Component<IChatRunnerProps, IChatRunnerSta
 
     private _isMounted: boolean = false;
 
-    private appsGroup?;
-
     public set isMounted(status: boolean) {
         this._isMounted = status;
     }
