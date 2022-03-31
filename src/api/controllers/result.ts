@@ -5,10 +5,13 @@ import { v4 as uuidv4 } from "uuid";
 import { IResponse, IDefinition } from "../../interfaces/definition";
 import * as Superagent from "superagent";
 import { getDefinitionNode } from "../../services/definition";
-import { INode } from "@tripetto/map";
-import { isDate } from "../../helpers/date";
-import { IExportableField } from "../../interfaces/results";
+import { IExportableField, INode } from "../../interfaces/results";
 import { isMultipleChoice } from "../../helpers/multiple-choice";
+import { isPictureChoice } from "../../helpers/picture-choice";
+import { isCheckboxes } from "../../helpers/checkboxes";
+import { isMatrix } from "../../helpers/matrix";
+import { isFileUpload } from "../../helpers/file-upload";
+import { getFieldAlias, getFieldType } from "../../helpers/field";
 
 function save(request, response)
 {
@@ -49,91 +52,71 @@ function save(request, response)
 
                         let definition: IDefinition = Object.assign({} as IDefinition, result);
 
-                        let _fields: any[] = [];
+                        let _fields: IExportableField[] = [];
 
                         Object.values(fields).forEach((field: IExportableField) => {
                             let data = JSON.parse(JSON.stringify(field));
 
-                            data.type = data.type.replace("tripetto-block-", "");
+                            data.type = field.type.replace("tripetto-block-", "");
 
-                            if (isMultipleChoice(field)) {
-                                let id = data.node.id || undefined;
+                            if (isMultipleChoice(field) || isCheckboxes(field) || isPictureChoice(field) || isMatrix(field)) {
+                                let id = field.node.id || undefined;
                                 
                                 if (typeof id !== "undefined") {
                                     let node: INode | undefined = getDefinitionNode(definition, id);
 
-                                    if (typeof node !== "undefined" && typeof node?.block?.multiple !== "undefined" && node?.block?.multiple === true) {
-                                        let values = '';
-                                        let firstKey = undefined;
+                                    if (typeof node !== "undefined" && (typeof node?.block?.multiple !== "undefined" && node?.block?.multiple === true || isCheckboxes(field) || isMatrix(field))) {
+                                        let values: string = '';
+                                        let firstKey: string | undefined = undefined;
                                         let keysToIgnore: string[] = [];
                                         
-                                        Object.values(fields).forEach((field) => {
+                                        Object.values(fields).forEach((field: IExportableField, index: number) => {
                                             let data = JSON.parse(JSON.stringify(field));
-                                            if (typeof data.node.id !== "undefined" && data.node.id === id) {
-                                                if (data.value === true) {
-                                                    if (values !== '') {
-                                                        values = values.concat(', ');
-                                                    }
-                                                    
+                                            if (typeof field.node.id !== "undefined" && field.node.id === id) {
+                                                if (values !== '' && (field.value === true || isMatrix(field))) {
+                                                    values = values.concat(', ');
+                                                }
+
+                                                if (field.value === true) {
                                                     values = values.concat(data.name);
                                                 }
 
-                                                if (typeof firstKey === "undefined" && data.value === true) {
-                                                    firstKey = data.key;
+                                                if (isMatrix(field)) {
+                                                    values = values.concat(`${data.name}: ${data.value}`);
+                                                }
+
+                                                if ((typeof firstKey === "undefined" && field.value === true) || index === 0) {
+                                                    firstKey = field.key;
                                                 } else {
-                                                    keysToIgnore.push(data.key);
+                                                    keysToIgnore.push(field.key);
                                                 }
                                             }
                                         });
 
-                                        if (Object.values(keysToIgnore).includes(data.key)) {
+                                        if (Object.values(keysToIgnore).includes(field.key)) {
                                             return;
                                         } else {
-                                            let node: INode | undefined = getDefinitionNode(definition, id);
-                                            if (typeof node !== "undefined") {
-                                                data.name = node.name || '';
-                                                data.value = values;
+                                            data.name = node.name || '';
+                                            data.value = values;
+                                            data.alias = getFieldAlias(node, field);
 
-                                                if (typeof node?.slots !== "undefined" && Array.isArray(node?.slots) && node?.slots.length > 0 && typeof data.slot === "string") {
-                                                    let slot = (node?.slots ?? []).find((slot) => slot.reference === data.slot);
-                                                    
-                                                    if (typeof slot !== "undefined" && typeof slot.alias === "string") {
-                                                        data.alias = slot.alias;
-                                                    }
-                                                }
-
-                                                return _fields.push(data);
-                                            }
+                                            return _fields.push(data);
                                         }
-
-                                        return;
                                     }
                                 }
                             }
 
-                            if (typeof data.node.id !== "undefined") {
-                                let node: INode | undefined = getDefinitionNode(definition, data.node.id);
+                            if (typeof field.node.id !== "undefined") {
+                                let node: INode | undefined = getDefinitionNode(definition, field.node.id);
 
                                 if (typeof node !== "undefined") {
-                                    data.name = node.name || data.name || '';
-                                }
-
-
-                                if (isDate(field) && typeof node?.block?.time === "boolean" && node?.block?.time === true) {
-                                    data.type = "datetime";
-                                }
-
-                                // TODO: remove duplication
-                                if (typeof node?.slots !== "undefined" && Array.isArray(node?.slots) && node?.slots.length > 0 && typeof data.slot === "string") {
-                                    let slot = (node?.slots ?? []).find((slot) => slot.reference === data.slot);
-                                    
-                                    if (typeof slot !== "undefined" && typeof slot.alias === "string") {
-                                        data.alias = slot.alias;
-                                    }
+                                    data.name = node.name || field.name || '';
+                                    data.alias = getFieldAlias(node, field);
+                                    data.type = getFieldType(node, field);
                                 }
                             }
 
-                            return _fields.push(data);
+                            return _fields.push(data as IExportableField);
                         });
 
                         let _response: IResponse = Object.assign({} as IResponse, { fields: _fields });
@@ -227,6 +210,16 @@ function save(request, response)
                                     .insertOne(normalizedResponses)
                                     .then(normalizedResult => {
                                         client.close();
+
+                                        let parsedFields = (_response.fields ?? []).map((field: IExportableField) => {
+                                            if (isFileUpload(field)) {
+                                                delete field.reference;
+                                            }
+
+                                            return field;
+                                        });
+
+                                        _response.fields = parsedFields;
 
                                         if (RESULT_WEBHOOK) {
                                             return Superagent
