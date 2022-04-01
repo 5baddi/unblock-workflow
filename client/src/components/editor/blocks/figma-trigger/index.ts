@@ -1,6 +1,7 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "figma-trigger";
+    const BLOCK_NAME = "figmaTrigger";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "Figma Trigger";
         }
     })
-    export class FigmaTrigger extends NodeBlock
-    {
-    
+    export class FigmaTrigger extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    

@@ -1,6 +1,7 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "google-cloud-firestore";
+    const BLOCK_NAME = "googleCloudFirestore";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "Google Cloud Firestore";
         }
     })
-    export class GoogleCloudFirestore extends NodeBlock
-    {
-    
+    export class GoogleCloudFirestore extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    

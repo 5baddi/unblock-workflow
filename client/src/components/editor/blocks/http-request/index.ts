@@ -1,6 +1,7 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "http-request";
+    const BLOCK_NAME = "httpRequest";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "HTTP Request";
         }
     })
-    export class HTTPRequest extends NodeBlock
-    {
-    
+    export class HTTPRequest extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    

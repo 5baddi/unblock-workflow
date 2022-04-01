@@ -1,6 +1,7 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "microsoft-graph-security";
+    const BLOCK_NAME = "microsoftGraphSecurity";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "Microsoft Graph Security";
         }
     })
-    export class MicrosoftGraphSecurity extends NodeBlock
-    {
-    
+    export class MicrosoftGraphSecurity extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    

@@ -1,6 +1,7 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "google-sheets-";
+    const BLOCK_NAME = "googleSheets";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "Google Sheets ";
         }
     })
-    export class GoogleSheets extends NodeBlock
-    {
-    
+    export class GoogleSheets extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    

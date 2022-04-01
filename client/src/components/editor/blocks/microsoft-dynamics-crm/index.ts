@@ -1,6 +1,7 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "microsoft-dynamics-crm";
+    const BLOCK_NAME = "microsoftDynamicsCrm";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "Microsoft Dynamics CRM";
         }
     })
-    export class MicrosoftDynamicsCRM extends NodeBlock
-    {
-    
+    export class MicrosoftDynamicsCRM extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    

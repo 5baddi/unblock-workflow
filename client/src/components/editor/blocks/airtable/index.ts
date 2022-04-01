@@ -1,4 +1,5 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { Node, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
 
     const BLOCK_NAME = "airtable";
     const BLOCK_VERSION = "0.0.1";
@@ -13,9 +14,12 @@ import { NodeBlock, tripetto } from "tripetto";
         get label() {
             // TODO: use translation
             return "Airtable";
-        }
+        },
+
     })
-    export class Airtable extends NodeBlock
-    {
-    
+    export class Airtable extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }

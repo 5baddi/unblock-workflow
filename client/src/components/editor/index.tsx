@@ -18,6 +18,7 @@ import "./blocks";
 
 import "./style.scss";
 import { Glue42Web } from "@glue42/web";
+import { initCustomIntegrations } from "./integrations";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -143,6 +144,8 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
         window.addEventListener("beforeunload", this.beforeUnload);
+
+        initCustomIntegrations();
 
         // accept notification handler
         if(this.props.glue) {

@@ -1,4 +1,5 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
     const BLOCK_NAME = "misp";
     const BLOCK_VERSION = "0.0.1";
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "MISP";
         }
     })
-    export class MISP extends NodeBlock
-    {
-    
+    export class MISP extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    

@@ -1,4 +1,5 @@
-import { NodeBlock, tripetto } from "tripetto";
+import { CustomIntegrationBlock } from "../../integrations";
+import { Node, tripetto } from "tripetto";
 
     const BLOCK_NAME = "crypto";
     const BLOCK_VERSION = "0.0.1";
@@ -15,7 +16,11 @@ import { NodeBlock, tripetto } from "tripetto";
             return "Crypto";
         }
     })
-    export class Crypto extends NodeBlock
-    {
-    
+    export class Crypto extends CustomIntegrationBlock {
+        constructor(pNode: Node) {
+            super(pNode);
+            this.BLOCK_NAME = BLOCK_NAME;
+        }
     }
+      
+    
