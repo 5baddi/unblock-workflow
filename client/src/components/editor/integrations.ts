@@ -1,5 +1,6 @@
 import { Layer } from "@marblecore/ui-layers";
 import { NodeBlock } from "tripetto";
+import { N8N_URL } from "../../settings";
 
 declare global {
   interface Window {
@@ -49,7 +50,7 @@ export const openIntegrationPopup = (): void => {
 
   let iframeElement = document.createElement("iframe");
   iframeElement.id = "custom-integration-iframe";
-  iframeElement.src = `http://localhost:8080/workflow?integration=${window.customIntegrations.name}`;
+  iframeElement.src = `${N8N_URL}/workflow?integration=${window.customIntegrations.name}`;
 
   iframeContainer.appendChild(iframeOverlay);
   iframeContainer.appendChild(iframeElement);
