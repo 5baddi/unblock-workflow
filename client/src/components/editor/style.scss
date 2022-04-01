@@ -179,11 +179,11 @@
 }
 
 #custom-integration-iframe-overlay {
-  height: 3000%;
-  width: 3000%;
   position: absolute;
-  top: -50vh;
-  left: -50vw;
+  height: 100vh;
+  width: 100vw;
+  top: calc(350px - 50vh);
+  left: calc(450px - 50vh);
   background: #0000000d;
   z-index: -1;
 }
