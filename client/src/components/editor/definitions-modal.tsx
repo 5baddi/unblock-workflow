@@ -200,6 +200,11 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
             return;
         }
 
+        let parsedParams = Object.assign({}, JSON.parse(JSON.stringify(params)));
+        if (typeof parsedParams !== "undefined" && typeof parsedParams.row !== "undefined" && typeof parsedParams.row.name !== "undefined" && parsedParams.row.name == name) {
+            return;
+        }
+
         API.put(`${PUBLIC_URL}/api/definitions/${definitionId}/${getTenantId(user)}`, { name })
             .then(() => Promise.resolve())
             .catch(error => {
