@@ -183,7 +183,9 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
                         this.setSelectionModel(newSelectionModel);
                     }}
                     selectionModel={this.state.selectionModel}
-                    onCellEditCommit={(params: GridCellEditCommitParams) => {this.updateDefinition(params, this.props.user)}}
+                    onCellEditCommit={(params: GridCellEditCommitParams) => {
+                        this.updateDefinition(params, this.props.user);
+                    }}
                 />
             </div>
         );
@@ -191,9 +193,8 @@ class DefinitionsModal extends React.Component<IEditorDefinitionsModalProps, IEd
 
     private updateDefinition(params: GridCellEditCommitParams, user?: User): void
     {
-        let rowParams = Object.assign({}, JSON.parse(JSON.stringify(params)));
-        let definitionId = rowParams.row._id || undefined;
-        let name = rowParams.value || undefined;
+        let definitionId = params.id || undefined;
+        let name = params.value || undefined;
 
         if (typeof definitionId === "undefined" || typeof name === "undefined") {
             return;
