@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "rssRead";
+    const BLOCK_NAME = "rssFeedRead";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

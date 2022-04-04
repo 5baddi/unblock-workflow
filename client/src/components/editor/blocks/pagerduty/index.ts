@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "pagerduty";
+    const BLOCK_NAME = "pagerDuty";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

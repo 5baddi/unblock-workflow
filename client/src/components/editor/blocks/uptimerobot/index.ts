@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "uptimerobot";
+    const BLOCK_NAME = "uptimeRobot";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

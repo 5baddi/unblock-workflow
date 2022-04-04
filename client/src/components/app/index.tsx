@@ -29,23 +29,23 @@ const settings = {
 };
 
 const App = ({ classes }) => {
-    const { isAuthenticated }: { isAuthenticated: boolean } = useAuth();
-    const user = useAuthUser();
+    // const { isAuthenticated }: { isAuthenticated: boolean } = useAuth();
+    // const user = useAuthUser();
 
-    if (isAuthenticated) {
-        API.interceptors.request.use(function (config) {
-            const token = user.accessToken;
-            config.headers =  {'Authorization': `Bearer ${token}`};
+    // if (isAuthenticated) {
+    //     API.interceptors.request.use(function (config) {
+    //         const token = user.accessToken;
+    //         config.headers =  {'Authorization': `Bearer ${token}`};
 
-            return config;
-        });
-    }
+    //         return config;
+    //     });
+    // }
 
     let defaultApp = (
         <React.Fragment>
             <CssBaseline/>
             <main className={classes.main}>
-                {isAuthenticated && (
+                {true && (
                         <Routes>
                             <Route path="/run/:id/:tenantId" element={<ChatRunner />} />
                             <Route path="/preview/:id/:tenantId" element={<ChatPreview />} />
@@ -62,7 +62,7 @@ const App = ({ classes }) => {
             <React.Fragment>
                 <CssBaseline/>
                 <main className={classes.main}>
-                    {isAuthenticated && (
+                    {true && (
                         <Routes>
                             <Route path="/run/:id" element={<ChatRunner />} />
                             <Route path="/preview/:id" element={<ChatPreview />} />

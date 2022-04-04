@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "mondaycom";
+    const BLOCK_NAME = "mondayCom";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

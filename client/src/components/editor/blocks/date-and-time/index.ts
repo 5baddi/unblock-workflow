@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "dateAndTime";
+    const BLOCK_NAME = "dateTime";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

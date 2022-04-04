@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "erpnext";
+    const BLOCK_NAME = "erpNext";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

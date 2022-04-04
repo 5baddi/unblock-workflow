@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "posthog";
+    const BLOCK_NAME = "postHog";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

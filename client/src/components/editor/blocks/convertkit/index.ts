@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "convertkit";
+    const BLOCK_NAME = "convertKit";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({

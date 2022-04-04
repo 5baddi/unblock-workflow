@@ -1,7 +1,7 @@
 import { CustomIntegrationBlock } from "../../integrations";
 import { Node, tripetto } from "tripetto";
 
-    const BLOCK_NAME = "quickBase";
+    const BLOCK_NAME = "quickbase";
     const BLOCK_VERSION = "0.0.1";
     
     @tripetto({
