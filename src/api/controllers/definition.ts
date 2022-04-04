@@ -54,7 +54,7 @@ function find(request, response)
     let id = request.params.id;
     let tenantId = request.params.tenantId;
     if (! id) {
-        response.status(401)
+        response.status(400)
             .send({
                 success: false,
                 message: "Bad request!",
@@ -76,7 +76,7 @@ function find(request, response)
                     if (! result === null) {
                         client.close();
 
-                        return response.status(401).send({
+                        return response.status(400).send({
                             success: false,
                             message: "failed to find definition",
                         });
@@ -104,7 +104,7 @@ async function findForRunner(request, response)
     let id = request.params.id;
     let tenantId = request.params.tenantId;
     if (! id) {
-        return response.status(401)
+        return response.status(400)
             .send({
                 success: false,
                 message: "Bad request!",
@@ -126,7 +126,7 @@ async function findForRunner(request, response)
                     if (! result === null) {
                         client.close();
 
-                        return response.status(401).send({
+                        return response.status(400).send({
                             success: false,
                             message: "failed to find definition",
                         });
@@ -156,7 +156,7 @@ function save(request, response)
     let tenantId = request.params.tenantId;
     let body = request.body;
     if (! body.definition) {
-        response.status(401)
+        response.status(400)
             .send({
                 success: false,
                 message: "Definition is required!",
@@ -178,7 +178,7 @@ function hash(request, response)
     let id = request.params.id;
     let tenantId = request.params.tenantId;
     if (! id) {
-        return response.status(401)
+        return response.status(400)
             .send({
                 success: false,
                 message: "Bad request!",
@@ -201,7 +201,7 @@ function hash(request, response)
                     if (! result.ok) {
                         client.close();
 
-                        return response.status(401).send({
+                        return response.status(400).send({
                             success: false,
                             message: "failed to find definition",
                         });
@@ -229,7 +229,7 @@ function updateName(request, response)
     let name = request.body.name;
 
     if (! id || ! name) {
-        return response.status(401)
+        return response.status(400)
             .send({
                 success: false,
                 message: "Bad request!",
@@ -251,7 +251,7 @@ function updateName(request, response)
                     if (! result === null) {
                         client.close();
 
-                        return response.status(401).send({
+                        return response.status(400).send({
                             success: false,
                             message: "failed to find definition",
                         });
@@ -282,7 +282,7 @@ function remove(request, response)
     let id = request.params.id;
     let tenantId = request.params.tenantId;
     if (! id) {
-        response.status(401)
+        response.status(400)
             .send({
                 success: false,
                 message: "Bad request!",
@@ -304,7 +304,7 @@ function remove(request, response)
                     if (! result.ok) {
                         client.close();
 
-                        return response.status(401).send({
+                        return response.status(400).send({
                             success: false,
                             message: "failed to delete definition",
                         });
@@ -331,7 +331,7 @@ function bulkRemove(request, response)
     let body = request.body;
     let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
     if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
-        response.status(401)
+        response.status(400)
             .send({
                 success: false,
                 message: "Bad request!",
@@ -358,7 +358,7 @@ function bulkRemove(request, response)
                     if (! result.ok) {
                         client.close();
 
-                        return response.status(401).send({
+                        return response.status(400).send({
                             success: false,
                             message: "failed to delete definitions",
                         });
@@ -385,7 +385,7 @@ function bulkExport(request, response)
     let body = request.body;
     let definitionsIds: string[] = Object.assign({} as string[], JSON.parse(JSON.stringify(body.definitionsIds)));
     if (typeof definitionsIds === "undefined" || definitionsIds.length === 0) {
-        response.status(401)
+        response.status(400)
             .send({
                 success: false,
                 message: "Bad request!",
