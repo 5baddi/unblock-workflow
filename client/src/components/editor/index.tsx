@@ -13,12 +13,12 @@ import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
 import { popup, error as errorPopup, apiError, confirm as confirmPopup} from "./dialog";
+import { Glue42Web } from "@glue42/web";
+import { initCustomIntegrations } from "./integrations";
 
 import "./blocks";
 
 import "./style.scss";
-import { Glue42Web } from "@glue42/web";
-import { initCustomIntegrations } from "./integrations";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {

@@ -10,3 +10,17 @@ export const DEFAULT_OPTIONS = [
         value: '-1',
     }
 ]
+
+export const SELECT_OPTION = [
+    {
+        label: 'Select a workflow',
+        value: '-1',
+    }
+]
+
+export const NO_OPTION_FOUND = [
+    {
+        label: 'Select a workflow',
+        value: '-1',
+    }
+]

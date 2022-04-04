@@ -2,9 +2,10 @@ import { TOption } from "@marblecore/ui-form-dropdown/lib/option";
 import { NodeBlock, tripetto, editor, Forms, definition } from "tripetto";
 import API from "../../../../../api";
 import { IProcessTaskOptionInterface } from "../interfaces";
-import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS } from "../constants";
+import { BLOCK_NAME, BLOCK_ICON, BLOCK_VERSION, BLOCK_LABEL, DEFAULT_OPTIONS, SELECT_OPTION, NO_OPTION_FOUND } from "../constants";
 import { USER_ID_KEY, USER_TENANT_ID_KEY } from "../../../../../global";
 import { ENV } from "../../../../../settings";
+import { IDefinition } from "../../../../../interfaces/index";
 
 @tripetto({
     type: "node",
@@ -20,10 +21,8 @@ import { ENV } from "../../../../../settings";
 })
 export class ProcessTask extends NodeBlock
 {
-    private options?: Array<TOption<IProcessTaskOptionInterface>>;
-
     @definition("string", "required", "rw")
-    definitionId: string = "";
+    definitionId: string = "-1";
 
     @definition("boolean")
     sendable: boolean = false;
@@ -46,35 +45,42 @@ export class ProcessTask extends NodeBlock
         }
 
         this.dropdown?.disabled(true);
-        this.dropdown?.options(DEFAULT_OPTIONS)
+        this.dropdown?.options([...DEFAULT_OPTIONS]);
         this.dropdown?.await();
 
         API.get(endpoint)
             .then(response => {
                 if (! response.data || ! response.data.definitions || ! Array.isArray(response.data.definitions)) {
-                    this.dropdown?.options([]);
+                    this.dropdown?.options([...NO_OPTION_FOUND]);
+                    this.dropdown?.select("-1");
                 }
 
-                let definitions = response.data.definitions.filter(definition => {
-                    if (! definition._id || ! definition.name) {
-                        return false;
-                    }
+                this.dropdown?.options([]);
 
-                    return true;
-                });
+                let definitions: [] = response.data.definitions
+                    .filter((definition: IDefinition) => {
+                        if (! definition._id || ! definition.name) {
+                            return false;
+                        }
 
-                this.options = definitions.map(definition => {
-                    return {
-                        value: <string> definition._id,
-                        label: <string> definition.name
-                    };
-                });
+                        return true;
+                    })
+                    .map((definition: IDefinition) => {
+                        return {
+                            value: <string> definition._id,
+                            label: <string> definition.name
+                        };
+                    });
 
-                this.dropdown?.options(this.options ?? DEFAULT_OPTIONS);
-                this.dropdown?.select(this.definitionId);
+                let _options = [...NO_OPTION_FOUND];
+                if (definitions.length > 0) {
+                    _options = [...SELECT_OPTION];
+                    _options.push(...definitions ?? []);
 
-                if (! Array.isArray(this.options) || this.options.length === 0) {
-                    this.dropdown?.options(DEFAULT_OPTIONS);
+                    this.dropdown?.options(_options as Array<TOption<IProcessTaskOptionInterface>>);
+                    this.dropdown?.select(this.definitionId);
+                } else {
+                    this.dropdown?.select("-1");
                 }
 
                 if (typeof this.dropdown !== "undefined") {
@@ -92,7 +98,8 @@ export class ProcessTask extends NodeBlock
                     this.dropdown.isAwaiting = false;
                 }
 
-                this.dropdown?.options(DEFAULT_OPTIONS);
+                this.dropdown?.options([...NO_OPTION_FOUND]);
+                this.dropdown?.select("-1");
                 this.dropdown?.disabled(false);
             });
     }
@@ -125,7 +132,8 @@ export class ProcessTask extends NodeBlock
                 controls: [
                     new Forms.Checkbox("Send the workflow as request to an Unblocker", Forms.Checkbox.bind(this, "sendable", false))
                 ]
-            }
+            },
+            activated: (this.sendable === true)
         });
     }
 }

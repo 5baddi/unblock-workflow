@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { DEFAULT_MONGODB_DATABASE, DEFINITION_COLLECTION_NAME } from '../../settings';
 import { IDefinition } from "../../interfaces/definition";
 import { connect } from "../../services/mongodb";
-import { loadSubDefinitions, loadSubBranches, saveDefinition } from "../../services/definition";
+import { loadSubDefinitions, saveDefinition } from "../../services/definition";
 import { generateHash } from "../../helpers";
 
 function index(request, response) 
@@ -133,12 +133,11 @@ async function findForRunner(request, response)
                     }
 
                     let definition = Object.assign({} as IDefinition, result);
-                    // let _definition: IDefinition = await loadSubDefinitions(db, definition);
-                    // _definition = await loadSubBranches(db, definition);
+                    let _definition: IDefinition = await loadSubDefinitions(db, definition);
 
                     client.close();
 
-                    return response.send({ success: true, definition });
+                    return response.send({ success: true, definition: _definition });
                 })
                 .catch(error => {
                     client.close();

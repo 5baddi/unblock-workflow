@@ -1,8 +1,8 @@
-import { IDefinition as TripettoIDefinition } from "tripetto";
 import { IBuilderProperties } from "tripetto";
 import { IEntity } from "./entity";
+import { ICluster, IBuilder, IPrologue, IEpilogue } from '@tripetto/map';
 
-export interface IDefinition extends TripettoIDefinition, IEntity
+export interface IDefinition extends IEntity
 {
     name?: string;
     slug?: string;
@@ -12,6 +12,26 @@ export interface IDefinition extends TripettoIDefinition, IEntity
     hash?: string;
     tenant_id?: string;
     tenants_ids?: Array<string>;
+
+    /** Contains the clusters. */
+    clusters: ICluster[];
+    /** Contains information about the builder. */
+    builder: IBuilder;
+    /** Contains the map description. */
+    description?: string;
+    /** Contains the map keywords. */
+    keywords?: string[];
+    /** Contains the language of the map. */
+    language?: string;
+    /** Contains the prologue for the map. */
+    prologue?: IPrologue;
+    /** Contains the epilogue for the map. */
+    epilogue?: IEpilogue;
+    /**
+     * Contains the preface for the map.
+     * @deprecated
+     */
+    preface?: IPrologue;
 }
 
 export interface IEditorProperties extends IBuilderProperties {}

@@ -34,210 +34,87 @@ async function loadSubDefinition(db: Db, definitionId: string): Promise<IDefinit
 
     return subDefinition;
 }
-
-async function loadSubDefinitions(db: Db, definition: IDefinition, newIndexs: number = 0): Promise<IDefinition>
+    
+async function loadSubClusters(db: Db, clusters: ICluster[]): Promise<ICluster[]>
 {
-    // TODO: Undo after fix blocks order issue
-    return Promise.resolve(definition);
-
-    if (! Array.isArray(definition.clusters)) {
-        return Promise.resolve(definition);
-    }
-
     await Promise.all(
-        await definition.clusters.map(async(cluster, clusterIndex) => {
-            let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
+        await clusters.map(async(cluster, clusterIndex) => {
+            cluster = await loadClusterSubBranches(db, cluster);
+
+            let _cluster = JSON.parse(JSON.stringify(cluster));
 
             await Promise.all(
                 await (cluster.nodes ?? []).map(async(node, nodeIndex) => {
-                    if (! isProcessTaskBlock(node)) {
+                    if (! isProcessTaskBlock(node) || (typeof _cluster.nodes[nodeIndex].fetched === "boolean" && _cluster.nodes[nodeIndex].fetched === true)) {
                         return;
                     }
 
-                    if (Array.isArray(cluster.nodes)) {
-                        _cluster.nodes[nodeIndex].fetched = true;
-                    }
+                    _cluster.nodes[nodeIndex].fetched = true;
+                    clusters[clusterIndex] = _cluster as ICluster;
 
                     let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block?.definitionId);
                     if (typeof subDefinition === "undefined") {
                         return;
                     }
 
-                    newIndexs += subDefinition.clusters?.length || 0;
+                    await Promise.all(
+                        await (subDefinition.clusters ?? []).map(async(subCluter, index) => {
+                            let _index = clusterIndex + index;
 
-                    subDefinition.clusters?.forEach(subCluter => {
-                        definition.clusters.splice((newIndexs + clusterIndex + 1), 0, subCluter);
-                    });
+                            let _clusters = await loadSubClusters(db, [subCluter]);
+
+                            await Promise.all(
+                                await (_clusters ?? []).map(async(_subCluster, index) => {
+
+                                    _subCluster = await loadClusterSubBranches(db, _subCluster);
+                                    clusters.splice((_index + index) + 1, 0, _subCluster);
+                                })
+                            );
+                        })
+                    );
                 }),
             );
-
-            definition.clusters[clusterIndex] = _cluster;
         })
     );
 
-    let processTaskBlocks = getDefinitionNodes(definition, undefined, "process-task");
-    let unfetched = (processTaskBlocks ?? []).filter(node => { return node.fetched === false; });
-
-    if (Array.isArray(unfetched) && unfetched.length > 0) {
-        return loadSubDefinitions(db, definition, newIndexs);
-    }
-
-    return Promise.resolve(definition);
+    return clusters;
 }
 
-async function loadSubBranches(db: Db, definition: IDefinition, newIndexs: number = 0): Promise<IDefinition>
+async function loadClusterSubBranches(db: Db, cluster: ICluster): Promise<ICluster>
+{
+    await Promise.all(
+        await (cluster.branches ?? []).map(async(branch, branchIndex) => {
+            if (typeof branch.fetched === "boolean" && branch.fetched === true) {
+                return;
+            }
+
+            let _branch = JSON.parse(JSON.stringify(branch));
+            _branch.fetched = true;
+
+            let _clusters = await loadSubClusters(db, branch.clusters || []);
+
+            if (Array.isArray(_clusters) && _clusters.length > 0) {
+                _branch.clusters = _clusters as ICluster[];
+            }
+
+            if (Array.isArray(cluster.branches) && cluster.branches.length > 0) {
+                cluster.branches[branchIndex] = _branch as IBranch;
+            }
+        }),
+    );
+
+    return cluster;
+}
+
+async function loadSubDefinitions(db: Db, definition: IDefinition): Promise<IDefinition>
 {
     if (! Array.isArray(definition.clusters)) {
         return Promise.resolve(definition);
     }
 
-    // await Promise.all(
-    //     await definition.clusters.map(async(cluster, clusterIndex) => {
-    //         let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
-
-    //         await Promise.all(
-    //             await (cluster.nodes ?? []).map(async(node, nodeIndex) => {
-    //                 if (! isProcessTaskBlock(node)) {
-    //                     return;
-    //                 }
-
-    //                 if (Array.isArray(cluster.nodes)) {
-    //                     _cluster.nodes[nodeIndex].fetched = true;
-    //                 }
-
-    //                 let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block?.definitionId);
-    //                 if (typeof subDefinition === "undefined") {
-    //                     return;
-    //                 }
-
-    //                 newIndexs += subDefinition.clusters?.length || 0;
-
-    //                 subDefinition.clusters?.forEach(subCluter => {
-    //                     definition.clusters.splice((newIndexs + clusterIndex + 1), 0, subCluter);
-    //                 });
-    //             }),
-    //         );
-
-    //         definition.clusters[clusterIndex] = _cluster;
-    //     })
-    // );
-
-    // let processTaskBlocks = getDefinitionNodes(definition, undefined, "process-task", true);
-    // let unfetched = (processTaskBlocks ?? []).filter(node => { return node.fetched === false; });
-
-    // if (Array.isArray(unfetched) && unfetched.length > 0) {
-    //     return loadSubDefinitions(db, definition, newIndexs);
-    // }
+    definition.clusters = await loadSubClusters(db, definition.clusters);
 
     return Promise.resolve(definition);
-}
-
-async function loadSubClusters(db: Db, definition: IDefinition, cluster: ICluster): Promise<IDefinition>
-{
-    let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
-
-    if (typeof _cluster.nodes !== "undefined" && _cluster.nodes.length > 0) {
-        await Promise.all(await _cluster.nodes.map(async(node, index) => {
-            if (! isProcessTaskBlock(node)) {
-                return;
-            }
-
-            let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block.definitionId);
-            if (typeof subDefinition === "undefined") {
-                return;
-            }
-
-            let _index = index;
-
-            await Promise.all(await subDefinition.clusters.map(async(subCluster) => {
-                if (Array.isArray(subCluster.branches)) {
-                    if (! Array.isArray(_cluster.branches)) {
-                        _cluster.branches = [];
-                    }
-
-                    _cluster.branches = _cluster.branches.concat(subCluster.branches);
-                }
-
-                let _loadedSubCluster = await loadSubNodes(db, subCluster);
-                if (typeof _loadedSubCluster !== "undefined") {
-                    (_loadedSubCluster.nodes ?? []).forEach(node => {
-                        ++_index;
-
-                        _cluster.nodes.push(_index, node);
-                    });
-
-                    // let _loadedCluster = JSON.parse(JSON.stringify(_loadedSubCluster));
-                    // if (! Array.isArray(_loadedCluster.branches)) {
-                    //     _loadedCluster.branches = [];
-                    // }
-
-                    // await Promise.all(await (_loadedCluster.branches ?? []).map(async(branche, index) => {
-                    //     await Promise.all((branche.clusters ?? []).map(async(subCluster, clusterIndex) => {
-                    //         let _loadedSubCluster = await loadSubClusters(db, subCluster);
-
-                    //         branche.clusters[clusterIndex] = _loadedSubCluster;
-                    //     }));
-        
-                    //     _loadedCluster.branches[index] = branche;
-                    // }));
-
-                    // if (Array.isArray(_loadedCluster.branches)) {
-                    //     if (! Array.isArray(_cluster.branches)) {
-                    //         _cluster.branches = [];
-                    //     }
-
-                    //     _cluster.branches?.push(..._loadedCluster.branches ?? []);
-                    // }
-                }
-            }));
-        }));
-    }
-
-    definition.clusters.forEach((cluster, index) => {
-        if (cluster.id === _cluster.id) {
-            definition.clusters[index] = _cluster as ICluster;
-        }
-    });
-
-    return definition;
-}
-
-async function loadSubNodes(db: Db, cluster: ICluster): Promise<ICluster>
-{
-    let _cluster = Object.assign({}, JSON.parse(JSON.stringify(cluster)));
-
-    if (typeof _cluster.nodes !== "undefined" && _cluster.nodes.length > 0) {
-        await Promise.all(
-            await _cluster.nodes.map(async(node, index) => {
-                if (! isProcessTaskBlock(node)) {
-                    return;
-                }
-    
-                let subDefinition: IDefinition | undefined = await loadSubDefinition(db, <string> node.block.definitionId);
-                if (typeof subDefinition === "undefined") {
-                    return;
-                }
-
-                let _index = index;
-    
-                await Promise.all(
-                    await subDefinition.clusters.map(async (subCluster) => {        
-                        let _subCluster = await loadSubNodes(db, subCluster);
-
-                        if (typeof _subCluster !== "undefined") {
-                            (_subCluster.nodes ?? []).forEach(node => {
-                                ++_index;
-        
-                                _cluster.nodes?.splice(_index, 0, node);
-                            });
-                        }
-                    })
-                );
-            })
-        );
-    }
-
-    return _cluster as ICluster;
 }
 
 function getNodesDiffNames(existsNode: INode, newNode: INode): { existsName: string, newName: string }
@@ -286,13 +163,15 @@ async function saveDefinition(tenantDB, definition, request, response?)
             if (query.existDefinition !== null && typeof query.existDefinition.slug !== "undefined" && typeof query.definition.slug !== "undefined") {
                 try {
                     let existsCollection = await query.db.listCollections({name: `${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`}).toArray();
+                    let existsNewCollection = await query.db.listCollections({name: `${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`}).toArray();
+
                     if (! Array.isArray(existsCollection) || existsCollection.length === 0) {
                         await query.db.createCollection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
 
                         return query;
                     }
                     
-                    if (query.existDefinition.slug !== query.definition.slug) {
+                    if (query.existDefinition.slug !== query.definition.slug && ! Array.isArray(existsNewCollection) || existsNewCollection.length === 0) {
                         await query.db.collection(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.existDefinition.slug.toLocaleLowerCase()}`)
                             .rename(`${NORMALIZED_RESPONSE_COLLECTION_NAME}${query.definition.slug.toLocaleLowerCase()}`);
                     }
@@ -346,7 +225,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
                     }
 
                     if (typeof response !== "undefined") {
-                        return response.status(401)
+                        return response.status(400)
                             .send({
                                 success: false,
                                 message: error.message || "failed to take snapshot of definition",
@@ -374,7 +253,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
                     query.db.collection(SNAPSHOT_COLLECTION_NAME).insertOne(JSON.parse(JSON.stringify(snapshot)));
                 } catch(error) {
                     if (typeof response !== "undefined") {
-                        return response.status(401)
+                        return response.status(400)
                             .send({
                                 success: false,
                                 message: error.message || "failed to take snapshot of definition",
@@ -406,7 +285,7 @@ async function saveDefinition(tenantDB, definition, request, response?)
                     }
 
                     if (typeof response !== "undefined") {
-                        return response.status(401)
+                        return response.status(400)
                             .send({
                                 success: false,
                                 message: error.message || "failed to take snapshot of definition",
@@ -554,7 +433,6 @@ function getClusterNodes(cluster: ICluster, id?: string, type?: string, onlyBran
 
 export {
     loadSubDefinitions,
-    loadSubBranches,
     checkDefinitionVersion,
     saveDefinition,
     getDefinitionNodes,
