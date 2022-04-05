@@ -13,12 +13,12 @@ import Loader from "../loader";
 import { parseDefinition, saveDefinition, loadDefinitionById, exportDefinitionAsJsonFile } from "../../services/definition";
 import { mergeProperties } from "../../services/builder";
 import { popup, error as errorPopup, apiError, confirm as confirmPopup} from "./dialog";
-import { Glue42Web } from "@glue42/web";
-import { initCustomIntegrations } from "./integrations";
 
 import "./blocks";
 
 import "./style.scss";
+import { Glue42Web } from "@glue42/web";
+import { closeIntegrationPopup, declareDefinitionAsLoaded, initCustomIntegrations } from "./integrations";
 
 class Editor extends React.Component<IEditorProps, IEditorState>
 {
@@ -138,14 +138,22 @@ class Editor extends React.Component<IEditorProps, IEditorState>
 
     componentDidMount()
     {
+        try {
+            initCustomIntegrations();
+
+            if(!this.state?.definition?._id) {
+                declareDefinitionAsLoaded();
+            }
+        } catch (err) {
+            console.error('error while initializing integrations', err);
+        }
+
         this.isMounted = true;
         this.isMounted && this.open();
 
         window.addEventListener("resize", this.onResize);
         window.addEventListener("orientationchange",  this.onResize);
         window.addEventListener("beforeunload", this.beforeUnload);
-
-        initCustomIntegrations();
 
         // accept notification handler
         if(this.props.glue) {
@@ -346,6 +354,12 @@ class Editor extends React.Component<IEditorProps, IEditorState>
         // Prevent dispatch on change & save hook
         this.editor.onChange = () => {};
         this.editor.onSave = () => {};
+        
+        closeIntegrationPopup();
+        initCustomIntegrations();
+        if(!this.state?.definition?._id) {
+            declareDefinitionAsLoaded();
+        }
 
         this.editor.open(definition);
         this.editor.onReady = () => this.ready();
@@ -414,7 +428,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             return;
         }
 
-        this.editor.onChange = (definition: TripettoDefinition) => (! this.props.manualSaving ? this.onChange(definition) : this.onChangeSnapshot(definition));
+        this.editor.onChange = (definition: TripettoDefinition) => {
+            declareDefinitionAsLoaded();
+
+            !this.props.manualSaving ?
+                this.onChange(definition) :
+                this.onChangeSnapshot(definition);
+        };
         this.editor.onClose = () => this.onClose();
 
         this.setState({ isLoading: false });
@@ -447,11 +467,13 @@ class Editor extends React.Component<IEditorProps, IEditorState>
             if (ENV === "development") {
                 console.log("definition has been changed", submittedDefinition);
             }
+
+            declareDefinitionAsLoaded();
     
             if (typeof this.props.manualSaving === "boolean" && this.props.manualSaving === true) {
                 this.setState({ isSaving: true });
             }
-    
+            
             let currentDefinition = this.getDefinition();
             let definition = parseDefinition(submittedDefinition, currentDefinition, this.props.user);
 

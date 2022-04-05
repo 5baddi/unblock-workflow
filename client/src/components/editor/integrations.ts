@@ -7,6 +7,7 @@ declare global {
     customIntegrations: {
       name: string;
       integrationIframeContainer: HTMLDivElement | null;
+      finishedLoadingDefinition: boolean;
     };
   }
 }
@@ -15,11 +16,11 @@ export const initCustomIntegrations = (): void => {
   window.customIntegrations = {
     name: "",
     integrationIframeContainer: null,
+    finishedLoadingDefinition: false,
   };
 
   window.addEventListener('message', ({data}) => {
-    data = JSON.parse(data);
-    if (data.command === 'closeIntegration') {
+    if ('command' in data && data.command === 'closeIntegration') {
       closeIntegrationPopup();
     }
   });
@@ -35,6 +36,18 @@ export const getCurrentCustomIntegration = (): string => {
 
 export const isCustomIntegrationsPopupOpen = (): boolean => {
   return window.customIntegrations.integrationIframeContainer instanceof HTMLDivElement;
+};
+
+export const declareDefinitionAsLoaded = (): void => {
+  window.customIntegrations.finishedLoadingDefinition = true;
+};
+
+export const declareDefinitionAsStillLoading = (): void => {
+  window.customIntegrations.finishedLoadingDefinition = false;
+};
+
+export const isDefinitionStillLoading = (): boolean => {
+  return window.customIntegrations.finishedLoadingDefinition === false;
 };
 
 export const openIntegrationPopup = (): void => {
@@ -86,6 +99,10 @@ export class CustomIntegrationBlock extends NodeBlock {
 
   assignedToNode(pPrevious?: NodeBlock) {
     return () => {
+      if(isDefinitionStillLoading()) {
+        return;
+      }
+
       setCurrentCustomIntegration(this.BLOCK_NAME);
       openIntegrationPopup();
     };
