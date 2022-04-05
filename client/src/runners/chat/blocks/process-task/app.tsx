@@ -76,10 +76,13 @@ export default function App (props: { process: IProcessTaskField, onSubmit?: (()
 
             if (typeof definition !== "undefined" && typeof instance !== "undefined") {
                 let exportables = Export.exportables(instance);
-                let data = { fields: exportables.fields, unblockerId: props.user?.id, unblockerTenantId: props.user?.tenantId };
                 let fields = exportables.fields;
 
-                await API.post(`${PUBLIC_URL}/api/webhooks/runner/${definition._id}/${getTenantId()}`, { fields: exportables.fields });
+                fields = fields.filter((field) => typeof field.value !== "undefined" && field.value !== "" );
+
+                let data = { fields, unblockerId: props.user?.id, unblockerTenantId: props.user?.tenantId };
+
+                await API.post(`${PUBLIC_URL}/api/webhooks/runner/${definition._id}/${getTenantId()}`, { fields });
                 let result = await API.post(`${PUBLIC_URL}/api/result/${definition._id}/${getTenantId()}`, data);
                 if (result && typeof result.data !== "undefined" && typeof result.data.fields !== "undefined") {
                     fields = result.data.fields;
