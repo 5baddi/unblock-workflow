@@ -212,11 +212,13 @@ function save(request, response)
                                         client.close();
 
                                         let parsedFields = (_response.fields ?? []).map((field: IExportableField) => {
+                                            let _field = JSON.parse(JSON.stringify(field));
+
                                             if (isFileUpload(field)) {
-                                                delete field.reference;
+                                                delete _field.reference;
                                             }
 
-                                            return field;
+                                            return _field as IExportableField;
                                         });
 
                                         _response.fields = parsedFields;
@@ -226,7 +228,7 @@ function save(request, response)
                                                 .post(RESULT_WEBHOOK)
                                                 .send(_response)
                                                 .then((webhookResult) => {
-                                                    return response.send({ success: true });;
+                                                    return response.send({ success: true, fields: parsedFields });;
                                                 });
                                         }
         

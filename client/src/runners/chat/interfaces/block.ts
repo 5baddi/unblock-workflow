@@ -5,6 +5,7 @@ import { IRunnerAttachments, TRunnerViews } from "tripetto-runner-react-hook";
 import { Glue42 } from "@glue42/desktop";
 import { Glue42Web } from "@glue42/web";
 import { User } from "@frontegg/redux-store";
+import { IChatController } from "../hooks/controller";
 
 export interface IChatRenderProps {
     readonly id: string;
@@ -30,6 +31,7 @@ export interface IChatRenderProps {
     readonly markdownifyToString: (md: string) => string;
     readonly user?: User;
     readonly glue?: Glue42Web.API | Glue42.Glue;
+    readonly controller?: [IChatController | undefined];
 }
 
 export interface IChatRendering extends NodeBlock {

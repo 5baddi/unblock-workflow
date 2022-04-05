@@ -10,7 +10,7 @@ import { PUBLIC_URL } from "../../../../src/settings";
 import { IChatStyles } from "../../runners/chat/interfaces/styles";
 import Loader from "../loader";
 import { ENV } from "../../settings";
-import { APPS_GROUP_ID } from "../../global";
+import { APPS_GROUP_ID } from '../../global';
 import { Glue42Workspaces } from "@glue42/workspaces-api";
 
 import "./style.scss";

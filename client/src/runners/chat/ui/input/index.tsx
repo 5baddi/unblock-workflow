@@ -6,6 +6,7 @@ import { RadiobuttonElement } from "tripetto-runner-fabric/components/radiobutto
 import { Glue42 } from "@glue42/desktop";
 import { Glue42Web } from "@glue42/web";
 import { User } from "@frontegg/redux-store";
+import { IChatController } from "../../hooks/controller";
 
 export const InputElement = styled.div<{
     props: {
@@ -44,6 +45,7 @@ export const Input = (props: {
     readonly children?: React.ReactNode;
     readonly user?: User;
     readonly glue?: Glue42Web.API | Glue42.Glue;
+    readonly controller?: [IChatController | undefined];
 }) => (
     <InputElement props={props} ref={props.focus} data-block={props.blockIdentifier}>
         { React.isValidElement(props.children) ? React.cloneElement(props.children, { glue: props.glue, user: props.user }) : props.children }

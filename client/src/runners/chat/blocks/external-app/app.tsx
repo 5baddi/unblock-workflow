@@ -9,12 +9,6 @@ import { ENV } from "../../../../settings";
 
 export default function App (props: { app: IExternalAppField, onSubmit?: (() => void) | undefined, onCancel?: (() => void) | undefined, readonly user?: User, readonly glue?: Glue42Web.API | Glue42.Glue })
 {
-    if (! props.glue) {
-        return (
-            <h4>Error - please skip or visit <a href="https://app.unblock.io">Unblock app</a></h4>
-        );
-    }
-
     React.useEffect(() => {
         try {
             initAppsGroup();

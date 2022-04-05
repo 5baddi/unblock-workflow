@@ -5,6 +5,7 @@ export const USER_ID_KEY = "user-id";
 export const USER_TENANT_ID_KEY = "user-tenant-id";
 export const APPS_LIST_KEY = "apps-list";
 export const APPS_GROUP_ID = "apps-group-id";
+export const PROCESS_TASK_RUNNER_APP_NAME = "workflowRunnerProcessTaskApp";
 
 export const DEFINITION_KEY = "definition";
 export const DEFINITION_ID_KEY = "definition-id";
