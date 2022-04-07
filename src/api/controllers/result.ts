@@ -11,7 +11,7 @@ import { isPictureChoice } from "../../helpers/picture-choice";
 import { isCheckboxes } from "../../helpers/checkboxes";
 import { isMatrix } from "../../helpers/matrix";
 import { isFileUpload } from "../../helpers/file-upload";
-import { getFieldAlias, getFieldType } from "../../helpers/field";
+import { getFieldAlias, getFieldType, getFieldDataType } from "../../helpers/field";
 
 function save(request, response)
 {
@@ -113,6 +113,7 @@ function save(request, response)
                                     data.name = node.name || field.name || '';
                                     data.alias = getFieldAlias(node, field);
                                     data.type = getFieldType(node, field);
+                                    data.datatype = getFieldDataType(node, field);
                                 }
                             }
 

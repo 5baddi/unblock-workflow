@@ -26,3 +26,14 @@ export function getFieldType(node: INode, field: IExportableField): string
 
     return type;
 }
+
+export function getFieldDataType(node: INode, field: IExportableField): string
+{
+    let type: string = field.datatype;
+
+    if (isDate(field) && typeof node?.block?.time === "boolean" && node?.block?.time === true) {
+        type = "datetime";
+    }
+
+    return type;
+}
