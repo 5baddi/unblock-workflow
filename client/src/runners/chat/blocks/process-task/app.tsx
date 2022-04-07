@@ -82,11 +82,12 @@ export default function App (props: { process: IProcessTaskField, onSubmit?: (()
 
                 let data = { fields, unblockerId: props.user?.id, unblockerTenantId: props.user?.tenantId };
 
-                await API.post(`${PUBLIC_URL}/api/webhooks/runner/${definition._id}/${getTenantId()}`, { fields });
                 let result = await API.post(`${PUBLIC_URL}/api/result/${definition._id}/${getTenantId()}`, data);
                 if (result && typeof result.data !== "undefined" && typeof result.data.fields !== "undefined") {
                     fields = result.data.fields;
                 }
+
+                await API.post(`${PUBLIC_URL}/api/webhooks/runner/${definition._id}/${getTenantId()}`, { fields });
 
                 let query = "?";
                 (fields ?? []).forEach((field) => {
