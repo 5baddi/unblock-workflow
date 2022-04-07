@@ -78,7 +78,7 @@ export default function App (props: { process: IProcessTaskField, onSubmit?: (()
                 let exportables = Export.exportables(instance);
                 let fields = exportables.fields;
 
-                fields = fields.filter((field) => typeof field.value !== "undefined" && field.value !== "" );
+                fields = fields.filter((field) => typeof field.value !== "undefined" && field.value !== "" && typeof field.time === "number" );
 
                 let data = { fields, unblockerId: props.user?.id, unblockerTenantId: props.user?.tenantId };
 
